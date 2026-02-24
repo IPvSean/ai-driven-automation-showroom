@@ -1,4 +1,4 @@
-= Section 6 - Summary and Call to Actions
+= Section 7 - Summary and Call to Actions
 
 🎉 **Congratulations!** You have completed the {lab_name}!
 
@@ -8,7 +8,7 @@ image::thumbs-up.gif[thumbsup!, link="_images/thumbs-up.gif", window=blank]
 
 == What You Accomplished
 
-Throughout this lab, you experienced the power of AI-driven automation across two domains:
+Throughout this lab, you experienced the power of AI-driven automation across three domains:
 
 === Part 1: AIOps with Apache Remediation
 * Built an intelligent log enrichment workflow using Red Hat AI
@@ -19,6 +19,12 @@ Throughout this lab, you experienced the power of AI-driven automation across tw
 * Configured Splunk for network observability
 * Set up Event-Driven Ansible to respond to OSPF alerts
 * Used AI to generate network remediation playbooks for Cisco routers
+
+=== Part 3: Windows Automation
+* Detected Active Directory account creation events using Event-Driven Ansible
+* Automatically generated Mattermost tickets from Windows event payloads
+* Used AI to analyze Windows Firewall changes and enrich tickets with expert insights
+* Demonstrated platform-agnostic AIOps across Linux, network devices, and Windows
 
 == Summary of Job Templates
 
@@ -44,6 +50,11 @@ Glossary:
 | `⚙️ Build HTTPD Remediation Template` | JT that creates another JT to apply the AI-generated fix
 | `✅ Execute HTTPD Remediation` | JT for Final fix (launched manually)
 | `✅ Restore Apache` | JT that Restores Apache to a known-good config
+| `🪟 Simulate AD Account Creation` | JT creates a test AD user on Windows to trigger Event ID 4722
+| `🪟 Simulate Windows Firewall Toggle` | JT toggles Windows Firewall to generate firewall events
+| `Windows Events` | RB that watches Kafka queue for Windows security and firewall events
+| `📋 Windows: Create Mattermost Ticket` | JT creates a Mattermost ticket from Windows event data
+| `🤖 Windows AI: Analyze and Ticket` | JT queries AI to analyze a Windows event and creates an enriched ticket
 |===
 
 Now here is a walkthrough in the same chronological order:

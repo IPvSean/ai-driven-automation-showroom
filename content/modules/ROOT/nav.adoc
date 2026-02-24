@@ -5,4 +5,6 @@
 ** xref:module-02.adoc[3. Splunk]
 ** xref:module-03.adoc[4. Event Driven Ansible - Splunk Webhook Setup]
 ** xref:module-04.adoc[5. Network Workflow]
-* xref:module-05.adoc[6. Summary and Call to Actions]
+* Part 3: AIOps with Windows Automation
+** xref:module-06.adoc[6. Windows Events and AI-Driven Ticketing]
+* xref:module-05.adoc[7. Summary and Call to Actions]

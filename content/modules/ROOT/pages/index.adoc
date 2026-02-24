@@ -50,6 +50,8 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
 - Gitea for source control management of Ansible Playbooks
 - Ansible Automation Platform to run job templates and workflows
 - Mattermost for message notifications
+- A Windows Server with Active Directory for Windows event-driven automation
+- Winlogbeat on Windows forwarding events to Kafka
 
 [quote]
 💡 EDA (Event-Driven Ansible) is part of Ansible Automation Platform.  It is referred to separately sometimes depending on the workflow.  EDA uses rulebooks to monitor events, then executes specified job templates or workflows based on the event.  Think of it simply as inputs and outputs.  EDA is an automatic way for inputs into Ansible Automation Platform, where Automation controller / Automation execution is the output (running a job template or workflow).
@@ -58,11 +60,12 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
 
 === Workshop Duration
 
-This workshop consists of two independent parts:
+This workshop consists of three independent parts:
 
 - *Part 1: AIOps with Apache Remediation* - 30-40 minutes
-- *Part 2: Network Automation* - 50-60 minutes
-- *Total Workshop Time* - 80-100 minutes
+- *Part 2: Network Automation* - 30-40 minutes
+- *Part 3: Windows Automation* - 15-20 minutes
+- *Total Workshop Time* - ~90 minutes
 
 For each workshop, there are 4 parts:
 
