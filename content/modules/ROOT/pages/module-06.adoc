@@ -6,7 +6,7 @@
 In this section, you will explore how **Event-Driven Ansible (EDA)** can detect Windows events and automatically create enriched tickets. This demonstrates two scenarios:
 
 1. **AD Account Creation** -- When a new Active Directory account is created, EDA detects the event and creates a Mattermost ticket with details from the event payload.
-2. **Firewall Event with AI Enrichment** -- When a Windows Firewall change occurs, EDA detects the event, queries **Red Hat AI (Granite LLM)** to analyze the event, and creates an AI-enriched Mattermost ticket.
+2. **Firewall Event with AI Enrichment** -- When a Windows Firewall rule is added, EDA detects the event, queries **Red Hat AI (Granite LLM)** to analyze the event, and creates an AI-enriched Mattermost ticket.
 
 This use case follows the same AIOps pattern as Parts 1 and 2 but applies it to the Windows ecosystem, showing how event-driven automation is platform-agnostic.
 
@@ -30,23 +30,23 @@ In this scenario, we simulate an Active Directory administrator creating a new u
 3. Verify that the **Windows Events** activation is running
 
 [quote]
-💡 The Windows Events rulebook listens on the `windows-events` Kafka topic and matches two types of events: AD account creation (Event ID 4722) and firewall changes.
+The Windows Events rulebook listens on the `windows-events` Kafka topic and matches two types of events: AD account creation (Event ID 4722) and firewall changes.
 
 === Step 2: Simulate AD Account Creation
 
 1. Navigate to **Automation Controller** -> **Templates**
-2. Find and launch the **🪟 Simulate AD Account Creation** job template
+2. Find and launch the **Simulate AD Account Creation** job template
 3. Watch the job output -- it creates a test AD user on the Windows Server
 
 [quote]
-⚠️ This job template runs the `windows_create_ad_user.yml` playbook against the Windows Server using the `microsoft.ad.user` module.
+This job template runs the `windows_create_ad_user.yml` playbook against the Windows Server using the `microsoft.ad.user` module.
 
 === Step 3: Observe EDA Response
 
 1. Navigate to **Event-Driven Ansible** -> **Rulebook Activations** -> **Windows Events**
 2. Click on the **History** tab
 3. You should see a new event matching the **AD account enabled detected** rule
-4. EDA automatically launches the **📋 Windows: Create Mattermost Ticket** job template
+4. EDA automatically launches the **Windows: Create Mattermost Ticket** job template
 
 === Step 4: View the Mattermost Ticket
 
@@ -60,32 +60,32 @@ In this scenario, we simulate an Active Directory administrator creating a new u
    * **Ticket Status**: OPEN - Awaiting Review
 
 [quote]
-💡 All of this information was harvested directly from the Windows Event payload -- no manual input required. This demonstrates how event-driven automation can create rich, contextual tickets automatically.
+All of this information was harvested directly from the Windows Event payload -- no manual input required. This demonstrates how event-driven automation can create rich, contextual tickets automatically.
 
 == Scenario 2: Firewall Event with AI Enrichment
 
-In this scenario, we toggle the Windows Firewall to generate a firewall change event. EDA picks up the event, but this time it queries the **Granite LLM** to analyze the event before creating the ticket. This demonstrates how AI can enrich the ticketing process with expert analysis.
+In this scenario, we simulate a suspicious firewall rule being added to the Windows Server. EDA picks up the event, queries the **Granite LLM** to analyze it before creating the ticket. This demonstrates how AI can enrich the ticketing process with expert analysis.
 
 === Step 1: Simulate Windows Firewall Toggle
 
 1. Navigate to **Automation Controller** -> **Templates**
-2. Find and launch the **🪟 Simulate Windows Firewall Toggle** job template
-3. Watch the job output -- it disables and re-enables the Windows Firewall Domain profile
+2. Find and launch the **Simulate Windows Firewall Toggle** job template
+3. Watch the job output -- it adds and removes a test inbound firewall rule (`LabTestRule-AIOps`)
 
 [quote]
-⚠️ The playbook toggles the firewall briefly (disable -> wait 5 seconds -> re-enable). This generates Windows Firewall events that Winlogbeat captures.
+The playbook adds a test firewall rule allowing inbound TCP on port 9999, waits briefly, then removes it. This generates Event ID 2004 (rule added) which Winlogbeat captures and forwards to Kafka.
 
 === Step 2: Observe EDA Response
 
 1. Navigate to **Event-Driven Ansible** -> **Rulebook Activations** -> **Windows Events**
 2. Click on the **History** tab
 3. You should see a new event matching the **Windows Firewall change detected** rule
-4. EDA automatically launches the **🤖 Windows AI: Analyze and Ticket** job template
+4. EDA automatically launches the **Windows AI: Analyze and Ticket** job template
 
 === Step 3: Watch the AI Analysis
 
 1. Navigate to **Automation Controller** -> **Jobs**
-2. Find the **🤖 Windows AI: Analyze and Ticket** job that was triggered
+2. Find the **Windows AI: Analyze and Ticket** job that was triggered
 3. Watch the job output to see:
    * The AI prompt being sent to the Granite LLM
    * The AI response explaining what the Windows Event means
@@ -99,14 +99,14 @@ In this scenario, we toggle the Windows Firewall to generate a firewall change e
    * **Event ID**: The firewall event ID
    * **Event Type**: Windows Firewall Change
    * **Event Description**: The original event message
-   * **🤖 AI Analysis**: A detailed explanation from the Granite LLM including:
+   * **AI Analysis**: A detailed explanation from the Granite LLM including:
      ** What the event means
      ** Security implications
      ** Recommended actions
    * **Ticket Status**: OPEN - AI-Enriched - Awaiting Review
 
 [quote]
-💡 By querying AI, we transform a cryptic Windows Event ID into actionable intelligence. This enrichment process could be applied to any event type -- making tickets more valuable for the teams that need to act on them.
+By querying AI, we transform a cryptic Windows Event ID into actionable intelligence. This enrichment process could be applied to any event type -- making tickets more valuable for the teams that need to act on them.
 
 == Key Takeaways
 
@@ -123,12 +123,12 @@ The **Windows Events** rulebook (`windows_events.yml`) uses the following rules:
 | Rule | Event ID | Action
 
 | AD account enabled detected
-| 4722
-| Launch **📋 Windows: Create Mattermost Ticket** with event payload data
+| 4720, 4722
+| Launch **Windows: Create Mattermost Ticket** with event payload data
 
 | Windows Firewall change detected
-| 4946, 4950, 2004, 2005, 2006
-| Launch **🤖 Windows AI: Analyze and Ticket** with event data for AI analysis
+| 2004 (LabTestRule-AIOps only)
+| Launch **Windows AI: Analyze and Ticket** with event data for AI analysis
 |===
 
 *Ansible Rulebook:*

@@ -50,11 +50,11 @@ Glossary:
 | `⚙️ Build HTTPD Remediation Template` | JT that creates another JT to apply the AI-generated fix
 | `✅ Execute HTTPD Remediation` | JT for Final fix (launched manually)
 | `✅ Restore Apache` | JT that Restores Apache to a known-good config
-| `🪟 Simulate AD Account Creation` | JT creates a test AD user on Windows to trigger Event ID 4722
-| `🪟 Simulate Windows Firewall Toggle` | JT toggles Windows Firewall to generate firewall events
+| `Simulate AD Account Creation` | JT creates a test AD user on Windows to trigger Event ID 4722
+| `Simulate Windows Firewall Toggle` | JT adds and removes a test firewall rule to generate a firewall event
 | `Windows Events` | RB that watches Kafka queue for Windows security and firewall events
-| `📋 Windows: Create Mattermost Ticket` | JT creates a Mattermost ticket from Windows event data
-| `🤖 Windows AI: Analyze and Ticket` | JT queries AI to analyze a Windows event and creates an enriched ticket
+| `Windows: Create Mattermost Ticket` | JT creates a Mattermost ticket from Windows event data
+| `Windows AI: Analyze and Ticket` | JT queries AI to analyze a Windows event and creates an enriched ticket
 |===
 
 Now here is a walkthrough in the same chronological order:
