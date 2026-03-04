@@ -31,7 +31,7 @@ The Windows event flow uses the same infrastructure as the Linux use case:
 
 == Scenario 1: AD account creation event
 
-In this scenario, you simulate an Active Directory administrator creating a new user account. Windows generates **Event ID 4720** (a user account was created) and **Event ID 4722** (a user account was enabled), which Winlogbeat captures and forwards to Kafka.
+In this scenario, you simulate an Active Directory administrator creating a new user account. Windows generates **Event ID 4722** (a user account was enabled), which Winlogbeat captures and forwards to Kafka. The EDA rulebook matches on this event only for test user accounts created by the simulation template.
 
 === Step 1: Verify EDA rulebook is active
 
@@ -41,7 +41,7 @@ In this scenario, you simulate an Active Directory administrator creating a new 
 
 [NOTE]
 ====
-The Windows Events rulebook listens on the `windows-events` Kafka topic and matches two types of events: AD account creation (Event IDs 4720, 4722) and firewall changes.
+The Windows Events rulebook listens on the `windows-events` Kafka topic and matches two types of events: AD account enablement (Event ID 4722, filtered to test user accounts) and firewall changes.
 ====
 
 === Step 2: Simulate AD account creation
@@ -155,7 +155,7 @@ The **Windows Events** rulebook (`windows_events.yml`) uses the following rules:
 | Rule name | Event ID | Action triggered
 
 | AD account enabled detected
-| 4720, 4722
+| 4722 (TestUser accounts only)
 | Launch **Windows: Create Mattermost Ticket** with event payload data
 
 | Windows Firewall change detected
