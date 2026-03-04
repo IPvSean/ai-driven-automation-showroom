@@ -52,7 +52,7 @@ The Windows Events rulebook listens on the `windows-events` Kafka topic and matc
 
 [NOTE]
 ====
-This job template runs the `windows_create_ad_user.yml` playbook against the Windows Server using the `microsoft.ad.user` module.
+This job template runs the `windows_create_ad_user.yml` playbook against the Windows Server using the `ansible.windows.win_user` module to create a local test account.
 ====
 
 === Step 3: Observe EDA response
