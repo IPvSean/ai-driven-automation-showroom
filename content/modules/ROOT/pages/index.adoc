@@ -229,14 +229,18 @@ a|
 
 A **basic introduction** to AIOps—learn the fundamentals by building a self-healing workflow for Apache service failures using Red Hat AI and Ansible Lightspeed.
 
-**Part 2: AIOps with Network Automation** (Modules 3-5) _Highly Recommended_
+**Part 2: AIOps with Network Automation** (Modules 3-5) Highly Recommended
 
 Apply the same AIOps patterns to **network infrastructure**. Troubleshoot OSPF routing issues on Cisco routers using Splunk, Event-Driven Ansible, and Lightspeed-generated playbooks.
+
+**Part 3: AIOps with Windows Automation** (Module 6) Highly Recommended
+
+Extend the AIOps pattern to **Windows Server**. Detect Active Directory and Windows Firewall events with Winlogbeat and Kafka, then use Event-Driven Ansible to create AI-enriched tickets automatically.
 |===
 
 [TIP]
 ====
-**Choose your path:** Both parts are independent and can be completed in any order. New to AIOps? Start with Part 1. Already familiar with the basics or completed Part 1 previously? Jump straight to Part 2 for a deeper dive into network automation.
+**Choose your path:** All three parts are independent and can be completed in any order. New to AIOps? Start with Part 1. Already familiar with the basics? Jump to Part 2 for network automation or Part 3 for Windows event-driven automation.
 ====
 
 Click the link below to proceed to **Module 1: Log Enrichment and Prompt Generation Workflow**.

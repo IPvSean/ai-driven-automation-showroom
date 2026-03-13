@@ -168,6 +168,6 @@ https://github.com/ansible-tmm/aiops-summitlab/blob/main/rulebooks/windows_event
 
 == Next steps
 
-You have completed Section 6. Continue to the next section to explore additional automation scenarios.
+You have completed Section 6 - Windows Event-Driven Automation! Continue to the summary section to review all the concepts you've learned across all three parts of this workshop.
 
-xref:module-07.adoc[Next: Section 7 ->]
+xref:module-05.adoc[Next: Summary and Call to Actions ->]

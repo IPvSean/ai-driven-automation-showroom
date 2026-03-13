@@ -560,6 +560,16 @@ By leveraging Ansible Lightspeed, our network expert could focus on codifying th
 
 You have successfully completed the Network Automation portion of this lab! You've now seen how AI-driven automation can be applied to both server infrastructure (Part 1) and network infrastructure (Part 2).
 
+== What's Next?
+
+You've completed Part 2! Ready to extend the AIOps pattern to Windows? Continue to Part 3 to see how Event-Driven Ansible detects Windows security events and automatically creates AI-enriched tickets.
+
+xref:module-06.adoc[Next: Part 3 - Windows Event-Driven Automation ->]
+
+Or skip directly to the summary:
+
+xref:module-05.adoc[Summary and Call to Actions ->]
+
 == Complete
 
-Click the link below to proceed to the **Summary and Call to Actions** for next steps and resources.
+Click the link above to proceed to the next section.
