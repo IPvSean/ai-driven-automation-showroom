@@ -215,6 +215,36 @@ This lab demonstrates a complete observe → evaluate → respond loop for netwo
 [quote]
 **Pre-configured Environment**: Most network components (workflows, projects, inventories, job templates, Gitea repository) are pre-loaded. You'll configure Splunk data inputs, verify EDA rulebook activations, and execute the OSPF troubleshooting scenarios to see the complete closed-loop automation in action.
 
+'''
+
+== Part 3: AIOps with Windows Automation
+
+This final part extends the AIOps pattern to the Windows ecosystem, demonstrating that the same observe-analyze-respond workflow applies universally across all platforms.
+
+Part 3 shows you how Event-Driven Ansible can detect Windows security events and automatically create intelligent tickets. The Windows environment includes:
+
+* **Windows Server 2022** - With Active Directory and Firewall event logging
+* **Winlogbeat** - Forwards Windows Security and Firewall event logs to Kafka
+* **Kafka** - Centralized event bus (shared infrastructure with Parts 1 and 2)
+* **Event-Driven Ansible** - Detects Windows events and triggers automation
+* **Red Hat AI (Granite LLM)** - Analyzes Windows security events
+* **Mattermost** - Receives AI-enriched automated tickets
+
+=== Two Windows Scenarios
+
+1. **AD Account Creation**: EDA detects Active Directory account creation (Event ID 4722) and automatically creates a Mattermost ticket with account details from the event payload
+2. **Firewall Event with AI Analysis**: EDA detects Windows Firewall rule changes (Event ID 2004), queries Red Hat AI for security analysis, and creates an AI-enriched ticket with recommendations
+
+=== The Platform-Agnostic AIOps Pattern
+
+This is the key insight: the AIOps pattern works across **any domain**:
+
+* **Part 1 (Linux)**: Filebeat → Kafka → EDA → AAP (detects service failures)
+* **Part 2 (Network)**: Splunk → Webhook → EDA → AAP (detects OSPF issues)
+* **Part 3 (Windows)**: Winlogbeat → Kafka → EDA → AAP (detects security events)
+
+Same pattern, different observability tools and domains.
+
 == What's Next?
 
 Lets get started!
