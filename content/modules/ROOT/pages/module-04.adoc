@@ -2,7 +2,7 @@
 
 [NOTE]
 ====
-**Terminology reminder**: References to "Ansible Lightspeed" in this section refer to the technology now called **Automation Code Assistant**. See the note in Module 1.1 for full details on the naming update.
+**Terminology reminder**: References to "Ansible Lightspeed" in this section refer to the technology now called **Automation code assistant**. See the note in Module 1.1 for full details on the naming update.
 ====
 
 The workflow used in this Lab is called the **Network-AIOps-Workflow**. This workflow is triggered by Event-Driven Ansible (EDA) whenever an OSPF neighbor adjacency issue is detected by Splunk. Specifically, this lab is set up to respond to failed OSPF neighbors. The workflow will run specific playbook tasks depending on the cause of the OSPF neighbor downtime.

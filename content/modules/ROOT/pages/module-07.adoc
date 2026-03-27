@@ -14,7 +14,7 @@ After completing this section, you will be able to:
 * Use Claude Code as an AI agent to download and review CVE playbooks via MCP
 * Review and validate playbooks inside code-server (VS Code) before committing
 * Push validated playbooks to Git and create corresponding AAP Job Templates
-* Use Automation Code Assistant to generate a playbook for HTTPD remediation
+* Use Automation code assistant to generate a playbook for HTTPD remediation
 * Understand RHEL System Roles and their use in standardized configuration management
 
 [NOTE]
@@ -31,13 +31,13 @@ Red Hat has consolidated its AI-powered services under the **Lightspeed** brand.
 | **Red Hat Lightspeed**
 
 | Ansible Lightspeed Code Assistant (with IBM watsonx)
-| **Automation Code Assistant** (supports Gemini, Red Hat AI, or IBM watsonx)
+| **Automation code assistant** (supports Gemini, Red Hat AI, or IBM watsonx)
 
 | Ansible Lightspeed Intelligent Assistant
 | **Automation intelligent assistant**
 |===
 
-If you have used Insights or Ansible Lightspeed before, the functionality is the same — only the branding has changed. In Parts 1-3 of this workshop, you may see references to "Ansible Lightspeed" — this is the same technology now called **Automation Code Assistant**.
+If you have used Insights or Ansible Lightspeed before, the functionality is the same — only the branding has changed. In Parts 1-3 of this workshop, you may see references to "Ansible Lightspeed" — this is the same technology now called **Automation code assistant**.
 ====
 
 == Background: Red Hat Lightspeed
@@ -194,8 +194,8 @@ You will work with **four playbooks** in this section, each targeting a differen
 
 | 3
 | HTTPD Configuration Fix
-| Remediates the Apache configuration issue using Automation Code Assistant
-| **AI-generated** — Automation Code Assistant (Gemini)
+| Remediates the Apache configuration issue using Automation code assistant
+| **AI-generated** — Automation code assistant (Gemini)
 
 | 4
 | System Roles Playbook
@@ -316,26 +316,26 @@ The Advisor section of Red Hat Lightspeed provides proactive recommendations —
 [quote]
 💡 **Advisor recommendations** are based on Red Hat's deep expertise supporting thousands of enterprise RHEL deployments. These are not theoretical — they flag real misconfigurations that Red Hat Support has seen cause outages in production.
 
-== Playbook 3: HTTPD Configuration Fix (Automation Code Assistant)
+== Playbook 3: HTTPD Configuration Fix (Automation code assistant)
 
-For this playbook, you will use **Automation Code Assistant** — Red Hat's AI-powered code generation tool integrated into your IDE — to generate a playbook that fixes the Apache configuration issue from Part 1.
+For this playbook, you will use **Automation code assistant** — Red Hat's AI-powered code generation tool integrated into your IDE — to generate a playbook that fixes the Apache configuration issue from Part 1.
 
 [NOTE]
 ====
-**What is Automation Code Assistant?**
+**What is Automation code assistant?**
 
-Automation Code Assistant (previously called Ansible Lightspeed Code Assistant) is an AI-powered tool that generates Ansible Playbook content from natural language descriptions. In Parts 1-3 of this workshop, it was called via API to auto-generate playbooks. In this section, you use it directly in your IDE as a developer tool.
+Automation code assistant (previously called Ansible Lightspeed Code Assistant) is an AI-powered tool that generates Ansible Playbook content from natural language descriptions. In Parts 1-3 of this workshop, it was called via API to auto-generate playbooks. In this section, you use it directly in your IDE as a developer tool.
 
-**Flexible AI backends**: Automation Code Assistant is no longer tied to a single AI provider. Your lab environment is configured with **Google Gemini** as the backend, but it also supports **Red Hat AI** and **IBM watsonx**. This gives organizations the flexibility to choose the AI provider that best fits their requirements.
+**Flexible AI backends**: Automation code assistant is no longer tied to a single AI provider. Your lab environment is configured with **Google Gemini** as the backend, but it also supports **Red Hat AI** and **IBM watsonx**. This gives organizations the flexibility to choose the AI provider that best fits their requirements.
 ====
 
 === Step 1: Open a new playbook file
 
 1. In code-server, create a new file called `httpd-fix.yml` in the playbooks directory.
 
-=== Step 2: Use Automation Code Assistant to generate the playbook
+=== Step 2: Use Automation code assistant to generate the playbook
 
-With Automation Code Assistant enabled in your IDE, start typing a task description and let the AI assist:
+With Automation code assistant enabled in your IDE, start typing a task description and let the AI assist:
 
 1. Begin with a comment describing what you want:
 
@@ -345,7 +345,7 @@ With Automation Code Assistant enabled in your IDE, start typing a task descript
 ----
 
 [start=2]
-2. Automation Code Assistant (powered by Gemini) will suggest task completions as you type.
+2. Automation code assistant (powered by Gemini) will suggest task completions as you type.
 3. Accept the suggestions to build out the playbook.
 
 The resulting playbook should look similar to:
@@ -375,8 +375,8 @@ The resulting playbook should look similar to:
       when: httpd_check.rc == 0
 ----
 
-// TODO: Add screenshot of Automation Code Assistant generating the playbook in code-server
-// TODO: Confirm Automation Code Assistant extension is pre-installed and configured
+// TODO: Add screenshot of Automation code assistant generating the playbook in code-server
+// TODO: Confirm Automation code assistant extension is pre-installed and configured
 
 === Step 3: Review and save
 
@@ -439,7 +439,7 @@ This playbook:
 
 [NOTE]
 ====
-**Stretch goal — AI-generated System Roles playbooks**: A known challenge in the Ansible community is getting AI code assistants to generate playbooks that use System Roles instead of raw module calls. This is an active area of work. In a future version of this lab, you may use a custom AI skill that instructs Automation Code Assistant to prefer System Roles when generating RHEL automation.
+**Stretch goal — AI-generated System Roles playbooks**: A known challenge in the Ansible community is getting AI code assistants to generate playbooks that use System Roles instead of raw module calls. This is an active area of work. In a future version of this lab, you may use a custom AI skill that instructs Automation code assistant to prefer System Roles when generating RHEL automation.
 ====
 
 == Pushing Playbooks to Git
@@ -555,7 +555,7 @@ Red Hat Lightspeed (CVE/Advisor)
                         → Create Job Templates
 ----
 
-This is the **human-in-the-loop** approach to AIOps remediation. Red Hat Lightspeed identifies issues, AI generates fixes (via MCP or Automation Code Assistant), but a human validates everything in the IDE before it reaches production.
+This is the **human-in-the-loop** approach to AIOps remediation. Red Hat Lightspeed identifies issues, AI generates fixes (via MCP or Automation code assistant), but a human validates everything in the IDE before it reaches production.
 
 == Key Takeaways
 
@@ -576,11 +576,11 @@ This section demonstrated four distinct sources for production-quality Ansible P
 | **RHEL System Roles**
 | Officially supported, pre-built Ansible roles shipped with RHEL that provide a stable, version-independent interface for common configuration tasks (NTP, networking, storage, SELinux, firewall, and more).
 
-| **AI-assisted authoring (Automation Code Assistant)**
-| Developers use Automation Code Assistant in the IDE to accelerate playbook creation. The AI generates a first draft, then a human reviews, refines, and validates before committing. This speeds up production of custom playbooks that go through a proper review process.
+| **AI-assisted authoring (Automation code assistant)**
+| Developers use Automation code assistant in the IDE to accelerate playbook creation. The AI generates a first draft, then a human reviews, refines, and validates before committing. This speeds up production of custom playbooks that go through a proper review process.
 |===
 
-Each source has its place. Lightspeed and System Roles give you ready-made, trusted content. Automation Code Assistant helps you create new playbooks faster — but the human review step is what makes them production-ready.
+Each source has its place. Lightspeed and System Roles give you ready-made, trusted content. Automation code assistant helps you create new playbooks faster — but the human review step is what makes them production-ready.
 
 === Human-in-the-Loop and Gatekeeping with AAP
 

@@ -2,7 +2,7 @@
 
 [NOTE]
 ====
-**Terminology Note**: Red Hat has recently consolidated its AI-powered services under new branding. Throughout Parts 1-3, you will see references to **Ansible Lightspeed** — this technology is now called **Automation Code Assistant** and supports multiple AI backends (Gemini, Red Hat AI, or IBM watsonx). Similarly, **Red Hat Insights** on console.redhat.com is now branded as **Red Hat Lightspeed**. The functionality is the same — only the names have changed. You will work with the new naming in Parts 4 and 5.
+**Terminology Note**: Red Hat has recently consolidated its AI-powered services under new branding. Throughout Parts 1-3, you will see references to **Ansible Lightspeed** — this technology is now called **Automation code assistant** and supports multiple AI backends (Gemini, Red Hat AI, or IBM watsonx). Similarly, **Red Hat Insights** on console.redhat.com is now branded as **Red Hat Lightspeed**. The functionality is the same — only the names have changed. You will work with the new naming in Parts 4 and 5.
 ====
 
 == Objective
