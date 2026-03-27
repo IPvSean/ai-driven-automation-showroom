@@ -82,25 +82,37 @@ code-server (VS Code in browser)
 1. Open code-server using the link above (or the tab in your lab interface).
 2. You should see a full VS Code environment in your browser.
 
-=== Step 2: Launch Claude Code
+=== Step 2: Launch an AI agent
+
+Your lab has two AI agents pre-installed — **Claude Code** and **OpenCode**. Either one works for this exercise. Both connect to the same Ansible MCP server.
 
 1. Open a **terminal** inside code-server (Terminal → New Terminal, or press `Ctrl+``).
-2. Type:
+2. Type either:
 
 [source,bash]
 ----
 claude
 ----
 
+or
+
+[source,bash]
+----
+opencode
+----
+
 [start=3]
-3. Claude Code will start and display a chat interface in your terminal.
+3. A chat interface will appear in your terminal.
 
 // TODO: Add screenshot of Claude Code running in code-server terminal
 
 [NOTE]
 ====
-**MCP is pre-configured.** Claude Code is already connected to the **Ansible MCP server** in your lab environment. You do not need to configure anything — the MCP connection to AAP is ready to use as soon as Claude Code starts.
+**MCP is pre-configured.** Both Claude Code and OpenCode are already connected to the **Ansible MCP server** in your lab environment. You do not need to configure anything — the MCP connection to AAP is ready to use as soon as either agent starts.
 ====
+
+[quote]
+💡 The examples below use Claude Code, but you can substitute OpenCode anywhere — the MCP tools and workflows are the same.
 
 == The Ansible MCP Server
 
@@ -268,10 +280,10 @@ Claude Code should:
 
 == Key Takeaways
 
-* **Claude Code** is a terminal-based AI agent that runs inside code-server and connects to AAP via MCP
-* The **Ansible MCP server** bridges the AI agent to Ansible Automation Platform's full capabilities
+* **Claude Code and OpenCode** are terminal-based AI agents that run inside code-server and connect to AAP via MCP — use whichever you prefer
+* The **Ansible MCP server** bridges any MCP-compatible AI agent to Ansible Automation Platform's full capabilities
 * **Human-in-the-loop** means the agent proposes but you decide — every action requires explicit approval
-* Claude Code can **discover, reason, and propose** actions across inventory, job templates, and job history
+* The agent can **discover, reason, and propose** actions across inventory, job templates, and job history
 * This approach complements traditional event-driven workflows — use both depending on the situation
 
 == Complete

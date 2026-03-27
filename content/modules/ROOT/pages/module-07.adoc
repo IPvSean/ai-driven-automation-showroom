@@ -34,7 +34,7 @@ Red Hat has consolidated its AI-powered services under the **Lightspeed** brand.
 | **Automation Code Assistant** (supports Gemini, Red Hat AI, or IBM watsonx)
 
 | Ansible Lightspeed Intelligent Assistant
-| **Automation Intelligent Assistant**
+| **Automation intelligent assistant**
 |===
 
 If you have used Insights or Ansible Lightspeed before, the functionality is the same — only the branding has changed. In Parts 1-3 of this workshop, you may see references to "Ansible Lightspeed" — this is the same technology now called **Automation Code Assistant**.
@@ -101,27 +101,50 @@ Your lab environment includes **code-server**, which is https://code.visualstudi
 | `{ide_password}`
 |===
 
-=== AI Agent: Claude Code
+=== AI Agents: Claude Code and OpenCode
 
-Your lab environment uses **Claude Code** as the AI agent. Claude Code is a CLI-based AI assistant that runs in the terminal and can interact with external tools through the **Model Context Protocol (MCP)**.
+Your lab environment has **two AI agents** pre-installed, both running in the terminal inside code-server. Either one can be used for the exercises in this section — they both support MCP and connect to the same Ansible and Lightspeed MCP servers.
 
-To launch Claude Code:
+[cols="2,2,3", options="header"]
+|===
+| Agent | Launch Command | Description
+
+| **Claude Code**
+| `claude`
+| Anthropic's CLI-based AI agent
+
+| **OpenCode**
+| `opencode`
+| Open-source terminal AI agent
+|===
+
+To launch an agent:
 
 1. Open a **terminal** inside code-server.
-2. Type:
+2. Type either:
 
 [source,bash]
 ----
 claude
 ----
 
+or
+
+[source,bash]
+----
+opencode
+----
+
 [start=3]
-3. Claude Code will start and you will see a chat interface in your terminal.
+3. A chat interface will appear in your terminal. You can interact with it using natural language.
 
 [NOTE]
 ====
-**MCP is pre-configured.** Claude Code is already connected to the Ansible MCP server and the Red Hat Lightspeed MCP server in your lab environment. You do not need to configure anything — just type `claude` and start chatting.
+**MCP is pre-configured for both agents.** Claude Code and OpenCode are already connected to the Ansible MCP server and the Red Hat Lightspeed MCP server in your lab environment. You do not need to configure anything — just launch either agent and start chatting.
 ====
+
+[quote]
+💡 The exercises in this section use Claude Code in the examples, but you can substitute OpenCode anywhere you see `claude` — the MCP tools and workflows work the same way with either agent.
 
 == Accessing Red Hat Lightspeed
 
@@ -536,12 +559,40 @@ This is the **human-in-the-loop** approach to AIOps remediation. Red Hat Lightsp
 
 == Key Takeaways
 
-* **Red Hat Lightspeed** (formerly Insights) continuously monitors your RHEL fleet for CVEs and misconfigurations
-* **CVE playbooks can be downloaded agentically** through Claude Code and the Lightspeed MCP server
-* **Advisor playbooks are generated manually** through the web UI (MCP support coming in a future release)
-* **Automation Code Assistant** (formerly Ansible Lightspeed Code Assistant) generates playbooks in the IDE and now supports multiple AI backends (Gemini, Red Hat AI, IBM watsonx)
-* **RHEL System Roles** provide a stable, version-independent interface for common RHEL configuration tasks
-* **IDE review** adds a human validation step between AI-generated content and production execution
+=== Where Do Good Playbooks Come From?
+
+This section demonstrated four distinct sources for production-quality Ansible Playbooks:
+
+[cols="1,3", options="header"]
+|===
+| Source | Description
+
+| **CVE Remediation (Lightspeed)**
+| Red Hat Lightspeed identifies vulnerabilities affecting your RHEL fleet and generates targeted playbooks to patch them. These are based on Red Hat's Security Data API and errata.
+
+| **Advisor Recommendations (Lightspeed)**
+| Lightspeed flags misconfigurations and best-practice violations (e.g., SELinux policy issues, configurations that won't survive a reboot) and generates playbooks to fix them proactively.
+
+| **RHEL System Roles**
+| Officially supported, pre-built Ansible roles shipped with RHEL that provide a stable, version-independent interface for common configuration tasks (NTP, networking, storage, SELinux, firewall, and more).
+
+| **AI-assisted authoring (Automation Code Assistant)**
+| Developers use Automation Code Assistant in the IDE to accelerate playbook creation. The AI generates a first draft, then a human reviews, refines, and validates before committing. This speeds up production of custom playbooks that go through a proper review process.
+|===
+
+Each source has its place. Lightspeed and System Roles give you ready-made, trusted content. Automation Code Assistant helps you create new playbooks faster — but the human review step is what makes them production-ready.
+
+=== Human-in-the-Loop and Gatekeeping with AAP
+
+The real power of this workflow is not just generating playbooks — it's the **gatekeeping**. Ansible Automation Platform provides the controls that ensure nothing reaches production without proper review:
+
+* **Git as source of truth** — every playbook is version-controlled, auditable, and reviewable before it enters AAP
+* **Project sync** — AAP only runs playbooks that have been committed and synced from a trusted Git repository
+* **Job Templates with guardrails** — credentials, inventory limits, and surveys ensure playbooks run against the right targets with the right parameters
+* **Approval gates** — workflows can include approval steps where a human signs off before execution proceeds
+* **Human-in-the-loop by design** — whether a playbook was generated by Lightspeed, written with AI assistance, or hand-crafted, the same review and approval process applies
+
+This is the difference between "AI wrote it" and "AI wrote it, a human reviewed it, and AAP enforces that it runs safely." The IDE is where the review happens; AAP is where the gatekeeping happens.
 
 == Complete
 
