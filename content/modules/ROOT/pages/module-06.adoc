@@ -1,4 +1,4 @@
-= Section 6 - Windows events and AI-driven ticketing
+= Module 3.1 — Windows Events and AI-Driven Ticketing
 :navtitle: Windows events and AI-driven ticketing
 
 == Objective
@@ -168,6 +168,6 @@ https://github.com/ansible-tmm/aiops-summitlab/blob/main/rulebooks/windows_event
 
 == Next steps
 
-You have completed Section 6 - Windows Event-Driven Automation! Continue to the summary section to review all the concepts you've learned across all three parts of this workshop.
+You have completed Module 3.1 — Windows Event-Driven Automation! Continue to the summary section to review all the concepts you've learned across all parts of this workshop.
 
 xref:module-05.adoc[Next: Summary and Call to Actions ->]

@@ -1,4 +1,4 @@
-= Section 10 - Summary and Call to Actions
+= Summary and Call to Actions
 
 🎉 **Congratulations!** You have completed the {lab_name}!
 

@@ -1,4 +1,4 @@
-= Section 8 - Agentic IDE Workflow with Ansible MCP
+= Module 4.2 — Agentic IDE Workflow with Ansible MCP
 :navtitle: Agentic IDE Workflow with Ansible MCP
 
 == Objective
@@ -15,11 +15,11 @@ After completing this section, you will be able to:
 * Understand how the Ansible MCP server connects Claude Code to Ansible Automation Platform
 * Query inventory, discover patches, and locate Job Templates conversationally
 * Approve and execute remediation actions through the agent
-* Explain the difference between agentic (human-in-the-loop) and autonomous (Section 9) workflows
+* Explain the difference between agentic (human-in-the-loop) and autonomous (Part 5) workflows
 
 [IMPORTANT]
 ====
-**This is a separate demo from Section 9.** This section demonstrates a human-in-the-loop workflow where an AI agent assists you but always asks for permission before taking action. Section 9 demonstrates the fully autonomous approach where pre-approved automation runs without human intervention. Both are valid approaches depending on your organization's risk tolerance and maturity.
+**This is a separate demo from Part 5 (Module 5.1 — Autonomous AIOps).** This module demonstrates a human-in-the-loop workflow where an AI agent assists you but always asks for permission before taking action. Part 5 demonstrates the fully autonomous approach where pre-approved automation runs without human intervention. Both are valid approaches depending on your organization's risk tolerance and maturity.
 ====
 
 == Background: Agentic Automation
@@ -142,7 +142,7 @@ Claude Code calls these tools behind the scenes when you ask questions in natura
 
 == Agentic Workflow: Server Assessment and Patching
 
-In this exercise, you will have a conversation with Claude Code to assess your RHEL fleet and remediate issues discovered in Section 7.
+In this exercise, you will have a conversation with Claude Code to assess your RHEL fleet and remediate issues discovered in Module 4.1.
 
 === Step 1: Ask about your servers
 
@@ -178,7 +178,7 @@ template that can patch it?
 Claude Code will:
 
 * Look up `{rhel_node2}` in the inventory
-* Search available job templates for relevant remediation (e.g., the CVE Remediation template you created in Section 7)
+* Search available job templates for relevant remediation (e.g., the CVE Remediation template you created in Module 4.1)
 * Report what it found, including the template name and configuration
 
 // TODO: Add screenshot of Claude Code showing available JT for the host
@@ -288,8 +288,8 @@ Claude Code should:
 
 == Complete
 
-You have completed Section 8 — Agentic IDE Workflow. You have used Claude Code to interactively assess and remediate your RHEL fleet through natural language conversation.
+You have completed Module 4.2 — Agentic IDE Workflow. You have used Claude Code to interactively assess and remediate your RHEL fleet through natural language conversation.
 
-In the next section, you will see the **opposite approach**: a fully autonomous workflow where Splunk detects a RHEL misconfiguration and pre-approved automation fixes it without any human intervention.
+In the next part, you will see the **opposite approach**: a fully autonomous workflow where Splunk detects a RHEL misconfiguration and pre-approved automation fixes it without any human intervention.
 
-Click the link below to continue to **Section 9: Autonomous AIOps — Self-Healing RHEL with Splunk**.
+Click the link below to continue to **Part 5, Module 5.1: Autonomous AIOps — Self-Healing RHEL with Splunk**.

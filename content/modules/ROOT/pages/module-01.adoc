@@ -1,8 +1,8 @@
-= Section 2 - Remediation Workflow
+= Module 1.2 — Remediation Workflow
 
 == Objective
 
-For this section, we will build another workflow called the **Remediation Workflow**. The goal for this workflow is to take the information we learned from Section 1 with Red Hat AI and now prompt Ansible Lightspeed to automatically create an Ansible Playbook to fix the issue. By combining these two workflows, we can create an AIOps workflow capable of self-healing infrastructure.
+For this section, we will build another workflow called the **Remediation Workflow**. The goal for this workflow is to take the information we learned from Module 1.1 with Red Hat AI and now prompt Ansible Lightspeed to automatically create an Ansible Playbook to fix the issue. By combining these two workflows, we can create an AIOps workflow capable of self-healing infrastructure.
 
 image::remediation_workflow.png[remediation_workflow, link="_images/remediation_workflow.png", window=blank]
 

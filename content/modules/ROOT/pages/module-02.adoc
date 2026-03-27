@@ -1,4 +1,4 @@
-= Section 3 - Splunk for Network Observability
+= Module 2.1 — Splunk for Network Observability
 
 [quote]
 **Part 2: AIOps with Network Automation** - Welcome to Part 2! In Part 1, you learned how Red Hat AI and Ansible Lightspeed work together to create self-healing infrastructure for Apache services. Now you'll apply those same AIOps concepts to **network infrastructure**, using Splunk for observability, Event-Driven Ansible for automation triggers, and Ansible Lightspeed code assistant to generate network remediation playbooks automatically.

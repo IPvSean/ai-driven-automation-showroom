@@ -1,4 +1,4 @@
-= Section 7 - Red Hat Lightspeed — CVE and Advisor Remediation
+= Module 4.1 — Red Hat Lightspeed — CVE and Advisor Remediation
 :navtitle: Red Hat Lightspeed — CVE and Advisor Remediation
 
 == Objective
@@ -538,7 +538,7 @@ Password: `{controller_password}`
    * **Project**: The Gitea playbook project
 
 [quote]
-💡 **These Job Templates will be used in the next two sections.** In Section 8, you will use Claude Code with the Ansible MCP server to discover and launch these templates interactively. In Section 9, they will be triggered autonomously by Splunk events through Event-Driven Ansible.
+💡 **These Job Templates will be used in the next two modules.** In Module 4.2 (Agentic IDE Workflow), you will use Claude Code with the Ansible MCP server to discover and launch these templates interactively. In Part 5 (Module 5.1), they will be triggered autonomously by Splunk events through Event-Driven Ansible.
 
 == The General Workflow
 
@@ -596,8 +596,8 @@ This is the difference between "AI wrote it" and "AI wrote it, a human reviewed 
 
 == Complete
 
-You have completed Section 7 — Red Hat Lightspeed. Your remediation playbooks are now in Git and available as Job Templates in AAP.
+You have completed Module 4.1 — Red Hat Lightspeed. Your remediation playbooks are now in Git and available as Job Templates in AAP.
 
-In the next section, you will use **Claude Code with the Ansible MCP server** to interactively discover servers that need patching and execute remediation — with your approval.
+In the next module, you will use **Claude Code with the Ansible MCP server** to interactively discover servers that need patching and execute remediation — with your approval.
 
-Click the link below to continue to **Section 8: Agentic IDE Workflow with Ansible MCP**.
+Click the link below to continue to **Module 4.2: Agentic IDE Workflow with Ansible MCP**.

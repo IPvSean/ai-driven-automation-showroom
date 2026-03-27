@@ -1,4 +1,4 @@
-= Section 9 - Autonomous AIOps — Self-Healing RHEL with Splunk
+= Module 5.1 — Autonomous AIOps — Self-Healing RHEL with Splunk
 :navtitle: Autonomous AIOps — Self-Healing RHEL with Splunk
 
 == Objective
@@ -12,17 +12,17 @@ After completing this section, you will be able to:
 * Explain how Splunk monitors RHEL systems for misconfigurations
 * Observe EDA responding to Splunk alerts for RHEL events (not just network events)
 * Understand how pre-approved Job Templates enable fully autonomous remediation
-* Compare the autonomous approach (this section) with the human-in-the-loop approach (Section 8)
+* Compare the autonomous approach (this module) with the human-in-the-loop approach (Part 4, Module 4.2)
 * Articulate when each approach is appropriate for your organization
 
 [IMPORTANT]
 ====
-**This is a separate demo from Section 8.** Section 8 demonstrated a human-in-the-loop workflow where an AI agent assists you and asks for permission before acting. This section demonstrates the fully autonomous approach where the entire detection-to-remediation pipeline runs without human intervention using **pre-approved, trusted automation**. Both are valid strategies — and most organizations use a combination of both.
+**This is a separate demo from Part 4 (Module 4.2 — Agentic IDE Workflow).** Module 4.2 demonstrated a human-in-the-loop workflow where an AI agent assists you and asks for permission before acting. This module demonstrates the fully autonomous approach where the entire detection-to-remediation pipeline runs without human intervention using **pre-approved, trusted automation**. Both are valid strategies — and most organizations use a combination of both.
 ====
 
 == Background: Fully Autonomous Remediation
 
-In Parts 1-3, the AIOps workflows included human checkpoints: reviewing AI output, approving survey prompts, manually launching final remediation. In Section 8, an AI agent asked for permission before every action.
+In Parts 1-3, the AIOps workflows included human checkpoints: reviewing AI output, approving survey prompts, manually launching final remediation. In Module 4.2, an AI agent asked for permission before every action.
 
 This section removes all human checkpoints. The workflow is:
 
@@ -59,7 +59,7 @@ Splunk detects misconfiguration on RHEL
 |===
 
 [quote]
-💡 **Start small, think big.** Most organizations begin with human-in-the-loop workflows (like Section 8) and gradually promote well-tested remediation to fully autonomous (like this section) as confidence grows. You don't have to choose one approach — use both.
+💡 **Start small, think big.** Most organizations begin with human-in-the-loop workflows (like Part 4) and gradually promote well-tested remediation to fully autonomous (like this module) as confidence grows. You don't have to choose one approach — use both.
 
 == Architecture Overview
 
@@ -162,10 +162,10 @@ Before triggering the scenario, confirm the remediation Job Template exists and 
    * The correct target host (`{rhel_node2}` or `{rhel_node3}`)
 
 // TODO: Confirm job template name and configuration
-// TODO: Confirm if this uses one of the playbooks from Section 7 or a dedicated pre-built playbook
+// TODO: Confirm if this uses one of the playbooks from Module 4.1 or a dedicated pre-built playbook
 
 [quote]
-💡 **Pre-approved means pre-tested.** This Job Template was reviewed and validated during Section 7. Your team has confidence that running it against the target host is safe. That's what makes fully autonomous execution acceptable — the remediation is not generated on the fly, it is a known-good, tested fix.
+💡 **Pre-approved means pre-tested.** This Job Template was reviewed and validated during Part 4 (Module 4.1). Your team has confidence that running it against the target host is safe. That's what makes fully autonomous execution acceptable — the remediation is not generated on the fly, it is a known-good, tested fix.
 
 == Scenario: Trigger the Misconfiguration
 
@@ -264,7 +264,7 @@ Here is what just happened, end-to-end, without any human intervention:
 ----
 
 [quote]
-💡 **This is the end state of AIOps maturity.** Organizations start with manual response, move to human-in-the-loop (Section 8), and eventually promote well-tested scenarios to fully autonomous (this section). Each step builds confidence in the automation.
+💡 **This is the end state of AIOps maturity.** Organizations start with manual response, move to human-in-the-loop (Part 4), and eventually promote well-tested scenarios to fully autonomous (this module). Each step builds confidence in the automation.
 
 == Comparing All Five Parts
 
@@ -310,7 +310,7 @@ This table captures the AIOps maturity journey: from human-guided remediation to
 
 == Complete
 
-You have completed Section 9 — Autonomous AIOps with Splunk and RHEL.
+You have completed Module 5.1 — Autonomous AIOps with Splunk and RHEL.
 
 You have now experienced the full spectrum of AIOps approaches:
 

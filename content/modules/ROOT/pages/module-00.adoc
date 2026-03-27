@@ -1,4 +1,4 @@
-= Section 1 - Log Enrichment and Prompt Generation Workflow
+= Module 1.1 — Log Enrichment and Prompt Generation Workflow
 
 [NOTE]
 ====

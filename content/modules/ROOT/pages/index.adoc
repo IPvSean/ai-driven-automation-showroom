@@ -263,8 +263,8 @@ Part 4 introduces two new dimensions to AIOps: **Red Hat Lightspeed** (formerly 
 ====
 **These are two separate demos** that work together:
 
-. **Red Hat Lightspeed** (Section 7): Generate remediation playbooks for CVEs and Advisor recommendations, use Automation Code Assistant (formerly Ansible Lightspeed Code Assistant) to generate an HTTPD fix, review everything in code-server, and push to Git/AAP
-. **Agentic IDE Workflow** (Section 8): Use Claude Code with the Ansible MCP server to discover servers needing patches, find matching Job Templates, and execute remediation — with human approval at every step
+. **Red Hat Lightspeed** (Module 4.1): Generate remediation playbooks for CVEs and Advisor recommendations, use Automation Code Assistant (formerly Ansible Lightspeed Code Assistant) to generate an HTTPD fix, review everything in code-server, and push to Git/AAP
+. **Agentic IDE Workflow** (Module 4.2): Use Claude Code with the Ansible MCP server to discover servers needing patches, find matching Job Templates, and execute remediation — with human approval at every step
 ====
 
 * **Observability**: Red Hat Lightspeed continuously monitors RHEL systems for CVEs and misconfigurations

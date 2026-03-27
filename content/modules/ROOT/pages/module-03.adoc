@@ -1,4 +1,4 @@
-= Section 4 - Event Driven Ansible
+= Module 2.2 — Event Driven Ansible
 
 What is Event-Driven Ansible?
 
