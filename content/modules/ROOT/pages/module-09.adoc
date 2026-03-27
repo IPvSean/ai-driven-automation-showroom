@@ -289,7 +289,7 @@ Here is what just happened, end-to-end, without any human intervention:
 
 | **Part 4**
 | RHEL (CVE/Advisor)
-| Red Hat Insights + IDE Agent
+| Red Hat Lightspeed + Claude Code
 | Human reviews in IDE, agent asks permission
 
 | **Part 5**

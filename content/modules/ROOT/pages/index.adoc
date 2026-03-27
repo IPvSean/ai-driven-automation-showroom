@@ -52,8 +52,9 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
 - Mattermost for message notifications
 - A Windows Server with Active Directory for Windows event-driven automation
 - Winlogbeat on Windows forwarding events to Kafka
-- Red Hat Insights for CVE and Advisor remediation playbook generation
-- A developer IDE with an AI agent connected to AAP via the Ansible MCP server
+- Red Hat Lightspeed (formerly Insights) for CVE and Advisor remediation playbook generation
+- code-server (VS Code in the browser) with Claude Code as the AI agent, connected to AAP via the Ansible MCP server
+- Automation Code Assistant (formerly Ansible Lightspeed Code Assistant) for AI-powered playbook generation in the IDE
 - Splunk Universal Forwarder on RHEL for system-level misconfiguration detection
 
 [quote]
@@ -68,7 +69,7 @@ This workshop consists of five independent parts:
 - *Part 1: AIOps with Apache Remediation* - 30-40 minutes
 - *Part 2: Network Automation* - 30-40 minutes
 - *Part 3: Windows Automation* - 15-20 minutes
-- *Part 4: Red Hat Insights & Agentic IDE Workflow* - 50-70 minutes
+- *Part 4: Red Hat Lightspeed & Agentic IDE Workflow* - 50-70 minutes
 - *Part 5: Autonomous AIOps with Splunk and RHEL* - 20-30 minutes
 - *Total Workshop Time* - ~150-200 minutes
 
@@ -247,34 +248,35 @@ This is the key insight: the AIOps pattern works across **any domain**:
 * **Part 1 (Linux)**: Filebeat → Kafka → EDA → AAP (detects service failures)
 * **Part 2 (Network)**: Splunk → Webhook → EDA → AAP (detects OSPF issues)
 * **Part 3 (Windows)**: Winlogbeat → Kafka → EDA → AAP (detects security events)
-* **Part 4 (Insights + IDE)**: Red Hat Insights → IDE → Human reviews → Git → AAP (human-in-the-loop with AI agent)
+* **Part 4 (Lightspeed + IDE)**: Red Hat Lightspeed → code-server + Claude Code → Human reviews → Git → AAP (human-in-the-loop with AI agent)
 * **Part 5 (Autonomous)**: Splunk → Webhook → EDA → AAP (fully autonomous self-healing)
 
 Same pattern, different observability tools, domains, and levels of human involvement.
 
-== Part 4: Red Hat Insights & Agentic IDE Workflow
+== Part 4: Red Hat Lightspeed & Agentic IDE Workflow
 
 image::aap_logo.png[aap_logo,150, link="_images/aap_logo.png", window=blank]
 
-Part 4 introduces two new dimensions to AIOps: **Red Hat Insights** for vulnerability and compliance management, and an **AI agent in a developer IDE** for interactive infrastructure management.
+Part 4 introduces two new dimensions to AIOps: **Red Hat Lightspeed** (formerly Insights) for vulnerability and compliance management, and **Claude Code** as an AI agent in **code-server (VS Code)** for interactive infrastructure management.
 
 [IMPORTANT]
 ====
 **These are two separate demos** that work together:
 
-. **Red Hat Insights** (Section 7): Generate remediation playbooks for CVEs and Advisor recommendations, review them in an IDE, and push to Git/AAP
-. **Agentic IDE Workflow** (Section 8): Use an AI agent with the Ansible MCP server to discover servers needing patches, find matching Job Templates, and execute remediation — with human approval at every step
+. **Red Hat Lightspeed** (Section 7): Generate remediation playbooks for CVEs and Advisor recommendations, use Automation Code Assistant (formerly Ansible Lightspeed Code Assistant) to generate an HTTPD fix, review everything in code-server, and push to Git/AAP
+. **Agentic IDE Workflow** (Section 8): Use Claude Code with the Ansible MCP server to discover servers needing patches, find matching Job Templates, and execute remediation — with human approval at every step
 ====
 
-* **Observability**: Red Hat Insights continuously monitors RHEL systems for CVEs and misconfigurations
-* **Inference**: Insights generates targeted remediation playbooks; the IDE agent reasons about what actions are needed
+* **Observability**: Red Hat Lightspeed continuously monitors RHEL systems for CVEs and misconfigurations
+* **Inference**: Lightspeed generates targeted remediation playbooks; Claude Code reasons about what actions are needed
 * **Automation**: Playbooks are pushed to Git and promoted to AAP Job Templates; the agent executes them with human approval
 
 === What You'll Learn
 
-* How to use Red Hat Insights to generate CVE and Advisor remediation playbooks
-* Reviewing AI-generated playbooks in a developer IDE before committing
-* Using an AI agent with the Ansible MCP server to interactively manage RHEL infrastructure
+* How to use Red Hat Lightspeed to generate CVE and Advisor remediation playbooks
+* Using Automation Code Assistant (with Gemini backend) to generate playbooks in the IDE
+* Reviewing AI-generated playbooks in code-server before committing
+* Using Claude Code with the Ansible MCP server to interactively manage RHEL infrastructure
 * The human-in-the-loop principle: AI proposes, human decides
 
 == Part 5: Autonomous AIOps with Splunk and RHEL
@@ -314,9 +316,9 @@ Apply the same AIOps patterns to **network infrastructure**. Troubleshoot OSPF r
 
 Extend the AIOps pattern to **Windows Server**. Detect Active Directory and Windows Firewall events with Winlogbeat and Kafka, then use Event-Driven Ansible to create AI-enriched tickets automatically.
 
-**Part 4: Red Hat Insights & Agentic IDE Workflow** (Modules 7-8) NEW
+**Part 4: Red Hat Lightspeed & Agentic IDE Workflow** (Modules 7-8) NEW
 
-Use **Red Hat Insights** to generate remediation playbooks for CVEs and Advisor recommendations, then use an **AI agent in a developer IDE** to interactively discover and remediate issues via the Ansible MCP server.
+Use **Red Hat Lightspeed** to generate remediation playbooks for CVEs and Advisor recommendations, use **Automation Code Assistant** to generate an HTTPD fix in code-server, then use **Claude Code** to interactively discover and remediate issues via the Ansible MCP server.
 
 **Part 5: Autonomous AIOps with Splunk and RHEL** (Module 9) NEW
 

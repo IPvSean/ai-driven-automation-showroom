@@ -1,26 +1,48 @@
-= Section 7 - Red Hat Insights — CVE and Advisor Remediation
-:navtitle: Red Hat Insights — CVE and Advisor Remediation
+= Section 7 - Red Hat Lightspeed — CVE and Advisor Remediation
+:navtitle: Red Hat Lightspeed — CVE and Advisor Remediation
 
 == Objective
 
 *Estimated time: 30-40 minutes*
 
-In this section, you will use **Red Hat Insights** to identify vulnerabilities and misconfigurations across your RHEL fleet, generate remediation playbooks, review them in a developer IDE, push them to Git, and create Job Templates in Ansible Automation Platform. This is the foundation for both human-guided and fully autonomous remediation workflows in the subsequent sections.
+In this section, you will use **Red Hat Lightspeed** (on https://console.redhat.com[console.redhat.com^]) to identify vulnerabilities and misconfigurations across your RHEL fleet, generate remediation playbooks, review them in a developer IDE, push them to Git, and create Job Templates in Ansible Automation Platform. This is the foundation for both human-guided and fully autonomous remediation workflows in the subsequent sections.
 
 After completing this section, you will be able to:
 
-* Access Red Hat Insights and navigate CVE and Advisor reports
-* Generate Ansible Playbooks from Insights to remediate CVEs and Advisor recommendations
-* Review AI-generated playbooks inside a developer IDE before committing
+* Access Red Hat Lightspeed and navigate CVE and Advisor reports
+* Generate Ansible Playbooks from Lightspeed to remediate CVEs and Advisor recommendations
+* Use Claude Code as an AI agent to download and review CVE playbooks via MCP
+* Review and validate playbooks inside code-server (VS Code) before committing
 * Push validated playbooks to Git and create corresponding AAP Job Templates
-* Understand the difference between CVE remediation and Advisor recommendations
+* Use Automation Code Assistant to generate a playbook for HTTPD remediation
+* Understand RHEL System Roles and their use in standardized configuration management
 
-[quote]
-💡 **Two types of Insights remediation playbooks**: Red Hat Insights generates playbooks for **CVEs** (known vulnerabilities with a formal CVE ID) and **Advisor recommendations** (proactive best-practice recommendations from Red Hat, such as fixing SELinux policies or configurations that would not survive a reboot). Both follow the same generate → review → push → execute pattern.
+[NOTE]
+====
+**Terminology Update — Red Hat Lightspeed**
 
-== Background: Red Hat Insights
+Red Hat has consolidated its AI-powered services under the **Lightspeed** brand. Here is a quick reference for the new naming:
 
-https://console.redhat.com/insights[Red Hat Insights^] is a managed service included with every RHEL subscription. It continuously analyzes your connected RHEL systems and provides:
+[cols="2,2", options="header"]
+|===
+| Previous Name | New Name
+
+| Red Hat Insights (console.redhat.com)
+| **Red Hat Lightspeed**
+
+| Ansible Lightspeed Code Assistant (with IBM watsonx)
+| **Automation Code Assistant** (supports Gemini, Red Hat AI, or IBM watsonx)
+
+| Ansible Lightspeed Intelligent Assistant
+| **Automation Intelligent Assistant**
+|===
+
+If you have used Insights or Ansible Lightspeed before, the functionality is the same — only the branding has changed. In Parts 1-3 of this workshop, you may see references to "Ansible Lightspeed" — this is the same technology now called **Automation Code Assistant**.
+====
+
+== Background: Red Hat Lightspeed
+
+https://console.redhat.com[Red Hat Lightspeed^] (formerly Red Hat Insights) is a managed service included with every RHEL subscription. It continuously analyzes your connected RHEL systems and provides:
 
 * **Vulnerability reports** — identifies CVEs affecting your systems, with severity ratings and remediation guidance
 * **Advisor recommendations** — proactive suggestions from Red Hat Support to improve stability, performance, and security (e.g., "SELinux is in permissive mode" or "system would not survive a reboot due to a bad policy")
@@ -31,11 +53,13 @@ https://console.redhat.com/insights[Red Hat Insights^] is a managed service incl
 
 === Generating a PDF Report
 
-Red Hat Insights can generate PDF reports summarizing CVEs affecting your environment. Students can download and review these reports to understand the vulnerability landscape before generating remediation playbooks.
+Red Hat Lightspeed can generate PDF reports summarizing CVEs affecting your environment. Students can download and review these reports to understand the vulnerability landscape before generating remediation playbooks.
 
-// TODO: Add screenshot of Insights PDF report generation
+// TODO: Add screenshot of Lightspeed PDF report generation
 
-== Lab Environment — RHEL Instances
+== Lab Environment
+
+=== RHEL Instances
 
 This part of the lab uses **three RHEL instances**, each dedicated to a specific use case:
 
@@ -59,132 +83,16 @@ This part of the lab uses **three RHEL instances**, each dedicated to a specific
 [quote]
 💡 **Why three RHEL instances?** Each use case runs on its own node so that if one breaks during the exercise, the lab continues on the others. This also keeps scenarios cleanly separated for simplicity.
 
-== Accessing Red Hat Insights
+=== Developer IDE: code-server
+
+Your lab environment includes **code-server**, which is https://code.visualstudio.com/[Visual Studio Code^] running in your browser. This gives you a full VS Code experience — editor, terminal, extensions — without installing anything locally.
 
 [cols="2,2", options="header"]
 |===
 | Component | Value
 
-| Red Hat Insights URL
-| link:https://console.redhat.com/insights[Red Hat Insights^]
-
-| Username
-| `{insights_username}`
-
-| Password
-| `{insights_password}`
-|===
-
-1. Log in to https://console.redhat.com/insights[Red Hat Insights^] using the credentials above.
-2. Navigate to **RHEL** → **Vulnerability** to see the CVE dashboard.
-3. Observe the list of CVEs affecting your connected RHEL systems.
-
-// TODO: Add screenshot of Insights Vulnerability dashboard
-
-[start=4]
-4. Navigate to **RHEL** → **Advisor** → **Recommendations** to see the Advisor dashboard.
-5. Observe the recommendations flagged for your systems (e.g., SELinux policy issues, configuration drift).
-
-// TODO: Add screenshot of Insights Advisor dashboard
-
-[NOTE]
-====
-Scott McBrien has documented the full Insights vulnerability and advisor workflows. For additional reference:
-
-* https://github.com/rhpds/zt-insights-vulnerability[Insights Vulnerability Lab^]
-* https://github.com/rhpds/zt-insights-workshop[Insights Advisor Workshop^]
-====
-
-== Generating Remediation Playbooks
-
-You will generate **four playbooks** in this section, each targeting a different remediation scenario:
-
-[cols="1,2,2", options="header"]
-|===
-| # | Playbook | Description
-
-| 1
-| CVE Remediation
-| Patches a specific CVE identified by Insights on `{rhel_node2}`
-
-| 2
-| Advisor Remediation
-| Fixes an Advisor-flagged misconfiguration on `{rhel_node3}`
-
-| 3
-| HTTPD Configuration Fix
-| Remediates the Apache configuration issue (same pattern as Part 1, now from Insights)
-
-| 4
-| System Roles Playbook
-| Uses RHEL System Roles for standardized configuration management
-|===
-
-=== Playbook 1: CVE Remediation
-
-1. In Red Hat Insights, navigate to **RHEL** → **Vulnerability** → **CVEs**.
-2. Select a CVE affecting `{rhel_node2}`.
-3. Click **Remediate** to generate a remediation playbook.
-4. Download the generated playbook.
-
-// TODO: Add screenshot of CVE remediation generation
-// TODO: Confirm specific CVE to use in lab
-
-[quote]
-💡 **What just happened?** Insights analyzed the RPM packages installed on your system, cross-referenced them against the Red Hat Security Data API, and generated a playbook that applies the correct errata update to patch the vulnerability.
-
-=== Playbook 2: Advisor Remediation
-
-1. In Red Hat Insights, navigate to **RHEL** → **Advisor** → **Recommendations**.
-2. Select a recommendation affecting `{rhel_node3}` (e.g., an SELinux policy issue or a configuration that would not survive a reboot).
-3. Click **Remediate** to generate a remediation playbook.
-4. Download the generated playbook.
-
-// TODO: Add screenshot of Advisor remediation generation
-// TODO: Confirm specific Advisor recommendation to use
-
-[quote]
-💡 **Advisor recommendations** are based on Red Hat's deep expertise supporting thousands of enterprise RHEL deployments. These are not just theoretical — they flag real misconfigurations that Red Hat Support has seen cause outages in production.
-
-=== Playbook 3: HTTPD Configuration Fix
-
-This is the same Apache remediation from Part 1, but now generated through Insights rather than via the Lightspeed API workflow. This demonstrates that Insights can also generate playbooks for service-level issues.
-
-1. In Red Hat Insights, locate the httpd configuration issue.
-2. Generate the remediation playbook.
-3. Download the playbook.
-
-// TODO: Confirm if this playbook comes from Insights directly or is the same Lightspeed-generated one from Part 1
-
-=== Playbook 4: System Roles
-
-https://access.redhat.com/articles/3050101[RHEL System Roles^] are a collection of Ansible roles and modules shipped with RHEL that provide a stable, consistent interface for managing RHEL subsystems (networking, storage, timesync, SELinux, firewall, etc.).
-
-[NOTE]
-====
-For this exercise, pre-built playbooks using RHEL System Roles are provided. These playbooks come with corresponding surveys and job templates already configured in AAP.
-
-**Stretch goal**: Use an AI coding assistant configured with a custom skill to generate playbooks that leverage System Roles instead of raw module calls. This is a known challenge being worked on by the Ansible team.
-====
-
-// TODO: Confirm which System Role playbook(s) to include
-// TODO: Determine if pre-built or AI-generated for the lab
-
-== Reviewing Playbooks in the IDE
-
-[IMPORTANT]
-====
-**This is a key change from the original AIOps workflow.** In Parts 1-3, playbooks were auto-generated via API calls and pushed to Git programmatically. In this section, you bring the playbooks into a **developer environment** where a human reviews and validates them before committing. This represents a more realistic enterprise workflow where a developer or SRE reviews AI-generated content before it reaches production.
-====
-
-=== Accessing the IDE
-
-[cols="2,2", options="header"]
-|===
-| Component | Value
-
-| IDE URL
-| link:{ide_url}[Developer IDE^]
+| code-server URL
+| link:{ide_url}[code-server (VS Code)^]
 
 | Username
 | `{ide_username}`
@@ -193,36 +101,137 @@ For this exercise, pre-built playbooks using RHEL System Roles are provided. The
 | `{ide_password}`
 |===
 
-// TODO: Confirm IDE platform (code-server, OpenCode, LibreChat, or other)
+=== AI Agent: Claude Code
 
-1. Open the IDE using the link above.
-2. Open the terminal inside the IDE.
-3. Clone or navigate to the playbook repository:
+Your lab environment uses **Claude Code** as the AI agent. Claude Code is a CLI-based AI assistant that runs in the terminal and can interact with external tools through the **Model Context Protocol (MCP)**.
+
+To launch Claude Code:
+
+1. Open a **terminal** inside code-server.
+2. Type:
 
 [source,bash]
 ----
-cd ~/playbooks
-ls -la
+claude
 ----
 
-=== Review the Downloaded Playbooks
+[start=3]
+3. Claude Code will start and you will see a chat interface in your terminal.
 
-1. Open each of the four downloaded playbooks in the IDE editor.
-2. Review the YAML content — verify the tasks make sense for their intended targets.
-3. Pay attention to:
-   * The `hosts:` target — does it match the correct RHEL instance?
-   * The modules used — are they appropriate (e.g., `ansible.builtin.dnf` for patching, `ansible.posix.selinux` for SELinux)?
-   * Any variables or parameters that might need adjustment for your environment
+[NOTE]
+====
+**MCP is pre-configured.** Claude Code is already connected to the Ansible MCP server and the Red Hat Lightspeed MCP server in your lab environment. You do not need to configure anything — just type `claude` and start chatting.
+====
 
-[quote]
-💡 **Why manual review matters**: AI-generated playbooks are powerful but not infallible. A quick human review catches edge cases, environment-specific issues, or overly broad changes before they hit production. This is the "human in the loop" principle applied to infrastructure as code.
+== Accessing Red Hat Lightspeed
 
-=== Example: CVE Remediation Playbook
+[cols="2,2", options="header"]
+|===
+| Component | Value
 
-Here is an example of what a CVE remediation playbook from Insights might look like:
+| Red Hat Lightspeed URL
+| link:https://console.redhat.com[Red Hat Lightspeed (console.redhat.com)^]
+
+| Username
+| `{insights_username}`
+
+| Password
+| `{insights_password}`
+|===
+
+1. Log in to https://console.redhat.com[Red Hat Lightspeed^] using the credentials above.
+2. Navigate to **RHEL** → **Vulnerability** to see the CVE dashboard.
+3. Observe the list of CVEs affecting your connected RHEL systems.
+
+// TODO: Add screenshot of Lightspeed Vulnerability dashboard
+
+[start=4]
+4. Navigate to **RHEL** → **Advisor** → **Recommendations** to see the Advisor dashboard.
+5. Observe the recommendations flagged for your systems (e.g., SELinux policy issues, configuration drift).
+
+// TODO: Add screenshot of Lightspeed Advisor dashboard
+
+== Generating Remediation Playbooks
+
+You will work with **four playbooks** in this section, each targeting a different remediation scenario:
+
+[cols="1,2,2,2", options="header"]
+|===
+| # | Playbook | Description | Method
+
+| 1
+| CVE Remediation
+| Patches a specific CVE identified by Lightspeed on `{rhel_node2}`
+| **Agentic** — Claude Code + MCP
+
+| 2
+| Advisor Remediation
+| Fixes an Advisor-flagged misconfiguration on `{rhel_node3}`
+| **Manual** — Lightspeed web UI
+
+| 3
+| HTTPD Configuration Fix
+| Remediates the Apache configuration issue using Automation Code Assistant
+| **AI-generated** — Automation Code Assistant (Gemini)
+
+| 4
+| System Roles Playbook
+| Uses RHEL System Roles for NTP configuration
+| **Pre-built** — provided in the lab
+|===
+
+== Playbook 1: CVE Remediation (Agentic via MCP)
+
+This exercise demonstrates the **fully agentic approach**: you will use Claude Code to discover CVEs and download a remediation playbook entirely through the MCP interface, without ever opening the Lightspeed web UI manually.
+
+=== Step 1: Launch Claude Code
+
+1. Open a terminal in code-server.
+2. Type `claude` to start Claude Code.
+
+=== Step 2: Ask Claude Code about CVEs
+
+In the Claude Code chat, type a prompt like:
+
+[source]
+----
+What CVEs are affecting my RHEL systems? Show me the critical and important
+ones that have remediation available.
+----
+
+Claude Code will use the **Red Hat Lightspeed MCP server** to:
+
+* Query your connected RHEL systems
+* List CVEs with severity ratings
+* Identify which CVEs have remediation playbooks available
+
+// TODO: Add screenshot of Claude Code showing CVE query results
+
+=== Step 3: Download the remediation playbook
+
+Ask Claude Code to download the playbook:
+
+[source]
+----
+Download the remediation playbook for that CVE. Save it as cve-remediation.yml
+in the playbooks directory.
+----
+
+Claude Code will:
+
+* Use the Lightspeed MCP server to fetch the remediation playbook
+* Save it to the specified location in your code-server workspace
+
+// TODO: Add screenshot of Claude Code downloading the playbook
+// TODO: Confirm specific CVE to target in the lab
+
+=== Step 4: Review the playbook
+
+The downloaded playbook will automatically be available in the code-server file explorer. Open it and review the YAML content.
 
 [source,yaml]
 ----
+# Example CVE remediation playbook (actual content will vary by CVE)
 - name: Remediate CVE-XXXX-XXXXX
   hosts: all
   become: true
@@ -244,19 +253,183 @@ Here is an example of what a CVE remediation playbook from Insights might look l
         msg: "Package updated to {{ pkg_version.stdout }}"
 ----
 
-// TODO: Replace with actual CVE playbook content from the lab environment
+// TODO: Replace with actual CVE playbook content from the lab
+
+[quote]
+💡 **This was entirely agentic.** You never opened a web browser, navigated dashboards, or clicked download buttons. Claude Code used MCP to query Lightspeed, found the CVE, and fetched the playbook — all through a conversation in the terminal.
+
+== Playbook 2: Advisor Remediation (Manual)
+
+The Advisor section of Red Hat Lightspeed provides proactive recommendations — misconfigurations, compliance issues, and best practices flagged by Red Hat Support.
+
+[NOTE]
+====
+**MCP support for Advisor is coming in a future release.** Currently, the Red Hat Lightspeed MCP server supports CVE vulnerability queries but does not yet support Advisor recommendations. For this exercise, you will generate the Advisor playbook manually through the Lightspeed web UI. Once MCP support lands, this workflow will be fully agentic like the CVE exercise above.
+====
+
+=== Step 1: Navigate to Advisor
+
+1. Open https://console.redhat.com[Red Hat Lightspeed^] in your browser (or use the link from the lab interface).
+2. Navigate to **RHEL** → **Advisor** → **Recommendations**.
+3. Find a recommendation affecting `{rhel_node3}` (e.g., an SELinux policy issue or a configuration that would not survive a reboot).
+
+// TODO: Add screenshot of Advisor recommendations
+// TODO: Confirm specific Advisor recommendation to use
+
+=== Step 2: Generate the remediation playbook
+
+1. Select the recommendation.
+2. Click **Remediate** to generate a remediation playbook.
+3. Download the generated playbook.
+
+// TODO: Add screenshot of Advisor remediation generation
+
+=== Step 3: Move the playbook into code-server
+
+1. Upload or copy the downloaded playbook into code-server.
+2. Save it as `advisor-remediation.yml` in the playbooks directory.
+3. Review the content in the editor.
+
+[quote]
+💡 **Advisor recommendations** are based on Red Hat's deep expertise supporting thousands of enterprise RHEL deployments. These are not theoretical — they flag real misconfigurations that Red Hat Support has seen cause outages in production.
+
+== Playbook 3: HTTPD Configuration Fix (Automation Code Assistant)
+
+For this playbook, you will use **Automation Code Assistant** — Red Hat's AI-powered code generation tool integrated into your IDE — to generate a playbook that fixes the Apache configuration issue from Part 1.
+
+[NOTE]
+====
+**What is Automation Code Assistant?**
+
+Automation Code Assistant (previously called Ansible Lightspeed Code Assistant) is an AI-powered tool that generates Ansible Playbook content from natural language descriptions. In Parts 1-3 of this workshop, it was called via API to auto-generate playbooks. In this section, you use it directly in your IDE as a developer tool.
+
+**Flexible AI backends**: Automation Code Assistant is no longer tied to a single AI provider. Your lab environment is configured with **Google Gemini** as the backend, but it also supports **Red Hat AI** and **IBM watsonx**. This gives organizations the flexibility to choose the AI provider that best fits their requirements.
+====
+
+=== Step 1: Open a new playbook file
+
+1. In code-server, create a new file called `httpd-fix.yml` in the playbooks directory.
+
+=== Step 2: Use Automation Code Assistant to generate the playbook
+
+With Automation Code Assistant enabled in your IDE, start typing a task description and let the AI assist:
+
+1. Begin with a comment describing what you want:
+
+[source,yaml]
+----
+# Fix Apache httpd configuration by removing invalid directives and restarting the service
+----
+
+[start=2]
+2. Automation Code Assistant (powered by Gemini) will suggest task completions as you type.
+3. Accept the suggestions to build out the playbook.
+
+The resulting playbook should look similar to:
+
+[source,yaml]
+----
+- name: Fix Apache HTTPD configuration
+  hosts: all
+  become: true
+  tasks:
+    - name: Remove invalid directive from httpd.conf
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "^InvalidDirectiveHere"
+        state: absent
+
+    - name: Validate Apache configuration
+      ansible.builtin.command:
+        cmd: httpd -t
+      register: httpd_check
+      changed_when: false
+
+    - name: Restart Apache service
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+      when: httpd_check.rc == 0
+----
+
+// TODO: Add screenshot of Automation Code Assistant generating the playbook in code-server
+// TODO: Confirm Automation Code Assistant extension is pre-installed and configured
+
+=== Step 3: Review and save
+
+1. Review the generated playbook in the editor.
+2. Save the file.
+
+[quote]
+💡 **IDE-first workflow**: In Parts 1-3, playbooks were generated programmatically via API calls and pushed to Git without human review. Here, you are working in the IDE as a developer would — using AI assistance to write the playbook, reviewing the output, and making any adjustments before committing. This is the modern developer workflow for infrastructure as code.
+
+== Playbook 4: RHEL System Roles (Pre-Built)
+
+=== What are RHEL System Roles?
+
+https://access.redhat.com/articles/3050101[RHEL System Roles^] are a collection of **officially supported Ansible roles and modules** shipped with Red Hat Enterprise Linux. They provide a stable, consistent, and version-independent interface for managing common RHEL subsystems.
+
+System Roles cover areas like:
+
+* **`rhel-system-roles.timesync`** — NTP/Chrony time synchronization configuration
+* **`rhel-system-roles.network`** — Network interface and connection management
+* **`rhel-system-roles.storage`** — Disk, partition, and filesystem management
+* **`rhel-system-roles.selinux`** — SELinux policy and mode configuration
+* **`rhel-system-roles.firewall`** — Firewall rules and zones
+* **`rhel-system-roles.crypto_policies`** — System-wide cryptographic policies
+* **`rhel-system-roles.logging`** — Rsyslog and journal configuration
+
+[quote]
+💡 **Why use System Roles?** System Roles abstract away the differences between RHEL major versions. A playbook using `rhel-system-roles.timesync` works the same on RHEL 8 and RHEL 9, even though the underlying NTP implementation may differ. This makes automation portable and future-proof.
+
+=== Example: Configuring NTP with System Roles
+
+For this exercise, a **pre-built playbook** using the `rhel-system-roles.timesync` role is provided in your lab environment. This playbook configures NTP time synchronization across your RHEL fleet.
+
+Open the file `system-roles-timesync.yml` in code-server and review the content:
+
+[source,yaml]
+----
+- name: Configure NTP using RHEL System Roles
+  hosts: all
+  become: true
+  roles:
+    - role: rhel-system-roles.timesync
+      vars:
+        timesync_ntp_servers:
+          - hostname: time.google.com
+            iburst: true
+          - hostname: time.cloudflare.com
+            iburst: true
+        timesync_ntp_provider: chrony
+----
+
+This playbook:
+
+* Uses the `rhel-system-roles.timesync` role (no raw module calls needed)
+* Configures two NTP servers (Google and Cloudflare) with `iburst` for fast initial sync
+* Explicitly sets `chrony` as the NTP provider
+* Works identically across RHEL 8 and RHEL 9
+
+// TODO: Confirm pre-built playbook location in the lab environment
+// TODO: Determine if we want students to run this playbook or just review it
+
+[NOTE]
+====
+**Stretch goal — AI-generated System Roles playbooks**: A known challenge in the Ansible community is getting AI code assistants to generate playbooks that use System Roles instead of raw module calls. This is an active area of work. In a future version of this lab, you may use a custom AI skill that instructs Automation Code Assistant to prefer System Roles when generating RHEL automation.
+====
 
 == Pushing Playbooks to Git
 
-Once you are satisfied with the playbooks, push them to the Git repository so AAP can access them.
+Once you are satisfied with all four playbooks, push them to the Git repository so AAP can access them.
 
-1. In the IDE terminal, add and commit the playbooks:
+1. In a code-server terminal, add and commit the playbooks:
 
 [source,bash]
 ----
 cd ~/playbooks
 git add .
-git commit -m "Add Insights remediation playbooks - CVE, Advisor, HTTPD, System Roles"
+git commit -m "Add Lightspeed remediation playbooks - CVE, Advisor, HTTPD, System Roles"
 git push origin main
 ----
 
@@ -280,8 +453,6 @@ git push origin main
 3. Confirm all four playbooks are visible in the repository.
 
 // TODO: Add screenshot of Gitea with the four playbooks
-
-// TODO: Determine if MCP for Git should be used here or if students push manually
 
 == Creating Job Templates in AAP
 
@@ -329,7 +500,7 @@ Password: `{controller_password}`
 | `{rhel_node1}`
 
 | ⚙️ System Roles Configuration
-| `system-roles.yml`
+| `system-roles-timesync.yml`
 | All RHEL nodes
 |===
 
@@ -344,37 +515,38 @@ Password: `{controller_password}`
    * **Project**: The Gitea playbook project
 
 [quote]
-💡 **These Job Templates will be used in the next two sections.** In Section 8, you will use an AI agent in the IDE to discover and launch these templates interactively. In Section 9, they will be triggered autonomously by Splunk events through Event-Driven Ansible.
+💡 **These Job Templates will be used in the next two sections.** In Section 8, you will use Claude Code with the Ansible MCP server to discover and launch these templates interactively. In Section 9, they will be triggered autonomously by Splunk events through Event-Driven Ansible.
 
 == The General Workflow
 
-Here is the complete flow you just completed:
+Here is the complete flow you covered in this section:
 
 [source]
 ----
-Red Hat Insights (CVE/Advisor)
+Red Hat Lightspeed (CVE/Advisor)
     → Generate Remediation Playbooks
-        → Download to Developer IDE
-            → Human Reviews Playbooks
+        → Review in code-server (VS Code)
+            → Human Reviews & Validates
                 → Push to Git (Gitea)
                     → Sync Project in AAP
                         → Create Job Templates
 ----
 
-This is the **human-in-the-loop** approach to AIOps remediation. The AI and Insights platform do the heavy lifting of identifying issues and generating fixes, but a human validates everything before it reaches production.
+This is the **human-in-the-loop** approach to AIOps remediation. Red Hat Lightspeed identifies issues, AI generates fixes (via MCP or Automation Code Assistant), but a human validates everything in the IDE before it reaches production.
 
 == Key Takeaways
 
-* **Red Hat Insights** continuously monitors your RHEL fleet for CVEs and misconfigurations
-* **Two types of remediation**: CVE patches (reactive) and Advisor recommendations (proactive)
+* **Red Hat Lightspeed** (formerly Insights) continuously monitors your RHEL fleet for CVEs and misconfigurations
+* **CVE playbooks can be downloaded agentically** through Claude Code and the Lightspeed MCP server
+* **Advisor playbooks are generated manually** through the web UI (MCP support coming in a future release)
+* **Automation Code Assistant** (formerly Ansible Lightspeed Code Assistant) generates playbooks in the IDE and now supports multiple AI backends (Gemini, Red Hat AI, IBM watsonx)
+* **RHEL System Roles** provide a stable, version-independent interface for common RHEL configuration tasks
 * **IDE review** adds a human validation step between AI-generated content and production execution
-* **Four playbooks** cover the breadth of remediation scenarios: vulnerability patching, advisor fixes, service configuration, and system roles
-* **Git as the source of truth** ensures all playbooks are version-controlled and auditable
 
 == Complete
 
-You have completed Section 7 — Red Hat Insights. Your remediation playbooks are now in Git and available as Job Templates in AAP.
+You have completed Section 7 — Red Hat Lightspeed. Your remediation playbooks are now in Git and available as Job Templates in AAP.
 
-In the next section, you will use an **AI agent inside the IDE** to interactively discover servers that need patching and execute remediation — with your approval.
+In the next section, you will use **Claude Code with the Ansible MCP server** to interactively discover servers that need patching and execute remediation — with your approval.
 
 Click the link below to continue to **Section 8: Agentic IDE Workflow with Ansible MCP**.
