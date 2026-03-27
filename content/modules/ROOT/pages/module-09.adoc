@@ -1,0 +1,321 @@
+= Section 9 - Autonomous AIOps — Self-Healing RHEL with Splunk
+:navtitle: Autonomous AIOps — Self-Healing RHEL with Splunk
+
+== Objective
+
+*Estimated time: 20-30 minutes*
+
+In this section, you will observe a **fully autonomous AIOps workflow** where Splunk detects a RHEL misconfiguration, Event-Driven Ansible triggers a response, and pre-approved automation fixes the issue — all without human intervention. This is the "Jesus takes the wheel" scenario: trusted automation that handles known issues end-to-end.
+
+After completing this section, you will be able to:
+
+* Explain how Splunk monitors RHEL systems for misconfigurations
+* Observe EDA responding to Splunk alerts for RHEL events (not just network events)
+* Understand how pre-approved Job Templates enable fully autonomous remediation
+* Compare the autonomous approach (this section) with the human-in-the-loop approach (Section 8)
+* Articulate when each approach is appropriate for your organization
+
+[IMPORTANT]
+====
+**This is a separate demo from Section 8.** Section 8 demonstrated a human-in-the-loop workflow where an AI agent assists you and asks for permission before acting. This section demonstrates the fully autonomous approach where the entire detection-to-remediation pipeline runs without human intervention using **pre-approved, trusted automation**. Both are valid strategies — and most organizations use a combination of both.
+====
+
+== Background: Fully Autonomous Remediation
+
+In Parts 1-3, the AIOps workflows included human checkpoints: reviewing AI output, approving survey prompts, manually launching final remediation. In Section 8, an AI agent asked for permission before every action.
+
+This section removes all human checkpoints. The workflow is:
+
+[source]
+----
+Splunk detects misconfiguration on RHEL
+    → Splunk alert fires
+        → EDA webhook receives alert
+            → EDA triggers pre-approved AAP workflow
+                → AAP executes remediation Job Template
+                    → Issue is fixed automatically
+----
+
+[quote]
+💡 **Why would you trust fully autonomous remediation?** Because the Job Templates have been pre-tested, pre-approved, and are known to be safe for the target systems. The automation does not generate new playbooks on the fly — it executes trusted, validated automation that your team has already reviewed and approved. Think of it like a circuit breaker: the response is predictable, tested, and limited in scope.
+
+=== When to Use Autonomous vs Human-in-the-Loop
+
+[cols="2,2", options="header"]
+|===
+| Use Autonomous When... | Use Human-in-the-Loop When...
+
+| The failure mode is well-understood and has a known fix
+| The issue is novel or complex and needs investigation
+
+| The remediation playbook is pre-tested and low-risk
+| The fix involves changes that could have broad impact
+
+| Speed of response matters (e.g., production outage at 3AM)
+| The organization requires change approval for every action
+
+| The scenario has been rehearsed and validated
+| You are still building confidence in AI-generated content
+|===
+
+[quote]
+💡 **Start small, think big.** Most organizations begin with human-in-the-loop workflows (like Section 8) and gradually promote well-tested remediation to fully autonomous (like this section) as confidence grows. You don't have to choose one approach — use both.
+
+== Architecture Overview
+
+This workflow reuses Splunk infrastructure from Part 2 (Network Automation) but applies it to **RHEL system monitoring** instead of Cisco router syslog.
+
+[source]
+----
+RHEL Node ({rhel_node2} or {rhel_node3})
+    → Splunk Universal Forwarder monitors system logs/state
+        → Splunk Enterprise detects misconfiguration
+            → Splunk Alert fires → EDA Webhook
+                → Event-Driven Ansible triggers workflow
+                    → Pre-approved AAP Job Template executes
+                        → RHEL misconfiguration is fixed
+----
+
+// TODO: Add architecture diagram for Splunk → RHEL → EDA flow
+
+=== Components
+
+* **Splunk Universal Forwarder** on the RHEL node — monitors system logs and configuration state
+* **Splunk Enterprise** — processes incoming data, runs saved searches, and fires alerts when misconfigurations are detected
+* **Event-Driven Ansible** — receives Splunk webhook alerts and triggers AAP workflows
+* **Ansible Automation Platform** — executes pre-approved Job Templates to remediate the issue
+
+[quote]
+💡 **Reusing Splunk from Part 2**: In Part 2, Splunk monitored Cisco router syslog for OSPF events. Here, Splunk monitors RHEL system logs for misconfigurations. Same observability platform, different domain — this is the AIOps pattern at work.
+
+== Splunk Configuration for RHEL Monitoring
+
+=== Accessing Splunk
+
+[cols="2,2", options="header"]
+|===
+| Component | Value
+
+| Splunk URL
+| link:{splunk_url}[Splunk^]
+
+| Username
+| `{splunk_username}`
+
+| Password
+| `{splunk_password}`
+|===
+
+=== Verify RHEL Data Input
+
+1. Log in to Splunk.
+2. Navigate to **Settings** → **Data Inputs**.
+3. Verify that a data input is configured to receive logs from the RHEL node.
+
+// TODO: Add screenshot of Splunk RHEL data input
+// TODO: Confirm data input type — Splunk Universal Forwarder, syslog, or other
+
+=== Verify Splunk Saved Search and Alert
+
+1. Navigate to **Settings** → **Searches, Reports, and Alerts**.
+2. Find the saved search that detects the RHEL misconfiguration.
+3. Verify the alert action is configured to send a webhook to EDA.
+
+// TODO: Add screenshot of Splunk saved search for RHEL misconfiguration
+// TODO: Confirm the specific misconfiguration being detected (SELinux disabled, bad Apache config, or other)
+
+[NOTE]
+====
+**What misconfiguration is being detected?** The Splunk forwarder on the RHEL node monitors for a specific misconfiguration event.
+
+Possible scenarios under consideration:
+
+* **SELinux set to permissive/disabled** — detected via `/var/log/audit/audit.log` or `sestatus` output
+* **Apache configuration error** — detected via httpd error logs (similar to Part 1 but detected by Splunk instead of Filebeat/Kafka)
+
+The pre-approved Job Template in AAP knows exactly how to fix this issue.
+====
+
+== Verify EDA Rulebook Activation
+
+1. Open the **AAP** tab.
+2. Navigate to **Event-Driven Ansible** → **Rulebook Activations**.
+3. Verify that a rulebook activation is running that listens for the Splunk RHEL webhook.
+
+// TODO: Add screenshot of EDA rulebook activation for Splunk RHEL
+// TODO: Confirm rulebook name
+
+[NOTE]
+====
+This rulebook is similar to the OSPF Neighbor rulebook from Part 2 — it listens on a webhook endpoint for Splunk alerts. When the alert fires, it launches a pre-approved AAP Job Template directly, without any survey prompts or human approval gates.
+====
+
+== Verify Pre-Approved Job Template
+
+Before triggering the scenario, confirm the remediation Job Template exists and is configured correctly.
+
+1. Navigate to **Automation Execution** → **Templates**.
+2. Find the pre-approved remediation Job Template (e.g., **🔧 RHEL Auto-Remediation**).
+3. Verify it is configured with:
+   * The correct playbook from your Git repository
+   * The correct inventory and credentials
+   * The correct target host (`{rhel_node2}` or `{rhel_node3}`)
+
+// TODO: Confirm job template name and configuration
+// TODO: Confirm if this uses one of the playbooks from Section 7 or a dedicated pre-built playbook
+
+[quote]
+💡 **Pre-approved means pre-tested.** This Job Template was reviewed and validated during Section 7. Your team has confidence that running it against the target host is safe. That's what makes fully autonomous execution acceptable — the remediation is not generated on the fly, it is a known-good, tested fix.
+
+== Scenario: Trigger the Misconfiguration
+
+Now let's see the autonomous workflow in action.
+
+=== Step 1: Trigger the misconfiguration
+
+1. Navigate to **Automation Execution** → **Templates**.
+2. Find and launch the break/simulation Job Template (e.g., **❌ Break RHEL Configuration**).
+3. Watch the job output — it introduces a misconfiguration on the target RHEL node.
+
+// TODO: Confirm the break job template name
+// TODO: Confirm what misconfiguration is introduced (SELinux permissive, bad config file, etc.)
+
+[NOTE]
+====
+This is similar to the **❌ Break Apache** job template from Part 1, but for a different misconfiguration scenario. It deliberately introduces a known issue that the autonomous workflow will detect and fix.
+====
+
+=== Step 2: Observe Splunk detection
+
+1. Switch to the **Splunk** tab.
+2. Run a search or check the alert history to see the misconfiguration event.
+3. Verify the Splunk alert has fired.
+
+// TODO: Add screenshot of Splunk detecting the RHEL misconfiguration
+// TODO: Add example Splunk search query
+
+[quote]
+💡 **This is the Observability pillar of AIOps.** Splunk is continuously monitoring the RHEL nodes. When it detects the misconfiguration, it fires an alert automatically. No human needed to notice the problem.
+
+=== Step 3: Watch EDA respond
+
+1. Navigate to **Event-Driven Ansible** → **Rulebook Activations**.
+2. Click on the RHEL monitoring rulebook.
+3. Click on the **History** tab.
+4. You should see a new event matching the misconfiguration rule.
+5. EDA automatically launches the pre-approved Job Template.
+
+// TODO: Add screenshot of EDA history showing the RHEL event
+
+[NOTE]
+====
+It may take up to 30-60 seconds for the complete chain to execute: Splunk detection → alert → webhook → EDA → AAP job launch. Refresh the History tab if no events are visible yet.
+====
+
+=== Step 4: Verify autonomous remediation
+
+1. Navigate to **Automation Controller** → **Jobs**.
+2. Find the job that was automatically launched.
+3. Watch the job output — it should fix the misconfiguration.
+4. When the job completes, you should see a green ✅ Success.
+
+// TODO: Add screenshot of successful autonomous remediation job
+
+=== Step 5: Confirm the fix
+
+Connect to the RHEL node and verify the issue is resolved:
+
+[source,bash]
+----
+[lab-user@bastion ~]$ sudo ssh {rhel_node2}
+----
+
+// TODO: Add verification commands specific to the misconfiguration scenario
+// For SELinux: sestatus | grep "Current mode"
+// For Apache: systemctl status httpd.service
+
+[source,bash]
+----
+# Example verification (adjust based on actual scenario)
+[ec2-user@{rhel_node2} ~]$ sudo sestatus
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   enforcing
+Mode from config file:          enforcing
+----
+
+If the misconfiguration has been corrected, the autonomous workflow has completed successfully.
+
+== The Complete Closed Loop
+
+Here is what just happened, end-to-end, without any human intervention:
+
+[source]
+----
+1. ❌ Misconfiguration introduced on RHEL node
+2. 🔍 Splunk forwarder detects the change
+3. 📊 Splunk saved search matches the event
+4. 🔔 Splunk alert fires → webhook to EDA
+5. ⚡ EDA rulebook matches → triggers AAP Job Template
+6. 🔧 AAP executes pre-approved remediation playbook
+7. ✅ RHEL node is fixed — no human touched it
+----
+
+[quote]
+💡 **This is the end state of AIOps maturity.** Organizations start with manual response, move to human-in-the-loop (Section 8), and eventually promote well-tested scenarios to fully autonomous (this section). Each step builds confidence in the automation.
+
+== Comparing All Five Parts
+
+[cols="1,2,2,2", options="header"]
+|===
+| Part | Domain | Observability | Human Involvement
+
+| **Part 1**
+| Linux (Apache)
+| Filebeat → Kafka → EDA
+| Human reviews AI output and prompts
+
+| **Part 2**
+| Network (OSPF)
+| Splunk → Webhook → EDA
+| Human approves check mode → run mode
+
+| **Part 3**
+| Windows (AD/Firewall)
+| Winlogbeat → Kafka → EDA
+| Automated ticketing, human reviews tickets
+
+| **Part 4**
+| RHEL (CVE/Advisor)
+| Red Hat Insights + IDE Agent
+| Human reviews in IDE, agent asks permission
+
+| **Part 5**
+| RHEL (Misconfiguration)
+| Splunk → Webhook → EDA
+| **None** — fully autonomous, pre-approved
+|===
+
+This table captures the AIOps maturity journey: from human-guided remediation to fully autonomous self-healing.
+
+== Key Takeaways
+
+* **Autonomous AIOps** uses pre-approved, pre-tested automation to fix known issues without human intervention
+* **Splunk** can monitor RHEL systems (not just network devices) and trigger EDA via webhooks
+* **Pre-approved Job Templates** are the trust anchor — the automation was reviewed and validated before being promoted to autonomous execution
+* **The same AIOps pattern** applies everywhere: observe → detect → respond — regardless of the platform or observability tool
+* **Autonomous and human-in-the-loop are complementary** — use both, depending on the scenario's risk and maturity
+
+== Complete
+
+You have completed Section 9 — Autonomous AIOps with Splunk and RHEL.
+
+You have now experienced the full spectrum of AIOps approaches:
+
+* ✅ **Parts 1-3**: Event-driven automation with AI-generated content and human review
+* ✅ **Part 4**: Human-in-the-loop agentic workflow with an AI assistant in the IDE
+* ✅ **Part 5**: Fully autonomous self-healing with pre-approved trusted automation
+
+Continue to the **Summary and Call to Actions** to review everything you've learned and explore next steps.

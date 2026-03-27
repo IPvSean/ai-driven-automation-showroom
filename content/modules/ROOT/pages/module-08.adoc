@@ -1,0 +1,265 @@
+= Section 8 - Agentic IDE Workflow with Ansible MCP
+:navtitle: Agentic IDE Workflow with Ansible MCP
+
+== Objective
+
+*Estimated time: 20-30 minutes*
+
+In this section, you will use an **AI agent inside a developer IDE** to interactively manage your RHEL infrastructure through the **Ansible MCP (Model Context Protocol) server**. Instead of manually navigating dashboards and clicking buttons, you will have a conversation with an AI agent that can query your AAP inventory, discover what needs patching, find existing Job Templates, and — with your explicit permission — execute remediation.
+
+This is the **human-in-the-loop agentic workflow**: the AI does the research and proposes actions, but you remain in control.
+
+After completing this section, you will be able to:
+
+* Interact with an AI agent in a developer IDE to manage infrastructure
+* Understand how the Ansible MCP server connects the IDE agent to Ansible Automation Platform
+* Use natural language to query inventory, discover patches, and locate Job Templates
+* Approve and execute remediation actions through the agent
+* Explain the difference between agentic (human-in-the-loop) and autonomous (Section 9) workflows
+
+[IMPORTANT]
+====
+**This is a separate demo from Section 9.** This section demonstrates a human-in-the-loop workflow where an AI agent assists you but always asks for permission before taking action. Section 9 demonstrates the fully autonomous approach where pre-approved automation runs without human intervention. Both are valid approaches depending on your organization's risk tolerance and maturity.
+====
+
+== Background: Agentic Automation
+
+Traditional automation follows a predefined path: an event triggers a workflow, the workflow runs a sequence of job templates, and the result is logged. The human designs the workflow ahead of time.
+
+**Agentic automation** adds an AI layer that can:
+
+* **Discover** — query systems to understand the current state
+* **Reason** — determine what actions are needed based on what it finds
+* **Propose** — suggest specific remediation steps to the operator
+* **Execute** — carry out approved actions through existing automation
+
+The key difference is that the agent can handle *novel situations* without a pre-built workflow. It uses the tools available to it (AAP inventory, job templates, Insights data) to figure out what to do and then asks for human approval.
+
+[quote]
+💡 **Think of it this way**: Traditional automation is like a train on rails — fast and reliable, but it only goes where tracks exist. Agentic automation is like a GPS-guided driver — it can navigate new routes, but you're sitting in the passenger seat and can say "stop" at any time.
+
+== Architecture Overview
+
+The agentic IDE workflow connects three components:
+
+[source]
+----
+Developer IDE (with AI Agent)
+    ↕ MCP Protocol
+Ansible MCP Server
+    ↕ REST API
+Ansible Automation Platform
+    (Inventory, Job Templates, Credentials, Jobs)
+----
+
+* **Developer IDE** — The coding environment with an integrated AI chat agent
+* **Ansible MCP Server** — A Model Context Protocol server that exposes AAP capabilities (inventory, jobs, templates) as tools the AI agent can call
+* **Ansible Automation Platform** — The execution engine that manages inventory, credentials, and runs automation
+
+[quote]
+💡 **What is MCP?** The Model Context Protocol is an open standard that allows AI assistants to interact with external tools and data sources. The Ansible MCP server exposes AAP's REST API as MCP tools, so AI agents can query inventory, list job templates, launch jobs, and more — all through natural language conversation.
+
+== Accessing the IDE
+
+[cols="2,2", options="header"]
+|===
+| Component | Value
+
+| IDE URL
+| link:{ide_url}[Developer IDE^]
+
+| Username
+| `{ide_username}`
+
+| Password
+| `{ide_password}`
+|===
+
+// TODO: Confirm IDE platform — code-server with chat extension, OpenCode, LibreChat, or other
+// TODO: Confirm MCP server is enabled and connected to AAP
+
+1. Open the IDE using the link above.
+2. Open the **AI Chat** panel (typically in the sidebar or bottom panel).
+3. Verify the Ansible MCP server is connected — the agent should have access to AAP tools.
+
+// TODO: Add screenshot of IDE with chat panel open and MCP connected
+
+== The Ansible MCP Server
+
+The MCP server provides the AI agent with the following capabilities:
+
+[cols="2,3", options="header"]
+|===
+| MCP Tool Category | What the Agent Can Do
+
+| **Inventory**
+| List hosts, groups, and inventories; inspect host variables; check which systems are registered
+
+| **Job Templates**
+| List available job templates; read template configurations; launch jobs with parameters
+
+| **Jobs**
+| Check running and completed jobs; read job output and events; monitor job status
+
+| **Projects**
+| List and sync projects from Git repositories
+
+| **Credentials**
+| List credential types (not secrets) to understand what access is available
+|===
+
+The agent calls these tools behind the scenes when you ask questions in natural language. You don't need to know the API endpoints — just describe what you want in plain English.
+
+== Agentic Workflow: Server Assessment and Patching
+
+In this exercise, you will have a conversation with the AI agent to assess your RHEL fleet and remediate issues discovered in Section 7.
+
+=== Step 1: Ask the agent about your servers
+
+In the AI Chat panel, type a prompt like:
+
+[source]
+----
+Are there any servers in my inventory that need patching or have outstanding
+remediation actions?
+----
+
+Observe how the agent:
+
+* Queries the AAP inventory via MCP to list your RHEL hosts
+* Checks for available job templates related to patching and remediation
+* Reports back with a summary of what it found
+
+// TODO: Add screenshot of agent response showing inventory query results
+
+[quote]
+💡 The agent is not just listing hosts — it is correlating inventory data with available job templates to give you an actionable summary. This is the "reasoning" step of agentic automation.
+
+=== Step 2: Ask for details on a specific host
+
+Follow up with a more specific question:
+
+[source]
+----
+What remediation is available for {rhel_node2}? Does AAP already have a job
+template that can patch it?
+----
+
+The agent will:
+
+* Look up `{rhel_node2}` in the inventory
+* Search available job templates for relevant remediation (e.g., the CVE Remediation template you created in Section 7)
+* Report what it found, including the template name and configuration
+
+// TODO: Add screenshot of agent showing available JT for the host
+
+=== Step 3: Ask the agent to execute remediation
+
+Now ask the agent to take action:
+
+[source]
+----
+Can you run the CVE remediation job template against {rhel_node2}?
+----
+
+[IMPORTANT]
+====
+**The agent will ask for your permission before executing.** This is the critical difference from autonomous automation. The agent proposes the action, shows you what it will do, and waits for your explicit approval. You are always in control.
+====
+
+The agent will:
+
+* Confirm the job template it will launch
+* Show the target host and any parameters
+* Ask: _"Shall I proceed?"_
+
+// TODO: Add screenshot of agent asking for permission
+
+=== Step 4: Approve and observe execution
+
+1. Approve the agent's request.
+2. The agent launches the job template via the Ansible MCP server.
+3. Watch the job execution in AAP:
+   * Navigate to **Automation Controller** → **Jobs**
+   * Find the job that was just launched
+   * Observe the output
+
+// TODO: Add screenshot of job running in AAP triggered by the agent
+
+=== Step 5: Verify the fix
+
+Ask the agent to confirm the remediation was successful:
+
+[source]
+----
+Did the patching job complete successfully? Can you check the status?
+----
+
+The agent will:
+
+* Query the job status via MCP
+* Report success or failure
+* Suggest next steps if needed
+
+== Extended Exercise: Multi-Host Remediation
+
+Try a broader prompt to see the agent handle multiple hosts:
+
+[source]
+----
+Check all three RHEL servers. Are there any outstanding issues? Can you
+remediate everything that has a matching job template?
+----
+
+The agent should:
+
+1. Query all RHEL hosts in the inventory
+2. Cross-reference available job templates
+3. Present a remediation plan for your approval
+4. Execute approved actions one at a time (or propose a workflow)
+
+[quote]
+💡 **This is the power of agentic automation.** Instead of navigating multiple AAP screens, Insights dashboards, and Git repositories, you had a single conversation that assessed your fleet and executed remediation. The agent did the research; you made the decisions.
+
+== How This Differs from Traditional Workflows
+
+[cols="2,2,2", options="header"]
+|===
+| Aspect | Traditional (Parts 1-3) | Agentic (This Section)
+
+| **Trigger**
+| Event (Filebeat, Splunk, Winlogbeat)
+| Human prompt in IDE
+
+| **Decision Maker**
+| Pre-defined workflow logic
+| AI agent with human approval
+
+| **Flexibility**
+| Fixed workflow steps
+| Dynamic — agent adapts to what it finds
+
+| **Approval**
+| Built into workflow (optional)
+| Always required — agent asks before acting
+
+| **Best For**
+| Known, repeatable scenarios
+| Ad-hoc investigation and remediation
+|===
+
+== Key Takeaways
+
+* **Agentic automation** lets you use natural language to manage infrastructure through an AI assistant
+* The **Ansible MCP server** bridges the AI agent to Ansible Automation Platform's full capabilities
+* **Human-in-the-loop** means the agent proposes but you decide — every action requires explicit approval
+* The agent can **discover, reason, and propose** actions across inventory, job templates, and job history
+* This approach complements traditional event-driven workflows — use both depending on the situation
+
+== Complete
+
+You have completed Section 8 — Agentic IDE Workflow. You have used an AI agent to interactively assess and remediate your RHEL fleet through natural language conversation.
+
+In the next section, you will see the **opposite approach**: a fully autonomous workflow where Splunk detects a RHEL misconfiguration and pre-approved automation fixes it without any human intervention.
+
+Click the link below to continue to **Section 9: Autonomous AIOps — Self-Healing RHEL with Splunk**.

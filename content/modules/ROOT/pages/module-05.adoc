@@ -1,4 +1,4 @@
-= Section 7 - Summary and Call to Actions
+= Section 10 - Summary and Call to Actions
 
 🎉 **Congratulations!** You have completed the {lab_name}!
 
@@ -8,7 +8,7 @@ image::thumbs-up.gif[thumbsup!, link="_images/thumbs-up.gif", window=blank]
 
 == What You Accomplished
 
-Throughout this lab, you experienced the power of AI-driven automation across three domains:
+Throughout this lab, you experienced the power of AI-driven automation across five domains:
 
 === Part 1: AIOps with Apache Remediation
 * Built an intelligent log enrichment workflow using Red Hat AI
@@ -25,6 +25,19 @@ Throughout this lab, you experienced the power of AI-driven automation across th
 * Automatically generated Mattermost tickets from Windows event payloads
 * Used AI to analyze Windows Firewall changes and enrich tickets with expert insights
 * Demonstrated platform-agnostic AIOps across Linux, network devices, and Windows
+
+=== Part 4: Red Hat Insights & Agentic IDE Workflow
+* Used Red Hat Insights to identify CVEs and Advisor recommendations across a RHEL fleet
+* Generated remediation playbooks from Insights for vulnerabilities, misconfigurations, HTTPD issues, and System Roles
+* Reviewed AI-generated playbooks in a developer IDE before committing to Git
+* Used an AI agent with the Ansible MCP server to interactively discover servers needing patches
+* Executed remediation through the agent with human-in-the-loop approval at every step
+
+=== Part 5: Autonomous AIOps with Splunk and RHEL
+* Observed Splunk detecting a RHEL misconfiguration in real-time
+* Watched Event-Driven Ansible trigger pre-approved automation without human intervention
+* Experienced a fully autonomous self-healing workflow from detection to remediation
+* Compared human-in-the-loop (Part 4) vs fully autonomous (Part 5) approaches
 
 == Summary of Job Templates
 
@@ -55,6 +68,13 @@ Glossary:
 | `Windows Events` | RB that watches Kafka queue for Windows security and firewall events
 | `Windows: Create Mattermost Ticket` | JT creates a Mattermost ticket from Windows event data
 | `Windows AI: Analyze and Ticket` | JT queries AI to analyze a Windows event and creates an enriched ticket
+| `🛡️ CVE Remediation` | JT patches a specific CVE identified by Red Hat Insights
+| `📋 Advisor Remediation` | JT fixes an Advisor-flagged misconfiguration from Red Hat Insights
+| `🔧 HTTPD Configuration Fix` | JT remediates Apache configuration issues (Insights-generated)
+| `⚙️ System Roles Configuration` | JT applies RHEL System Roles for standardized configuration
+| `❌ Break RHEL Configuration` | JT introduces a misconfiguration on a RHEL node for the autonomous demo
+| `🔧 RHEL Auto-Remediation` | JT pre-approved automation that fixes RHEL misconfigurations autonomously
+| `RHEL Splunk Misconfiguration` | RB watches for Splunk webhook alerts on RHEL misconfiguration events
 |===
 
 Now here is a walkthrough in the same chronological order:
@@ -385,6 +405,105 @@ The network automation workflows demonstrate:
 - **Automation**: Event-Driven Ansible triggers workflows that validate (check mode) and execute (run mode) fixes
 
 This creates a complete closed-loop automation system for network troubleshooting that codifies expert knowledge into reusable, AI-generated playbooks.
+
+== Part 4: Red Hat Insights & Agentic IDE Workflow
+
+=== Insights Remediation Overview
+
+Part 4 introduced a developer-centric approach to AIOps. Instead of fully automated playbook generation via API (as in Parts 1-3), this workflow brings the human into the loop through a developer IDE.
+
+=== Red Hat Insights Playbook Generation
+
+*Purpose:*
+Use Red Hat Insights to identify CVEs and Advisor recommendations, then generate targeted remediation playbooks.
+
+*What it does:*
+
+- Scans connected RHEL systems for vulnerabilities (CVEs) and misconfigurations (Advisor)
+- Generates Ansible Playbooks tailored to each issue
+- Downloads playbooks for human review in a developer IDE
+
+*Four playbooks generated:*
+
+1. **CVE Remediation** — patches a specific vulnerability on `{rhel_node2}`
+2. **Advisor Remediation** — fixes a Red Hat-flagged misconfiguration on `{rhel_node3}`
+3. **HTTPD Configuration Fix** — remediates Apache config issues on `{rhel_node1}`
+4. **System Roles** — applies RHEL System Roles for standardized configuration management
+
+=== Agentic IDE Workflow
+
+*Purpose:*
+Demonstrate human-in-the-loop agentic automation using an AI agent in a developer IDE connected to AAP via the Ansible MCP server.
+
+*What it does:*
+
+- Student prompts the AI agent in natural language (e.g., "Are there servers that need patching?")
+- The agent queries AAP inventory via MCP to discover hosts and their state
+- The agent identifies available Job Templates that match the remediation need
+- The agent asks for explicit permission before executing any action
+- Upon approval, the agent launches the Job Template through AAP
+
+*Key principle:* The AI proposes, the human decides. Every action requires explicit approval.
+
+== Part 5: Autonomous AIOps with Splunk and RHEL
+
+=== Autonomous Remediation Overview
+
+Part 5 demonstrated the end state of AIOps maturity: fully autonomous self-healing. This workflow uses the same Splunk infrastructure from Part 2 (Network Automation) but applies it to RHEL system monitoring.
+
+=== `❌ Break RHEL Configuration`
+
+*Purpose:*
+Introduces a known misconfiguration on a RHEL node to trigger the autonomous workflow.
+
+*What happens next:*
+
+- Splunk Universal Forwarder detects the configuration change
+- Splunk saved search matches the event and fires an alert
+- EDA webhook receives the alert and triggers pre-approved automation
+
+=== `RHEL Splunk Misconfiguration`
+
+*Purpose:*
+EDA rulebook that listens for Splunk webhook alerts related to RHEL misconfigurations.
+
+*What it does:*
+
+- Monitors the webhook endpoint for Splunk RHEL alerts
+- Matches on specific misconfiguration events
+- Launches the pre-approved `🔧 RHEL Auto-Remediation` Job Template
+
+=== `🔧 RHEL Auto-Remediation`
+
+*Purpose:*
+Pre-approved, pre-tested Job Template that fixes the RHEL misconfiguration automatically.
+
+*What it does:*
+
+- Executes a validated remediation playbook against the affected RHEL node
+- Fixes the misconfiguration without any human intervention
+- Reports success/failure in the AAP job history
+
+*Key principle:* This Job Template was reviewed and approved during Part 4. Its promotion to autonomous execution reflects organizational trust in tested, validated automation.
+
+=== The AIOps Maturity Spectrum
+
+[cols="1,2,2", options="header"]
+|===
+| Maturity Level | Approach | Workshop Part
+
+| **Level 1**
+| Event-driven with AI content generation + human review
+| Parts 1-3
+
+| **Level 2**
+| Human-in-the-loop with AI agent assistance
+| Part 4
+
+| **Level 3**
+| Fully autonomous with pre-approved trusted automation
+| Part 5
+|===
 
 == Call to action
 

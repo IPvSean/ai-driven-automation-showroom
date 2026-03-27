@@ -7,4 +7,9 @@
 ** xref:module-04.adoc[5. Network Workflow]
 * Part 3: AIOps with Windows Automation
 ** xref:module-06.adoc[6. Windows Events and AI-Driven Ticketing]
-* xref:module-05.adoc[7. Summary and Call to Actions]
+* Part 4: Red Hat Insights & Agentic IDE Workflow
+** xref:module-07.adoc[7. Red Hat Insights — CVE and Advisor Remediation]
+** xref:module-08.adoc[8. Agentic IDE Workflow with Ansible MCP]
+* Part 5: Autonomous AIOps with Splunk and RHEL
+** xref:module-09.adoc[9. Autonomous AIOps — Self-Healing RHEL with Splunk]
+* xref:module-05.adoc[Summary and Call to Actions]

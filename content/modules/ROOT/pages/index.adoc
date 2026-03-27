@@ -41,7 +41,7 @@ It is important to note that AIOps can be adopted incrementally and it is not al
 
 link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank]
 
-- A RHEL(Red Hat Enterprise Linux) node with Apache (`httpd`) installed
+- Three RHEL (Red Hat Enterprise Linux) nodes: one with Apache (`httpd`), one for CVE remediation, and one for Advisor recommendations
 - Filebeat monitoring Apache logs
 - Kafka acting as the event transport
 - Event-Driven Ansible is listening to Kafka and launching workflows based on defined rules
@@ -52,6 +52,9 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
 - Mattermost for message notifications
 - A Windows Server with Active Directory for Windows event-driven automation
 - Winlogbeat on Windows forwarding events to Kafka
+- Red Hat Insights for CVE and Advisor remediation playbook generation
+- A developer IDE with an AI agent connected to AAP via the Ansible MCP server
+- Splunk Universal Forwarder on RHEL for system-level misconfiguration detection
 
 [quote]
 💡 EDA (Event-Driven Ansible) is part of Ansible Automation Platform.  It is referred to separately sometimes depending on the workflow.  EDA uses rulebooks to monitor events, then executes specified job templates or workflows based on the event.  Think of it simply as inputs and outputs.  EDA is an automatic way for inputs into Ansible Automation Platform, where Automation controller / Automation execution is the output (running a job template or workflow).
@@ -60,12 +63,14 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
 
 === Workshop Duration
 
-This workshop consists of three independent parts:
+This workshop consists of five independent parts:
 
 - *Part 1: AIOps with Apache Remediation* - 30-40 minutes
 - *Part 2: Network Automation* - 30-40 minutes
 - *Part 3: Windows Automation* - 15-20 minutes
-- *Total Workshop Time* - ~90 minutes
+- *Part 4: Red Hat Insights & Agentic IDE Workflow* - 50-70 minutes
+- *Part 5: Autonomous AIOps with Splunk and RHEL* - 20-30 minutes
+- *Total Workshop Time* - ~150-200 minutes
 
 For each workshop, there are 4 parts:
 
@@ -242,8 +247,50 @@ This is the key insight: the AIOps pattern works across **any domain**:
 * **Part 1 (Linux)**: Filebeat → Kafka → EDA → AAP (detects service failures)
 * **Part 2 (Network)**: Splunk → Webhook → EDA → AAP (detects OSPF issues)
 * **Part 3 (Windows)**: Winlogbeat → Kafka → EDA → AAP (detects security events)
+* **Part 4 (Insights + IDE)**: Red Hat Insights → IDE → Human reviews → Git → AAP (human-in-the-loop with AI agent)
+* **Part 5 (Autonomous)**: Splunk → Webhook → EDA → AAP (fully autonomous self-healing)
 
-Same pattern, different observability tools and domains.
+Same pattern, different observability tools, domains, and levels of human involvement.
+
+== Part 4: Red Hat Insights & Agentic IDE Workflow
+
+image::aap_logo.png[aap_logo,150, link="_images/aap_logo.png", window=blank]
+
+Part 4 introduces two new dimensions to AIOps: **Red Hat Insights** for vulnerability and compliance management, and an **AI agent in a developer IDE** for interactive infrastructure management.
+
+[IMPORTANT]
+====
+**These are two separate demos** that work together:
+
+. **Red Hat Insights** (Section 7): Generate remediation playbooks for CVEs and Advisor recommendations, review them in an IDE, and push to Git/AAP
+. **Agentic IDE Workflow** (Section 8): Use an AI agent with the Ansible MCP server to discover servers needing patches, find matching Job Templates, and execute remediation — with human approval at every step
+====
+
+* **Observability**: Red Hat Insights continuously monitors RHEL systems for CVEs and misconfigurations
+* **Inference**: Insights generates targeted remediation playbooks; the IDE agent reasons about what actions are needed
+* **Automation**: Playbooks are pushed to Git and promoted to AAP Job Templates; the agent executes them with human approval
+
+=== What You'll Learn
+
+* How to use Red Hat Insights to generate CVE and Advisor remediation playbooks
+* Reviewing AI-generated playbooks in a developer IDE before committing
+* Using an AI agent with the Ansible MCP server to interactively manage RHEL infrastructure
+* The human-in-the-loop principle: AI proposes, human decides
+
+== Part 5: Autonomous AIOps with Splunk and RHEL
+
+This final part demonstrates the **end state of AIOps maturity**: fully autonomous self-healing infrastructure. Splunk monitors RHEL systems for misconfigurations, and when one is detected, pre-approved automation fixes it — without any human intervention.
+
+* **Observability**: Splunk Universal Forwarder detects RHEL misconfigurations in real-time
+* **Automation**: Event-Driven Ansible triggers pre-approved, trusted Job Templates that remediate the issue automatically
+
+=== The AIOps Maturity Journey
+
+This workshop takes you through the full maturity spectrum:
+
+* **Parts 1-3**: Event-driven with AI content generation and human review checkpoints
+* **Part 4**: Human-in-the-loop with an AI agent that asks permission before every action
+* **Part 5**: Fully autonomous — pre-approved, trusted automation handles everything
 
 == What's Next?
 
@@ -266,11 +313,19 @@ Apply the same AIOps patterns to **network infrastructure**. Troubleshoot OSPF r
 **Part 3: AIOps with Windows Automation** (Module 6) Highly Recommended
 
 Extend the AIOps pattern to **Windows Server**. Detect Active Directory and Windows Firewall events with Winlogbeat and Kafka, then use Event-Driven Ansible to create AI-enriched tickets automatically.
+
+**Part 4: Red Hat Insights & Agentic IDE Workflow** (Modules 7-8) NEW
+
+Use **Red Hat Insights** to generate remediation playbooks for CVEs and Advisor recommendations, then use an **AI agent in a developer IDE** to interactively discover and remediate issues via the Ansible MCP server.
+
+**Part 5: Autonomous AIOps with Splunk and RHEL** (Module 9) NEW
+
+Experience **fully autonomous self-healing**: Splunk detects a RHEL misconfiguration, Event-Driven Ansible triggers pre-approved automation, and the issue is fixed without human intervention.
 |===
 
 [TIP]
 ====
-**Choose your path:** All three parts are independent and can be completed in any order. New to AIOps? Start with Part 1. Already familiar with the basics? Jump to Part 2 for network automation or Part 3 for Windows event-driven automation.
+**Choose your path:** All five parts are independent and can be completed in any order. New to AIOps? Start with Part 1. Already familiar with the basics? Jump to Part 2 for network automation, Part 3 for Windows, Part 4 for Insights and agentic IDE workflows, or Part 5 for fully autonomous self-healing.
 ====
 
 Click the link below to proceed to **Module 1: Log Enrichment and Prompt Generation Workflow**.
