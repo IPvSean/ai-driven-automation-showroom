@@ -184,14 +184,27 @@ node1,node2,node3
 
 [start=6]
 6. Click the blue **Finish** button to launch the job.
-7. Wait for the job to complete successfully. This registers all three RHEL nodes with Red Hat Lightspeed so they appear in the Vulnerability and Advisor dashboards.
+7. Wait for the job to complete successfully.
 
 [NOTE]
 ====
 **Why automate registration?** Manually SSH-ing into each host to run `insights-client --register` is tedious and error-prone at scale. Using an AAP Job Template means you can register dozens or hundreds of hosts with a single click — and the same template can be reused for new hosts added later.
 ====
 
-Once registration is complete, return to your https://console.redhat.com[console.redhat.com^] browser tab. Your three RHEL nodes should now appear under **Inventory** → **Systems**. It may take a minute or two for the systems to populate.
+=== Finding Your Nodes in Red Hat Lightspeed
+
+When the job completes, note the **Group/Tag** value in the job output. This is your unique lab identifier that you will use to filter your systems in console.redhat.com.
+
+image::aap-register-job-output.png[Registration job output showing Group/Tag,80%,80%, link="_images/aap-register-job-output.png", window=blank]
+
+[start=8]
+8. Return to your https://console.redhat.com[console.redhat.com^] browser tab.
+9. Navigate to **Inventory** → **Systems**.
+10. Click **Filter by tags**, then filter by `group=` followed by your unique identifier from the job output (e.g., `group=k5txp`).
+
+image::console-inventory-tags-filter.png[Filter systems by tag in console.redhat.com,80%,80%, link="_images/console-inventory-tags-filter.png", window=blank]
+
+You should see your three RHEL nodes listed. It may take a minute or two after registration for the systems to fully populate.
 
 == Generating Remediation Playbooks
 
