@@ -287,6 +287,12 @@ image::console-advisor-plan-remediation.png[Plan a remediation dialog,60%,60%, l
 
 image::console-advisor-remediation-plan-created.png[Remediation plan created and ready to download,80%,80%, link="_images/console-advisor-remediation-plan-created.png", window=blank]
 
+Once downloaded, you can view the Ansible Playbook on your workstation. Below is a snippet of the generated playbook:
+
+image::console-advisor-playbook-snippet.png[Advisor remediation playbook snippet,40%,40%, link="_images/console-advisor-playbook-snippet.png", window=blank]
+
+NOTE: This is only a snippet — the full playbook may contain additional tasks and configuration depending on the recommendation.
+
 === Step 3: Move the playbook into code-server
 
 1. Upload or copy the downloaded playbook into code-server.
