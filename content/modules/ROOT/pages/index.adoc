@@ -20,24 +20,24 @@ This workshop consists of five independent labs that can be completed in any ord
 |===
 | Lab | Title | Description
 
-| Lab 1
-| AIOps with Apache Remediation
+| xref:module-00.adoc[Lab 1]
+| xref:module-00.adoc[AIOps with Apache Remediation]
 | A basic introduction to AIOps—learn the fundamentals by building a self-healing workflow for Apache service failures using Red Hat AI and Ansible Lightspeed. (30-40 min)
 
-| Lab 2
-| AIOps with Network Automation
+| xref:module-02.adoc[Lab 2]
+| xref:module-02.adoc[AIOps with Network Automation]
 | Apply the same AIOps patterns to network infrastructure. Troubleshoot OSPF routing issues on Cisco routers using Splunk, Event-Driven Ansible, and Lightspeed-generated playbooks. (30-40 min)
 
-| Lab 3
-| AIOps with Windows Automation
+| xref:module-06.adoc[Lab 3]
+| xref:module-06.adoc[AIOps with Windows Automation]
 | Extend the AIOps pattern to Windows Server. Detect Active Directory and Windows Firewall events with Winlogbeat and Kafka, then use Event-Driven Ansible to create AI-enriched tickets automatically. (15-20 min)
 
-| Lab 4 (ETX - Scenario 3)
-| Red Hat Lightspeed & Agentic IDE Workflow
+| xref:module-07.adoc[Lab 4 (ETX - Scenario 3)]
+| xref:module-07.adoc[Red Hat Lightspeed & Agentic IDE Workflow]
 | Use Red Hat Lightspeed to generate CVE and Advisor remediation playbooks, use Automation code assistant to generate an HTTPD fix in code-server, then use Claude Code to interactively discover and remediate issues via the Ansible MCP server. (50-70 min)
 
-| Lab 5 (ETX - Scenario 4)
-| Autonomous AIOps with Splunk and RHEL
+| xref:module-09.adoc[Lab 5 (ETX - Scenario 4)]
+| xref:module-09.adoc[Autonomous AIOps with Splunk and RHEL]
 | Experience fully autonomous self-healing: Splunk detects a RHEL misconfiguration, Event-Driven Ansible triggers pre-approved automation, and the issue is fixed without human intervention. (20-30 min)
 
 |===
@@ -187,6 +187,12 @@ Password: `{mattermost_password}`
 | link:{splunk_url}[Splunk^]
 | Username: `{splunk_username}`
 Password: `{splunk_password}`
+
+| Red Hat Lightspeed (console.redhat.com)
+| link:https://console.redhat.com[console.redhat.com^]
+Used in xref:module-07.adoc[Lab 4] for CVE and Advisor remediation
+| Username: `{insights_username}`
+Password: `{insights_password}`
 
 |===
 

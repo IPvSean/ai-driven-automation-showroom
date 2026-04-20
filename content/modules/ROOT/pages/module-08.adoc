@@ -84,21 +84,14 @@ code-server (VS Code in browser)
 
 === Step 2: Launch an AI agent
 
-Your lab has two AI agents pre-installed — **Claude Code** and **OpenCode**. Either one works for this exercise. Both connect to the same Ansible MCP server.
+Your lab has **Claude Code** pre-installed — Anthropic's CLI-based AI agent that connects to AAP via the Ansible MCP server.
 
 1. Open a **terminal** inside code-server (Terminal → New Terminal, or press `Ctrl+``).
-2. Type either:
+2. Type:
 
 [source,bash]
 ----
 claude
-----
-
-or
-
-[source,bash]
-----
-opencode
 ----
 
 [start=3]
@@ -108,11 +101,13 @@ opencode
 
 [NOTE]
 ====
-**MCP is pre-configured.** Both Claude Code and OpenCode are already connected to the **Ansible MCP server** in your lab environment. You do not need to configure anything — the MCP connection to AAP is ready to use as soon as either agent starts.
+**MCP is pre-configured.** Claude Code is already connected to the **Ansible MCP server** in your lab environment. You do not need to configure anything — the MCP connection to AAP is ready to use as soon as the agent starts.
 ====
 
-[quote]
-💡 The examples below use Claude Code, but you can substitute OpenCode anywhere — the MCP tools and workflows are the same.
+[NOTE]
+====
+**OpenCode** is also installed in this environment but has not been tested with this lab. If you want to experiment with it, you can launch it by typing `opencode` in the terminal. **Claude Code is the recommended and tested agent** for all exercises.
+====
 
 == The Ansible MCP Server
 
@@ -280,7 +275,7 @@ Claude Code should:
 
 == Key Takeaways
 
-* **Claude Code and OpenCode** are terminal-based AI agents that run inside code-server and connect to AAP via MCP — use whichever you prefer
+* **Claude Code** is a terminal-based AI agent that runs inside code-server and connects to AAP via MCP
 * The **Ansible MCP server** bridges any MCP-compatible AI agent to Ansible Automation Platform's full capabilities
 * **Human-in-the-loop** means the agent proposes but you decide — every action requires explicit approval
 * The agent can **discover, reason, and propose** actions across inventory, job templates, and job history

@@ -51,12 +51,6 @@ https://console.redhat.com[Red Hat Lightspeed^] (formerly Red Hat Insights) is a
 [quote]
 💡 **Advisor vs CVE**: Think of CVEs as *reactive* — patching known vulnerabilities. Advisor recommendations are *proactive* — fixing misconfigurations and applying best practices before they become incidents. Both are critical for a healthy RHEL fleet.
 
-=== Generating a PDF Report
-
-Red Hat Lightspeed can generate PDF reports summarizing CVEs affecting your environment. Students can download and review these reports to understand the vulnerability landscape before generating remediation playbooks.
-
-// TODO: Add screenshot of Lightspeed PDF report generation
-
 == Lab Environment
 
 === RHEL Instances
@@ -68,7 +62,7 @@ This part of the lab uses **three RHEL instances**, each dedicated to a specific
 | Host | Purpose | Use Case
 
 | `{rhel_node1}`
-| Apache web server (from Lab 1)
+| Apache web server (from xref:module-00.adoc[Lab 1])
 | HTTPD configuration remediation
 
 | `{rhel_node2}`
@@ -101,38 +95,18 @@ Your lab environment includes **code-server**, which is https://code.visualstudi
 | `{ide_password}`
 |===
 
-=== AI Agents: Claude Code and OpenCode
+=== AI Agent: Claude Code
 
-Your lab environment has **two AI agents** pre-installed, both running in the terminal inside code-server. Either one can be used for the exercises in this section — they both support MCP and connect to the same Ansible and Lightspeed MCP servers.
+Your lab environment has **Claude Code** pre-installed — Anthropic's CLI-based AI agent that runs in the terminal inside code-server. It supports MCP and connects to both the Ansible MCP server and the Red Hat Lightspeed MCP server.
 
-[cols="2,2,3", options="header"]
-|===
-| Agent | Launch Command | Description
-
-| **Claude Code**
-| `claude`
-| Anthropic's CLI-based AI agent
-
-| **OpenCode**
-| `opencode`
-| Open-source terminal AI agent
-|===
-
-To launch an agent:
+To launch Claude Code:
 
 1. Open a **terminal** inside code-server.
-2. Type either:
+2. Type:
 
 [source,bash]
 ----
 claude
-----
-
-or
-
-[source,bash]
-----
-opencode
 ----
 
 [start=3]
@@ -140,13 +114,15 @@ opencode
 
 [NOTE]
 ====
-**MCP is pre-configured for both agents.** Claude Code and OpenCode are already connected to the Ansible MCP server and the Red Hat Lightspeed MCP server in your lab environment. You do not need to configure anything — just launch either agent and start chatting.
+**MCP is pre-configured.** Claude Code is already connected to the Ansible MCP server and the Red Hat Lightspeed MCP server in your lab environment. You do not need to configure anything — just launch the agent and start chatting.
 ====
 
-[quote]
-💡 The exercises in this section use Claude Code in the examples, but you can substitute OpenCode anywhere you see `claude` — the MCP tools and workflows work the same way with either agent.
+[NOTE]
+====
+**OpenCode** is also installed in this environment but has not been tested with this lab. If you want to experiment with it, you can launch it by typing `opencode` in the terminal. It connects to the same MCP servers, but **Claude Code is the recommended and tested agent** for all exercises.
+====
 
-== Accessing Red Hat Lightspeed
+=== Red Hat Lightspeed (console.redhat.com)
 
 [cols="2,2", options="header"]
 |===
@@ -162,30 +138,73 @@ opencode
 | `{insights_password}`
 |===
 
-1. Log in to https://console.redhat.com[Red Hat Lightspeed^] using the credentials above.
-2. Navigate to **RHEL** → **Vulnerability** to see the CVE dashboard.
-3. Observe the list of CVEs affecting your connected RHEL systems.
+== Logging in to Red Hat Lightspeed
+
+[IMPORTANT]
+====
+**Manual login required.** You must log in to https://console.redhat.com[console.redhat.com^] with the credentials above. This is a shared Red Hat account that has your lab RHEL systems already registered. Open the link in a new browser tab and sign in before proceeding.
+====
+
+1. Open https://console.redhat.com[console.redhat.com^] in a new browser tab.
+2. Log in using the **Username** and **Password** shown in the table above.
+3. Click the **Red Hat Hybrid Cloud Console** dropdown (top-left) and select **Red Hat Enterprise Linux**.
+
+image::console-rhel-platform.png[Select Red Hat Enterprise Linux,60%,60%, link="_images/console-rhel-platform.png", window=blank]
+
+[start=4]
+4. Navigate to **Vulnerability** to see the CVE dashboard.
+5. Observe the list of CVEs affecting your connected RHEL systems.
 
 // TODO: Add screenshot of Lightspeed Vulnerability dashboard
 
-[start=4]
-4. Navigate to **RHEL** → **Advisor** → **Recommendations** to see the Advisor dashboard.
-5. Observe the recommendations flagged for your systems (e.g., SELinux policy issues, configuration drift).
+[start=6]
+6. Navigate to **Advisor** → **Recommendations** to see the Advisor dashboard.
+7. Observe the recommendations flagged for your systems (e.g., SELinux policy issues, configuration drift).
 
 // TODO: Add screenshot of Lightspeed Advisor dashboard
 
+== Register RHEL Nodes to Red Hat Lightspeed
+
+Before you can view CVEs, Advisor recommendations, or generate remediation playbooks, your RHEL nodes must be registered with Red Hat Lightspeed (formerly Red Hat Insights). Normally you would do this manually on each host by running `insights-client --register`, but in this lab we will use **Red Hat Ansible Automation Platform** to register all three nodes at once.
+
+1. Switch to the **AAP** tab in your lab interface (or open link:{controller_url}[AAP Web UI^] in a new tab).
+2. In the left navigation, click **Automation Execution** → **Templates**.
+
+image::aap-templates-nav.png[AAP Templates navigation,30%,30%, link="_images/aap-templates-nav.png", window=blank]
+
+[start=3]
+3. Find and click the **Register with Red Hat Lightspeed** job template.
+4. Click **Launch**.
+5. When prompted for **Limit**, type:
+
+[source]
+----
+node1,node2,node3
+----
+
+[start=6]
+6. Click the blue **Finish** button to launch the job.
+7. Wait for the job to complete successfully. This registers all three RHEL nodes with Red Hat Lightspeed so they appear in the Vulnerability and Advisor dashboards.
+
+[NOTE]
+====
+**Why automate registration?** Manually SSH-ing into each host to run `insights-client --register` is tedious and error-prone at scale. Using an AAP Job Template means you can register dozens or hundreds of hosts with a single click — and the same template can be reused for new hosts added later.
+====
+
+Once registration is complete, return to your https://console.redhat.com[console.redhat.com^] browser tab. Your three RHEL nodes should now appear under **Inventory** → **Systems**. It may take a minute or two for the systems to populate.
+
 == Generating Remediation Playbooks
 
-You will work with **four playbooks** in this section, each targeting a different remediation scenario:
+You will work through **five exercises** in this section. The first generates a vulnerability report, and the remaining four each produce a remediation playbook:
 
 [cols="1,2,2,2", options="header"]
 |===
-| # | Playbook | Description | Method
+| # | Exercise | Description | Method
 
 | 1
-| CVE Remediation
-| Patches a specific CVE identified by Lightspeed on `{rhel_node2}`
-| **Agentic** — Claude Code + MCP
+| Executive PDF Report
+| Generate a PDF report summarizing CVEs affecting your environment
+| **Manual** — Lightspeed web UI
 
 | 2
 | Advisor Remediation
@@ -193,17 +212,71 @@ You will work with **four playbooks** in this section, each targeting a differen
 | **Manual** — Lightspeed web UI
 
 | 3
+| CVE Remediation
+| Patches a specific CVE identified by Lightspeed on `{rhel_node2}`
+| **Agentic** — Claude Code + MCP
+
+| 4
 | HTTPD Configuration Fix
 | Remediates the Apache configuration issue using Automation code assistant
 | **AI-generated** — Automation code assistant (Gemini)
 
-| 4
+| 5
 | System Roles Playbook
 | Uses RHEL System Roles for NTP configuration
 | **Pre-built** — provided in the lab
 |===
 
-== Playbook 1: CVE Remediation (Agentic via MCP)
+== Exercise 1: Executive PDF Report
+
+Red Hat Lightspeed can generate PDF reports summarizing CVEs affecting your environment. You will generate an Executive Report to understand the vulnerability landscape before creating remediation playbooks.
+
+1. In the console.redhat.com browser tab you already have open, expand **Security** → **Vulnerability** → **Reports** in the left navigation.
+
+image::console-vulnerability-reports.png[Vulnerability Reports navigation,40%,40%, link="_images/console-vulnerability-reports.png", window=blank]
+
+[start=2]
+2. Click **Executive Report** to generate the report.
+3. Download and review the PDF — it summarizes the CVEs affecting your connected RHEL systems, organized by severity.
+
+[quote]
+💡 **Why start with a report?** The Executive Report gives you a high-level view of your environment's vulnerability posture. This context helps you prioritize which CVEs and Advisor recommendations to remediate first in the exercises that follow.
+
+== Exercise 2: Advisor Remediation (Manual)
+
+The Advisor section of Red Hat Lightspeed provides proactive recommendations — misconfigurations, compliance issues, and best practices flagged by Red Hat Support.
+
+[NOTE]
+====
+**MCP support for Advisor is coming in a future release.** Currently, the Red Hat Lightspeed MCP server supports CVE vulnerability queries but does not yet support Advisor recommendations. For this exercise, you will generate the Advisor playbook manually through the Lightspeed web UI. Once MCP support lands, this workflow will be fully agentic like the CVE exercise in Playbook 2.
+====
+
+=== Step 1: Navigate to Advisor
+
+1. In the console.redhat.com browser tab you already have open, navigate to **Operations** → **Advisor** → **Recommendations**.
+2. Find a recommendation affecting `{rhel_node3}` (e.g., an SELinux policy issue or a configuration that would not survive a reboot).
+
+// TODO: Add screenshot of Advisor recommendations
+// TODO: Confirm specific Advisor recommendation to use
+
+=== Step 2: Generate the remediation playbook
+
+1. Select the recommendation.
+2. Click **Remediate** to generate a remediation playbook.
+3. Download the generated playbook.
+
+// TODO: Add screenshot of Advisor remediation generation
+
+=== Step 3: Move the playbook into code-server
+
+1. Upload or copy the downloaded playbook into code-server.
+2. Save it as `advisor-remediation.yml` in the playbooks directory.
+3. Review the content in the editor.
+
+[quote]
+💡 **Advisor recommendations** are based on Red Hat's deep expertise supporting thousands of enterprise RHEL deployments. These are not theoretical — they flag real misconfigurations that Red Hat Support has seen cause outages in production.
+
+== Exercise 3: CVE Remediation (Agentic via MCP)
 
 This exercise demonstrates the **fully agentic approach**: you will use Claude Code to discover CVEs and download a remediation playbook entirely through the MCP interface, without ever opening the Lightspeed web UI manually.
 
@@ -281,42 +354,7 @@ The downloaded playbook will automatically be available in the code-server file 
 [quote]
 💡 **This was entirely agentic.** You never opened a web browser, navigated dashboards, or clicked download buttons. Claude Code used MCP to query Lightspeed, found the CVE, and fetched the playbook — all through a conversation in the terminal.
 
-== Playbook 2: Advisor Remediation (Manual)
-
-The Advisor section of Red Hat Lightspeed provides proactive recommendations — misconfigurations, compliance issues, and best practices flagged by Red Hat Support.
-
-[NOTE]
-====
-**MCP support for Advisor is coming in a future release.** Currently, the Red Hat Lightspeed MCP server supports CVE vulnerability queries but does not yet support Advisor recommendations. For this exercise, you will generate the Advisor playbook manually through the Lightspeed web UI. Once MCP support lands, this workflow will be fully agentic like the CVE exercise above.
-====
-
-=== Step 1: Navigate to Advisor
-
-1. Open https://console.redhat.com[Red Hat Lightspeed^] in your browser (or use the link from the lab interface).
-2. Navigate to **RHEL** → **Advisor** → **Recommendations**.
-3. Find a recommendation affecting `{rhel_node3}` (e.g., an SELinux policy issue or a configuration that would not survive a reboot).
-
-// TODO: Add screenshot of Advisor recommendations
-// TODO: Confirm specific Advisor recommendation to use
-
-=== Step 2: Generate the remediation playbook
-
-1. Select the recommendation.
-2. Click **Remediate** to generate a remediation playbook.
-3. Download the generated playbook.
-
-// TODO: Add screenshot of Advisor remediation generation
-
-=== Step 3: Move the playbook into code-server
-
-1. Upload or copy the downloaded playbook into code-server.
-2. Save it as `advisor-remediation.yml` in the playbooks directory.
-3. Review the content in the editor.
-
-[quote]
-💡 **Advisor recommendations** are based on Red Hat's deep expertise supporting thousands of enterprise RHEL deployments. These are not theoretical — they flag real misconfigurations that Red Hat Support has seen cause outages in production.
-
-== Playbook 3: HTTPD Configuration Fix (Automation code assistant)
+== Exercise 4: HTTPD Configuration Fix (Automation code assistant)
 
 For this playbook, you will use **Automation code assistant** — Red Hat's AI-powered code generation tool integrated into your IDE — to generate a playbook that fixes the Apache configuration issue from Lab 1.
 
@@ -386,7 +424,7 @@ The resulting playbook should look similar to:
 [quote]
 💡 **IDE-first workflow**: In Labs 1-3, playbooks were generated programmatically via API calls and pushed to Git without human review. Here, you are working in the IDE as a developer would — using AI assistance to write the playbook, reviewing the output, and making any adjustments before committing. This is the modern developer workflow for infrastructure as code.
 
-== Playbook 4: RHEL System Roles (Pre-Built)
+== Exercise 5: RHEL System Roles (Pre-Built)
 
 === What are RHEL System Roles?
 
