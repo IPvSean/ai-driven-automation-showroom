@@ -1,11 +1,11 @@
-= Module 5.1 -- Autonomous AIOps -- Self-Healing RHEL with Splunk
-:navtitle: Autonomous AIOps -- Self-Healing RHEL with Splunk
+= Module 5.1: Autonomous AIOps: Self-Healing RHEL with Splunk
+:navtitle: Autonomous AIOps: Self-Healing RHEL with Splunk
 
 == Objective
 
 *Estimated time: 20-30 minutes*
 
-In this section, you will build and observe a **fully autonomous AIOps workflow** where Splunk detects a crond failure on a RHEL server, Event-Driven Ansible triggers a response, and an **AI-powered routing agent** analyzes the error, selects the correct fix from available job templates, and applies it -- all without human intervention (after your initial approval).
+In this section, you will build and observe a **fully autonomous AIOps workflow** where Splunk detects a crond failure on a RHEL server, Event-Driven Ansible triggers a response, and an **AI-powered routing agent** analyzes the error, selects the correct fix from available job templates, and applies it. All without human intervention (after your initial approval).
 
 After completing this section, you will be able to:
 
@@ -36,7 +36,7 @@ RHEL Node (node1)
                             --> Dispatcher launches the correct fix
 ----
 
-The key innovation is the **AI routing agent**. Instead of hard-coding a single fix for every cron alert, the AI analyzes the actual syslog message, queries AAP for available fix templates, and selects the right one. Two different cron failures get two different fixes -- automatically.
+The key innovation is the **AI routing agent**. Instead of hard-coding a single fix for every cron alert, the AI analyzes the actual syslog message, queries AAP for available fix templates, and selects the right one. Two different cron failures get two different fixes, automatically.
 
 === Components
 
@@ -78,8 +78,8 @@ sourcetype=syslog ("bad minute" OR "bad hour" OR "bad day" OR "getpwnam() failed
 
 This search catches two types of crond errors:
 
-* **Syntax errors** -- crond reports `bad minute`, `bad hour`, or `bad day` when a crontab file has invalid scheduling syntax
-* **Invalid user errors** -- crond reports `getpwnam() failed` when a crontab references a user that does not exist on the system
+* **Syntax errors**: crond reports `bad minute`, `bad hour`, or `bad day` when a crontab file has invalid scheduling syntax
+* **Invalid user errors**: crond reports `getpwnam() failed` when a crontab references a user that does not exist on the system
 
 Run the search now. You should see no results yet (nothing is broken).
 
@@ -116,7 +116,7 @@ Run the search now. You should see no results yet (nothing is broken).
 
 [IMPORTANT]
 ====
-The alert title **must** be exactly `rhel-cron-failure`. The EDA rulebook matches on this name -- if it does not match, the workflow will not trigger.
+The alert title **must** be exactly `rhel-cron-failure`. The EDA rulebook matches on this name. If it does not match, the workflow will not trigger.
 ====
 
 == Step 3: Verify EDA and Workflow Are Ready
@@ -128,10 +128,10 @@ Before triggering failures, confirm the automation pipeline is in place:
 3. Verify that **RHEL Cron AIOps** shows **Running** status
 4. Navigate to **Automation Execution** -> **Templates**
 5. Verify that **Cron-AIOps-Workflow** exists
-6. Click into the workflow and open the **Visualizer** -- you should see three nodes:
-   * **ai_router** -- the AI routing agent
-   * **approval_gate** -- human review step
-   * **dispatch_fix** -- launches the selected fix
+6. Click into the workflow and open the **Visualizer**. You should see three nodes:
+   * **ai_router**: the AI routing agent
+   * **approval_gate**: human review step
+   * **dispatch_fix**: launches the selected fix
 
 == Challenge 1: Cron Syntax Error
 
@@ -163,19 +163,19 @@ The automated response happens in this order:
 
 [NOTE]
 ====
-It may take 30-60 seconds for the full chain to execute: crond logs the error -> rsyslog forwards to Splunk -> Splunk indexes and fires alert -> webhook reaches EDA -> workflow launches.
+It may take 30-60 seconds for the full chain to execute. The sequence is: crond logs the error, rsyslog forwards to Splunk, Splunk indexes and fires the alert, the webhook reaches EDA, and the workflow launches.
 ====
 
 === Step 4.3: Check Mattermost
 
 Open **Mattermost** and look for the AI incident report. You should see a card with:
 
-* **What Happened** -- the AI explains that crond encountered an invalid scheduling entry
-* **Root Cause** -- `syntax_error`
-* **Confidence** -- typically 95%+
-* **Recommended Fix** -- remove the invalid crontab file and restart crond
-* **Job Template** -- `Fix Cron - Syntax Error`
-* **Action Required** -- approve in AAP
+* **What Happened**: the AI explains that crond encountered an invalid scheduling entry
+* **Root Cause**: `syntax_error`
+* **Confidence**: typically 95%+
+* **Recommended Fix**: remove the invalid crontab file and restart crond
+* **Job Template**: `Fix Cron - Syntax Error`
+* **Action Required**: approve in AAP
 
 === Step 4.4: Approve the fix
 
@@ -183,7 +183,7 @@ Open **Mattermost** and look for the AI incident report. You should see a card w
 2. Find the **Cron-AIOps-Workflow** job
 3. The workflow should be paused at the **approval_gate** node
 4. Click **Approve** to allow the dispatcher to launch the fix
-5. Wait for the workflow to complete -- all nodes should show green
+5. Wait for the workflow to complete. All nodes should show green
 
 === Step 4.5: Verify the fix
 
@@ -192,7 +192,7 @@ Open **Mattermost** and look for the AI incident report. You should see a card w
 
 == Challenge 2: Cron Invalid User
 
-In this challenge, you will create a crontab entry that references a user that does not exist. This produces a different syslog error -- and the AI must route to a different fix.
+In this challenge, you will create a crontab entry that references a user that does not exist. This produces a different syslog error, and the AI must route to a different fix.
 
 === Step 5.1: Break cron with invalid user
 
@@ -210,7 +210,7 @@ This writes a crontab file to `/etc/cron.d/bad-user-job` with a nonexistent user
 
 [NOTE]
 ====
-Unlike the syntax error which fires immediately, the invalid user error only appears when crond attempts to execute the job -- once per minute. You may need to wait up to 60 seconds for the error to appear in Splunk.
+Unlike the syntax error which fires immediately, the invalid user error only appears when crond attempts to execute the job, once per minute. You may need to wait up to 60 seconds for the error to appear in Splunk.
 ====
 
 === Step 5.2: Watch the chain
@@ -225,9 +225,9 @@ The same automated pipeline fires, but this time the AI sees a different error:
 
 Open **Mattermost** and look for the new incident report. Compare it with the previous one:
 
-* **What Happened** -- the AI explains that crond tried to run a job for a user that does not exist on the system
-* **Root Cause** -- `invalid_user`
-* **Job Template** -- `Fix Cron - Invalid User` (different from Challenge 1)
+* **What Happened**: the AI explains that crond tried to run a job for a user that does not exist on the system
+* **Root Cause**: `invalid_user`
+* **Job Template**: `Fix Cron - Invalid User` (different from Challenge 1)
 
 This is the value of the AI routing agent: the same workflow handles both failures, but the AI selects a different fix based on what it reads in the syslog message.
 
@@ -241,12 +241,12 @@ This is the value of the AI routing agent: the same workflow handles both failur
 
 The AI routing agent is the key component that makes this workflow intelligent. Here is what happens inside the **AI Route Cron Remediation** job template:
 
-1. **Receives the Splunk payload** -- the full webhook payload including the raw syslog message
-2. **Queries AAP for available fix templates** -- fetches all job templates with "cron" in the name via the AAP API
-3. **Sends both to Claude** -- the syslog message and the template catalog go to Claude Sonnet with a prompt asking it to analyze the error and select the correct fix
-4. **Parses the AI response** -- Claude returns a JSON object with the selected template, confidence score, analysis, root cause, and recommendation
-5. **Posts to Mattermost** -- the AI analysis is formatted into a rich incident report
-6. **Passes the decision downstream** -- the selected template name flows through the approval gate to the dispatcher via workflow artifacts
+1. **Receives the Splunk payload**: the full webhook payload including the raw syslog message
+2. **Queries AAP for available fix templates**: fetches all job templates with "cron" in the name via the AAP API
+3. **Sends both to Claude**: the syslog message and the template catalog go to Claude Sonnet with a prompt asking it to analyze the error and select the correct fix
+4. **Parses the AI response**: Claude returns a JSON object with the selected template, confidence score, analysis, root cause, and recommendation
+5. **Posts to Mattermost**: the AI analysis is formatted into a rich incident report
+6. **Passes the decision downstream**: the selected template name flows through the approval gate to the dispatcher via workflow artifacts
 
 The dispatcher then looks up the selected template by name in AAP and launches it with a `limit` set to the affected host.
 
@@ -282,7 +282,7 @@ The dispatcher then looks up the selected template by name in AAP and launches i
 | Handles known failure patterns with matching fixes
 
 | **Speed**
-| Interactive -- depends on human response time
+| Interactive, depends on human response time
 | Seconds from detection to fix recommendation
 
 | **Best for**
@@ -298,14 +298,14 @@ Most organizations use both approaches. Start with human-in-the-loop (Module 4.2
 == Key Takeaways
 
 * **Splunk monitors RHEL systems** and can trigger EDA for any syslog pattern, not just network events
-* **AI routing replaces hard-coded workflows** -- one workflow handles multiple failure types because the AI selects the correct fix at runtime
-* **The AI explains its reasoning** -- the Mattermost report shows what happened, why, and what fix was selected, giving operators confidence in the automated decision
-* **Approval gates provide safety** -- even with AI-driven routing, a human reviews the decision before the fix is applied
-* **The same AIOps pattern applies everywhere**: observe (Splunk) -> analyze (AI) -> respond (AAP) -- regardless of the platform or failure type
+* **AI routing replaces hard-coded workflows**: one workflow handles multiple failure types because the AI selects the correct fix at runtime
+* **The AI explains its reasoning**: the Mattermost report shows what happened, why, and what fix was selected, giving operators confidence in the automated decision
+* **Approval gates provide safety**: even with AI-driven routing, a human reviews the decision before the fix is applied
+* **The same AIOps pattern applies everywhere**: observe (Splunk), analyze (AI), respond (AAP), regardless of the platform or failure type
 
 == Complete
 
-You have completed Module 5.1 -- Autonomous AIOps with Splunk and RHEL.
+You have completed Module 5.1, Autonomous AIOps with Splunk and RHEL.
 
 You have now experienced the full spectrum of AIOps approaches:
 
