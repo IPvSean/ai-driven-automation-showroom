@@ -63,6 +63,8 @@ sourcetype=syslog
 
 If you see events, rsyslog forwarding is working. The RHEL nodes are sending system logs to Splunk.
 
+image::cron_aiops_splunk_search_results.png[Splunk search results showing cron errors, link="_images/cron_aiops_splunk_search_results.png", window=blank]
+
 == Step 2: Create the Splunk Alert
 
 You need to create a Splunk saved search that detects crond errors and sends a webhook to Event-Driven Ansible.
@@ -126,6 +128,8 @@ Before triggering failures, confirm the automation pipeline is in place:
 1. Open **Ansible Automation Platform**
 2. Navigate to **Automation Decisions** -> **Rulebook Activations**
 3. Verify that **RHEL Cron AIOps** shows **Running** status
++
+image::cron_aiops_eda_activation.png[EDA Rulebook Activations showing RHEL Cron AIOps running, link="_images/cron_aiops_eda_activation.png", window=blank]
 4. Navigate to **Automation Execution** -> **Templates**
 5. Verify that **Cron-AIOps-Workflow** exists
 6. Click into the workflow and open the **Visualizer**. You should see three nodes:
@@ -177,6 +181,8 @@ Open **Mattermost** and look for the AI incident report. You should see a card w
 * **Job Template**: `Fix Cron - Syntax Error`
 * **Action Required**: approve in AAP
 
+image::cron_aiops_mattermost_reports.png[Mattermost AI incident report for syntax error, link="_images/cron_aiops_mattermost_reports.png", window=blank]
+
 === Step 4.4: Approve the fix
 
 1. Navigate to **Automation Execution** -> **Jobs**
@@ -184,11 +190,15 @@ Open **Mattermost** and look for the AI incident report. You should see a card w
 3. The workflow should be paused at the **approval_gate** node
 4. Click **Approve** to allow the dispatcher to launch the fix
 5. Wait for the workflow to complete. All nodes should show green
++
+image::cron_aiops_workflow_visualizer.png[Cron-AIOps-Workflow completed successfully, link="_images/cron_aiops_workflow_visualizer.png", window=blank]
 
 === Step 4.5: Verify the fix
 
 1. In AAP **Jobs**, confirm that **Fix Cron - Syntax Error** ran successfully on node1
 2. The fix removed `/etc/cron.d/broken-job` and restarted crond
+
+image::cron_aiops_jobs_list.png[AAP Jobs showing the full remediation chain, link="_images/cron_aiops_jobs_list.png", window=blank]
 
 == Challenge 2: Cron Invalid User
 
@@ -230,6 +240,8 @@ Open **Mattermost** and look for the new incident report. Compare it with the pr
 * **Job Template**: `Fix Cron - Invalid User` (different from Challenge 1)
 
 This is the value of the AI routing agent: the same workflow handles both failures, but the AI selects a different fix based on what it reads in the syslog message.
+
+image::cron_aiops_mattermost_both_reports.png[Mattermost AI incident report for invalid user, link="_images/cron_aiops_mattermost_both_reports.png", window=blank]
 
 === Step 5.4: Approve and verify
 
