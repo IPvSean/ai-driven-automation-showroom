@@ -9,13 +9,9 @@ In this section, you will use **Red Hat Lightspeed** (on https://console.redhat.
 
 After completing this section, you will be able to:
 
-* Access Red Hat Lightspeed and navigate CVE and Advisor reports
-* Generate Ansible Playbooks from Lightspeed to remediate CVEs and Advisor recommendations
-* Use Claude Code as an AI agent to download and review CVE playbooks via MCP
-* Review and validate playbooks inside code-server (VS Code) before committing
-* Push validated playbooks to Git and create corresponding AAP Job Templates
-* Use Automation code assistant to generate a playbook for HTTPD remediation
-* Understand RHEL System Roles and their use in standardized configuration management
+* 🔍 **Identify and report** — Use Red Hat Lightspeed to discover CVEs and Advisor recommendations across your RHEL fleet, and generate executive vulnerability reports
+* 🤖 **Generate and remediate** — Create remediation playbooks through multiple methods: manually via the Lightspeed web UI, agentically via Claude Code + MCP, and with AI assistance from Automation code assistant
+* 🚀 **Promote to production** — Review playbooks in code-server, push them to Git, and create AAP Job Templates ready for execution
 
 [NOTE]
 ====
@@ -151,23 +147,17 @@ claude
 
 image::console-rhel-platform.png[Select Red Hat Enterprise Linux,60%,60%, link="_images/console-rhel-platform.png", window=blank]
 
-[start=4]
-4. Navigate to **Vulnerability** to see the CVE dashboard.
-5. Observe the list of CVEs affecting your connected RHEL systems.
-
-// TODO: Add screenshot of Lightspeed Vulnerability dashboard
-
-[start=6]
-6. Navigate to **Advisor** → **Recommendations** to see the Advisor dashboard.
-7. Observe the recommendations flagged for your systems (e.g., SELinux policy issues, configuration drift).
-
-// TODO: Add screenshot of Lightspeed Advisor dashboard
+**Keep this browser tab open** — you will come back to it shortly. Right now the dashboards are empty because your RHEL nodes have not been registered yet. In the next step, we will use Ansible Automation Platform to register them so they appear here.
 
 == Register RHEL Nodes to Red Hat Lightspeed
 
 Before you can view CVEs, Advisor recommendations, or generate remediation playbooks, your RHEL nodes must be registered with Red Hat Lightspeed (formerly Red Hat Insights). Normally you would do this manually on each host by running `insights-client --register`, but in this lab we will use **Red Hat Ansible Automation Platform** to register all three nodes at once.
 
 1. Switch to the **AAP** tab in your lab interface (or open link:{controller_url}[AAP Web UI^] in a new tab).
+
+image::lab-tabs-aap.png[AAP tab in lab interface,20%,20%, link="_images/lab-tabs-aap.png", window=blank]
+
+[start=2]
 2. In the left navigation, click **Automation Execution** → **Templates**.
 
 image::aap-templates-nav.png[AAP Templates navigation,30%,30%, link="_images/aap-templates-nav.png", window=blank]
@@ -175,12 +165,18 @@ image::aap-templates-nav.png[AAP Templates navigation,30%,30%, link="_images/aap
 [start=3]
 3. Find and click the **Register with Red Hat Lightspeed** job template.
 4. Click **Launch**.
+
+image::aap-launch-template.png[Launch template button,20%,20%, link="_images/aap-launch-template.png", window=blank]
+
+[start=5]
 5. When prompted for **Limit**, type:
 
 [source]
 ----
 node1,node2,node3
 ----
+
+image::aap-register-limit-prompt.png[Prompt on Launch with Limit field,60%,60%, link="_images/aap-register-limit-prompt.png", window=blank]
 
 [start=6]
 6. Click the blue **Finish** button to launch the job.
@@ -196,6 +192,8 @@ node1,node2,node3
 When the job completes, note the **Group/Tag** value in the job output. This is your unique lab identifier that you will use to filter your systems in console.redhat.com.
 
 image::aap-register-job-output.png[Registration job output showing Group/Tag,80%,80%, link="_images/aap-register-job-output.png", window=blank]
+
+In this screenshot, our unique identifier is `k5txp` — yours will be different. Make a note of it.
 
 [start=8]
 8. Return to your https://console.redhat.com[console.redhat.com^] browser tab.
@@ -259,18 +257,17 @@ image::console-vulnerability-reports.png[Vulnerability Reports navigation,40%,40
 
 The Advisor section of Red Hat Lightspeed provides proactive recommendations — misconfigurations, compliance issues, and best practices flagged by Red Hat Support.
 
-[NOTE]
-====
-**MCP support for Advisor is coming in a future release.** Currently, the Red Hat Lightspeed MCP server supports CVE vulnerability queries but does not yet support Advisor recommendations. For this exercise, you will generate the Advisor playbook manually through the Lightspeed web UI. Once MCP support lands, this workflow will be fully agentic like the CVE exercise in Playbook 2.
-====
 
 === Step 1: Navigate to Advisor
 
 1. In the console.redhat.com browser tab you already have open, navigate to **Operations** → **Advisor** → **Recommendations**.
-2. Find a recommendation affecting `{rhel_node3}` (e.g., an SELinux policy issue or a configuration that would not survive a reboot).
 
-// TODO: Add screenshot of Advisor recommendations
-// TODO: Confirm specific Advisor recommendation to use
+image::console-advisor-nav.png[Advisor Recommendations navigation,40%,40%, link="_images/console-advisor-nav.png", window=blank]
+
+[start=2]
+2. Find a recommendation affecting `{rhel_node3}`. We recommend selecting **Decreased security: OpenSSH LoginGraceTime settings**.
+
+image::console-advisor-openssh-recommendation.png[Advisor OpenSSH LoginGraceTime recommendation,80%,80%, link="_images/console-advisor-openssh-recommendation.png", window=blank]
 
 === Step 2: Generate the remediation playbook
 
