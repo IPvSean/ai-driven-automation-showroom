@@ -344,6 +344,8 @@ This exercise demonstrates the **fully agentic approach**: you will use Claude C
 1. Open a terminal in code-server.
 2. Type `claude` to start Claude Code.
 
+image::claude-code-launch.png[Claude Code successfully launched,80%,80%, link="_images/claude-code-launch.png", window=blank]
+
 === Step 2: Ask Claude Code about CVEs
 
 In the Claude Code chat, type a prompt like:
