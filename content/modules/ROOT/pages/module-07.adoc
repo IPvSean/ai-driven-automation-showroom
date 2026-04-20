@@ -350,21 +350,21 @@ image::claude-code-launch.png[Claude Code successfully launched,80%,80%, link="_
 
 === Step 2: Ask Claude Code about CVEs
 
-In the Claude Code chat, type a prompt like:
+In the Claude Code chat, type a prompt like the one below. Replace `k5txp` with your unique tag from the registration step:
 
 [source]
 ----
 What CVEs are affecting my RHEL systems? Show me the critical and important
-ones that have remediation available.
+ones that have remediation available. Only show hosts with the k5txp tag.
 ----
 
 Claude Code will use the **Red Hat Lightspeed MCP server** to:
 
-* Query your connected RHEL systems
+* Query your connected RHEL systems filtered by your unique tag
 * List CVEs with severity ratings
 * Identify which CVEs have remediation playbooks available
 
-// TODO: Add screenshot of Claude Code showing CVE query results
+image::claude-code-cve-results.png[Claude Code CVE query results,80%,80%, link="_images/claude-code-cve-results.png", window=blank]
 
 === Step 3: Download the remediation playbook
 
