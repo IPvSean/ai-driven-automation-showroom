@@ -7,6 +7,41 @@ image::aiops.png[aiops,55%,55%, link="_images/aiops.png", window=blank]
 
 == Lab Introduction
 
+[NOTE]
+====
+**What is ETX?** The Emerging Tech Experience (ETX) is a limited series of manager-nominated, in-person workshops for Tech Sales and Services associates (incl. select partners) designed to accelerate enablement on the latest Red Hat emerging tech portfolio and close technical skills gaps for priority GTM motions. For more information, visit https://source.redhat.com/departments/sales/global_field_enablement/programs_and_initiatives/etx[the ETX page on Source^] (Red Hat employees only).
+====
+
+=== Lab Overview
+
+This workshop consists of five independent labs that can be completed in any order:
+
+[cols="1,2,3", options="header"]
+|===
+| Lab | Title | Description
+
+| Lab 1
+| AIOps with Apache Remediation
+| A basic introduction to AIOps—learn the fundamentals by building a self-healing workflow for Apache service failures using Red Hat AI and Ansible Lightspeed. (30-40 min)
+
+| Lab 2
+| AIOps with Network Automation
+| Apply the same AIOps patterns to network infrastructure. Troubleshoot OSPF routing issues on Cisco routers using Splunk, Event-Driven Ansible, and Lightspeed-generated playbooks. (30-40 min)
+
+| Lab 3
+| AIOps with Windows Automation
+| Extend the AIOps pattern to Windows Server. Detect Active Directory and Windows Firewall events with Winlogbeat and Kafka, then use Event-Driven Ansible to create AI-enriched tickets automatically. (15-20 min)
+
+| Lab 4 (ETX - Scenario 3)
+| Red Hat Lightspeed & Agentic IDE Workflow
+| Use Red Hat Lightspeed to generate CVE and Advisor remediation playbooks, use Automation code assistant to generate an HTTPD fix in code-server, then use Claude Code to interactively discover and remediate issues via the Ansible MCP server. (50-70 min)
+
+| Lab 5 (ETX - Scenario 4)
+| Autonomous AIOps with Splunk and RHEL
+| Experience fully autonomous self-healing: Splunk detects a RHEL misconfiguration, Event-Driven Ansible triggers pre-approved automation, and the issue is fixed without human intervention. (20-30 min)
+
+|===
+
 In this lab, you will build an intelligent, self-healing automation workflow using:
 
 - Red Hat AI for understanding service issues
@@ -64,16 +99,16 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
 
 === Workshop Duration
 
-This workshop consists of five independent parts:
+This workshop consists of five independent labs:
 
-- *Part 1: AIOps with Apache Remediation* - 30-40 minutes
-- *Part 2: Network Automation* - 30-40 minutes
-- *Part 3: Windows Automation* - 15-20 minutes
-- *Part 4: Red Hat Lightspeed & Agentic IDE Workflow* - 50-70 minutes
-- *Part 5: Autonomous AIOps with Splunk and RHEL* - 20-30 minutes
+- *Lab 1: AIOps with Apache Remediation* - 30-40 minutes
+- *Lab 2: Network Automation* - 30-40 minutes
+- *Lab 3: Windows Automation* - 15-20 minutes
+- *Lab 4: Red Hat Lightspeed & Agentic IDE Workflow (ETX - Scenario 3)* - 50-70 minutes
+- *Lab 5: Autonomous AIOps with Splunk and RHEL (ETX - Scenario 4)* - 20-30 minutes
 - *Total Workshop Time* - ~150-200 minutes
 
-For each workshop, there are 4 parts:
+For each lab, there are 4 parts:
 
 1. *Event-Driven Ansible (EDA) Response* - Event Driven Ansible will respond to a systemd application outage
 
@@ -82,11 +117,11 @@ For each workshop, there are 4 parts:
 3. *Remediation Workflow* - This workflow will focus on automatically creating an Ansible Playbook to resolve the issue by using Ansible Lightspeed.  This workflow will take the prompt created by the previous workflow, request a playbook from Ansible Lightspeed, sync this playbook to Git and then automatically create a Job Template for us to remediate the issue.
 
 4. *Execute a remediation*
-* For part 1: *Execute HTTPD Remediation* - This is the final Job Template that will actually fix the application outage on the RHEL webserver.
-* For part 2: *AI Driven Ansible for Network Automation* - This lab synthesizes the AI skills from the preceding sections of the {lab_name} into a practical network automation scenario.
+* For Lab 1: *Execute HTTPD Remediation* - This is the final Job Template that will actually fix the application outage on the RHEL webserver.
+* For Lab 2: *AI Driven Ansible for Network Automation* - This lab synthesizes the AI skills from the preceding sections of the {lab_name} into a practical network automation scenario.
 
 [quote]
-💡 Could this all be one workflow? Yes.  This is purposely broken up at natural breakpoints where a human user can review what the AIOps workflow is doing and course correct if required.  This also allows organization to incrementally adopt AIOps workflows.  Organization can benefit greatly from any of these individual parts!
+💡 Could this all be one workflow? Yes.  This is purposely broken up at natural breakpoints where a human user can review what the AIOps workflow is doing and course correct if required.  This also allows organization to incrementally adopt AIOps workflows.  Organization can benefit greatly from any of these individual labs!
 
 Here is a diagram of the entire workflow:
 
@@ -157,7 +192,7 @@ Password: `{splunk_password}`
 
 '''
 
-== Ready to Begin Part 1?
+== Ready to Begin Lab 1?
 
 You now have everything you need to start the core AIOps lab! In the following modules, you'll break Apache, watch EDA respond, see Red Hat AI analyze the incident, and let Ansible Lightspeed generate a fix—all automatically.
 
@@ -167,19 +202,19 @@ You now have everything you need to start the core AIOps lab! In the following m
 
 [NOTE]
 ====
-**This lab has two independent parts!** You can complete Part 1, Part 2, or both—in any order. If you've already completed Part 1 and want to explore a more advanced scenario, feel free to skip ahead to Part 2.
+**All five labs are independent!** You can complete them in any order. New to AIOps? Start with Lab 1. Already familiar with the basics? Jump to Lab 2 for network automation, Lab 3 for Windows, Lab 4 for Lightspeed and agentic IDE workflows (ETX - Scenario 3), or Lab 5 for fully autonomous self-healing (ETX - Scenario 4).
 ====
 
-== Part 2: AIOps with Network Automation
+== Lab 2: AIOps with Network Automation
 
 image::splunk-logo.png[splunk,150, link="_images/splunk-logo.png", window=blank]
 
 [IMPORTANT]
 ====
-**Highly Recommended!** While Part 2 can be completed independently, we strongly encourage completing this section. Part 1 provides a **basic introduction** to AIOps concepts using Apache service remediation. Part 2 applies the same AIOps principles to a **more complex, real-world networking scenario**—demonstrating how AI-driven automation scales to handle sophisticated infrastructure challenges.
+**Highly Recommended!** While Lab 2 can be completed independently, we strongly encourage completing this section. Lab 1 provides a **basic introduction** to AIOps concepts using Apache service remediation. Lab 2 applies the same AIOps principles to a **more complex, real-world networking scenario**—demonstrating how AI-driven automation scales to handle sophisticated infrastructure challenges.
 ====
 
-Part 2 applies the same three AIOps pillars you learned in Part 1—**Observability**, **Inference**, and **Automation**—to network infrastructure:
+Lab 2 applies the same three AIOps pillars you learned in Lab 1—**Observability**, **Inference**, and **Automation**—to network infrastructure:
 
 * **Observability**: Splunk collects and analyzes syslog data from Cisco routers, detecting OSPF neighbor failures in real-time
 * **Inference**: Ansible Lightspeed with IBM watsonx Code Assistant generates network remediation playbooks based on natural language prompts describing OSPF troubleshooting scenarios
@@ -209,7 +244,7 @@ This lab demonstrates a complete observe → evaluate → respond loop for netwo
 6. **Respond**: After human approval, the playbook executes in run mode, automatically restoring the OSPF neighbor adjacency
 
 [quote]
-**Same AIOps Pattern, Different Domain**: Notice how Part 2 follows the exact same workflow structure as Part 1? The power of AIOps is that these patterns apply universally—whether you're fixing Apache services or troubleshooting complex network protocols. You'll explore three OSPF failure scenarios, each demonstrating how to codify expert network knowledge into automated, AI-generated remediation playbooks.
+**Same AIOps Pattern, Different Domain**: Notice how Lab 2 follows the exact same workflow structure as Lab 1? The power of AIOps is that these patterns apply universally—whether you're fixing Apache services or troubleshooting complex network protocols. You'll explore three OSPF failure scenarios, each demonstrating how to codify expert network knowledge into automated, AI-generated remediation playbooks.
 
 === What You'll Learn
 
@@ -223,15 +258,15 @@ This lab demonstrates a complete observe → evaluate → respond loop for netwo
 
 '''
 
-== Part 3: AIOps with Windows Automation
+== Lab 3: AIOps with Windows Automation
 
-This final part extends the AIOps pattern to the Windows ecosystem, demonstrating that the same observe-analyze-respond workflow applies universally across all platforms.
+This lab extends the AIOps pattern to the Windows ecosystem, demonstrating that the same observe-analyze-respond workflow applies universally across all platforms.
 
-Part 3 shows you how Event-Driven Ansible can detect Windows security events and automatically create intelligent tickets. The Windows environment includes:
+Lab 3 shows you how Event-Driven Ansible can detect Windows security events and automatically create intelligent tickets. The Windows environment includes:
 
 * **Windows Server 2022** - With Active Directory and Firewall event logging
 * **Winlogbeat** - Forwards Windows Security and Firewall event logs to Kafka
-* **Kafka** - Centralized event bus (shared infrastructure with Parts 1 and 2)
+* **Kafka** - Centralized event bus (shared infrastructure with Labs 1 and 2)
 * **Event-Driven Ansible** - Detects Windows events and triggers automation
 * **Red Hat AI (Granite LLM)** - Analyzes Windows security events
 * **Mattermost** - Receives AI-enriched automated tickets
@@ -245,19 +280,19 @@ Part 3 shows you how Event-Driven Ansible can detect Windows security events and
 
 This is the key insight: the AIOps pattern works across **any domain**:
 
-* **Part 1 (Linux)**: Filebeat → Kafka → EDA → AAP (detects service failures)
-* **Part 2 (Network)**: Splunk → Webhook → EDA → AAP (detects OSPF issues)
-* **Part 3 (Windows)**: Winlogbeat → Kafka → EDA → AAP (detects security events)
-* **Part 4 (Lightspeed + IDE)**: Red Hat Lightspeed → code-server + Claude Code → Human reviews → Git → AAP (human-in-the-loop with AI agent)
-* **Part 5 (Autonomous)**: Splunk → Webhook → EDA → AAP (fully autonomous self-healing)
+* **Lab 1 (Linux)**: Filebeat → Kafka → EDA → AAP (detects service failures)
+* **Lab 2 (Network)**: Splunk → Webhook → EDA → AAP (detects OSPF issues)
+* **Lab 3 (Windows)**: Winlogbeat → Kafka → EDA → AAP (detects security events)
+* **Lab 4 (Lightspeed + IDE)**: Red Hat Lightspeed → code-server + Claude Code → Human reviews → Git → AAP (human-in-the-loop with AI agent)
+* **Lab 5 (Autonomous)**: Splunk → Webhook → EDA → AAP (fully autonomous self-healing)
 
 Same pattern, different observability tools, domains, and levels of human involvement.
 
-== Part 4: Red Hat Lightspeed & Agentic IDE Workflow
+== Lab 4: Red Hat Lightspeed & Agentic IDE Workflow (ETX - Scenario 3)
 
 image::aap_logo.png[aap_logo,150, link="_images/aap_logo.png", window=blank]
 
-Part 4 introduces two new dimensions to AIOps: **Red Hat Lightspeed** (formerly Insights) for vulnerability and compliance management, and **Claude Code** as an AI agent in **code-server (VS Code)** for interactive infrastructure management.
+Lab 4 introduces two new dimensions to AIOps: **Red Hat Lightspeed** (formerly Insights) for vulnerability and compliance management, and **Claude Code** as an AI agent in **code-server (VS Code)** for interactive infrastructure management.
 
 [IMPORTANT]
 ====
@@ -279,9 +314,9 @@ Part 4 introduces two new dimensions to AIOps: **Red Hat Lightspeed** (formerly 
 * Using Claude Code with the Ansible MCP server to interactively manage RHEL infrastructure
 * The human-in-the-loop principle: AI proposes, human decides
 
-== Part 5: Autonomous AIOps with Splunk and RHEL
+== Lab 5: Autonomous AIOps with Splunk and RHEL (ETX - Scenario 4)
 
-This final part demonstrates the **end state of AIOps maturity**: fully autonomous self-healing infrastructure. Splunk monitors RHEL systems for misconfigurations, and when one is detected, pre-approved automation fixes it — without any human intervention.
+This lab demonstrates the **end state of AIOps maturity**: fully autonomous self-healing infrastructure. Splunk monitors RHEL systems for misconfigurations, and when one is detected, pre-approved automation fixes it — without any human intervention.
 
 * **Observability**: Splunk Universal Forwarder detects RHEL misconfigurations in real-time
 * **Automation**: Event-Driven Ansible triggers pre-approved, trusted Job Templates that remediate the issue automatically
@@ -290,9 +325,9 @@ This final part demonstrates the **end state of AIOps maturity**: fully autonomo
 
 This workshop takes you through the full maturity spectrum:
 
-* **Parts 1-3**: Event-driven with AI content generation and human review checkpoints
-* **Part 4**: Human-in-the-loop with an AI agent that asks permission before every action
-* **Part 5**: Fully autonomous — pre-approved, trusted automation handles everything
+* **Labs 1-3**: Event-driven with AI content generation and human review checkpoints
+* **Lab 4**: Human-in-the-loop with an AI agent that asks permission before every action
+* **Lab 5**: Fully autonomous — pre-approved, trusted automation handles everything
 
 == What's Next?
 
@@ -304,30 +339,30 @@ a|
 image::aap_logo.png[aap_logo,120, link="_images/aap_logo.png", window=blank]
 
 a|
-**Part 1: AIOps with Apache Remediation** (Modules 1-2)
+**Lab 1: AIOps with Apache Remediation** (Modules 1-2)
 
 A **basic introduction** to AIOps—learn the fundamentals by building a self-healing workflow for Apache service failures using Red Hat AI and Ansible Lightspeed.
 
-**Part 2: AIOps with Network Automation** (Modules 3-5) Highly Recommended
+**Lab 2: AIOps with Network Automation** (Modules 3-5) Highly Recommended
 
 Apply the same AIOps patterns to **network infrastructure**. Troubleshoot OSPF routing issues on Cisco routers using Splunk, Event-Driven Ansible, and Lightspeed-generated playbooks.
 
-**Part 3: AIOps with Windows Automation** (Module 6) Highly Recommended
+**Lab 3: AIOps with Windows Automation** (Module 6) Highly Recommended
 
 Extend the AIOps pattern to **Windows Server**. Detect Active Directory and Windows Firewall events with Winlogbeat and Kafka, then use Event-Driven Ansible to create AI-enriched tickets automatically.
 
-**Part 4: Red Hat Lightspeed & Agentic IDE Workflow** (Modules 7-8) NEW
+**Lab 4: Red Hat Lightspeed & Agentic IDE Workflow (ETX - Scenario 3)** (Modules 7-8) NEW
 
 Use **Red Hat Lightspeed** to generate remediation playbooks for CVEs and Advisor recommendations, use **Automation code assistant** to generate an HTTPD fix in code-server, then use **Claude Code** to interactively discover and remediate issues via the Ansible MCP server.
 
-**Part 5: Autonomous AIOps with Splunk and RHEL** (Module 9) NEW
+**Lab 5: Autonomous AIOps with Splunk and RHEL (ETX - Scenario 4)** (Module 9) NEW
 
 Experience **fully autonomous self-healing**: Splunk detects a RHEL misconfiguration, Event-Driven Ansible triggers pre-approved automation, and the issue is fixed without human intervention.
 |===
 
 [TIP]
 ====
-**Choose your path:** All five parts are independent and can be completed in any order. New to AIOps? Start with Part 1. Already familiar with the basics? Jump to Part 2 for network automation, Part 3 for Windows, Part 4 for Insights and agentic IDE workflows, or Part 5 for fully autonomous self-healing.
+**Choose your path:** All five labs are independent and can be completed in any order. New to AIOps? Start with Lab 1. Already familiar with the basics? Jump to Lab 2 for network automation, Lab 3 for Windows, Lab 4 for Lightspeed and agentic IDE workflows (ETX - Scenario 3), or Lab 5 for fully autonomous self-healing (ETX - Scenario 4).
 ====
 
 Click the link below to proceed to **Module 1: Log Enrichment and Prompt Generation Workflow**.

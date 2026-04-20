@@ -18,7 +18,7 @@ After completing this section, you will be able to:
 * Identify the data fields automatically extracted from Windows Event payloads
 * Explain how the Granite LLM transforms raw event data into actionable security intelligence
 
-This use case follows the same AIOps pattern as Parts 1 and 2 but applies it to the Windows ecosystem, showing how event-driven automation is platform-agnostic.
+This use case follows the same AIOps pattern as Labs 1 and 2 but applies it to the Windows ecosystem, showing how event-driven automation is platform-agnostic.
 
 == Architecture overview
 
@@ -168,6 +168,6 @@ https://github.com/ansible-tmm/aiops-summitlab/blob/main/rulebooks/windows_event
 
 == Next steps
 
-You have completed Module 3.1 — Windows Event-Driven Automation! Continue to the summary section to review all the concepts you've learned across all parts of this workshop.
+You have completed Module 3.1 — Windows Event-Driven Automation! Continue to the summary section to review all the concepts you've learned across all labs of this workshop.
 
 xref:module-05.adoc[Next: Summary and Call to Actions ->]

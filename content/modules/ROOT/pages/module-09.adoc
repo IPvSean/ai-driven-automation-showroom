@@ -12,17 +12,17 @@ After completing this section, you will be able to:
 * Explain how Splunk monitors RHEL systems for misconfigurations
 * Observe EDA responding to Splunk alerts for RHEL events (not just network events)
 * Understand how pre-approved Job Templates enable fully autonomous remediation
-* Compare the autonomous approach (this module) with the human-in-the-loop approach (Part 4, Module 4.2)
+* Compare the autonomous approach (this module) with the human-in-the-loop approach (Lab 4, Module 4.2)
 * Articulate when each approach is appropriate for your organization
 
 [IMPORTANT]
 ====
-**This is a separate demo from Part 4 (Module 4.2 — Agentic IDE Workflow).** Module 4.2 demonstrated a human-in-the-loop workflow where an AI agent assists you and asks for permission before acting. This module demonstrates the fully autonomous approach where the entire detection-to-remediation pipeline runs without human intervention using **pre-approved, trusted automation**. Both are valid strategies — and most organizations use a combination of both.
+**This is a separate demo from Lab 4 (Module 4.2 — Agentic IDE Workflow).** Module 4.2 demonstrated a human-in-the-loop workflow where an AI agent assists you and asks for permission before acting. This module demonstrates the fully autonomous approach where the entire detection-to-remediation pipeline runs without human intervention using **pre-approved, trusted automation**. Both are valid strategies — and most organizations use a combination of both.
 ====
 
 == Background: Fully Autonomous Remediation
 
-In Parts 1-3, the AIOps workflows included human checkpoints: reviewing AI output, approving survey prompts, manually launching final remediation. In Module 4.2, an AI agent asked for permission before every action.
+In Labs 1-3, the AIOps workflows included human checkpoints: reviewing AI output, approving survey prompts, manually launching final remediation. In Module 4.2, an AI agent asked for permission before every action.
 
 This section removes all human checkpoints. The workflow is:
 
@@ -59,11 +59,11 @@ Splunk detects misconfiguration on RHEL
 |===
 
 [quote]
-💡 **Start small, think big.** Most organizations begin with human-in-the-loop workflows (like Part 4) and gradually promote well-tested remediation to fully autonomous (like this module) as confidence grows. You don't have to choose one approach — use both.
+💡 **Start small, think big.** Most organizations begin with human-in-the-loop workflows (like Lab 4) and gradually promote well-tested remediation to fully autonomous (like this module) as confidence grows. You don't have to choose one approach — use both.
 
 == Architecture Overview
 
-This workflow reuses Splunk infrastructure from Part 2 (Network Automation) but applies it to **RHEL system monitoring** instead of Cisco router syslog.
+This workflow reuses Splunk infrastructure from Lab 2 (Network Automation) but applies it to **RHEL system monitoring** instead of Cisco router syslog.
 
 [source]
 ----
@@ -86,7 +86,7 @@ RHEL Node ({rhel_node2} or {rhel_node3})
 * **Ansible Automation Platform** — executes pre-approved Job Templates to remediate the issue
 
 [quote]
-💡 **Reusing Splunk from Part 2**: In Part 2, Splunk monitored Cisco router syslog for OSPF events. Here, Splunk monitors RHEL system logs for misconfigurations. Same observability platform, different domain — this is the AIOps pattern at work.
+💡 **Reusing Splunk from Lab 2**: In Lab 2, Splunk monitored Cisco router syslog for OSPF events. Here, Splunk monitors RHEL system logs for misconfigurations. Same observability platform, different domain — this is the AIOps pattern at work.
 
 == Splunk Configuration for RHEL Monitoring
 
@@ -131,7 +131,7 @@ RHEL Node ({rhel_node2} or {rhel_node3})
 Possible scenarios under consideration:
 
 * **SELinux set to permissive/disabled** — detected via `/var/log/audit/audit.log` or `sestatus` output
-* **Apache configuration error** — detected via httpd error logs (similar to Part 1 but detected by Splunk instead of Filebeat/Kafka)
+* **Apache configuration error** — detected via httpd error logs (similar to Lab 1 but detected by Splunk instead of Filebeat/Kafka)
 
 The pre-approved Job Template in AAP knows exactly how to fix this issue.
 ====
@@ -147,7 +147,7 @@ The pre-approved Job Template in AAP knows exactly how to fix this issue.
 
 [NOTE]
 ====
-This rulebook is similar to the OSPF Neighbor rulebook from Part 2 — it listens on a webhook endpoint for Splunk alerts. When the alert fires, it launches a pre-approved AAP Job Template directly, without any survey prompts or human approval gates.
+This rulebook is similar to the OSPF Neighbor rulebook from Lab 2 — it listens on a webhook endpoint for Splunk alerts. When the alert fires, it launches a pre-approved AAP Job Template directly, without any survey prompts or human approval gates.
 ====
 
 == Verify Pre-Approved Job Template
@@ -165,7 +165,7 @@ Before triggering the scenario, confirm the remediation Job Template exists and 
 // TODO: Confirm if this uses one of the playbooks from Module 4.1 or a dedicated pre-built playbook
 
 [quote]
-💡 **Pre-approved means pre-tested.** This Job Template was reviewed and validated during Part 4 (Module 4.1). Your team has confidence that running it against the target host is safe. That's what makes fully autonomous execution acceptable — the remediation is not generated on the fly, it is a known-good, tested fix.
+💡 **Pre-approved means pre-tested.** This Job Template was reviewed and validated during Lab 4 (Module 4.1). Your team has confidence that running it against the target host is safe. That's what makes fully autonomous execution acceptable — the remediation is not generated on the fly, it is a known-good, tested fix.
 
 == Scenario: Trigger the Misconfiguration
 
@@ -182,7 +182,7 @@ Now let's see the autonomous workflow in action.
 
 [NOTE]
 ====
-This is similar to the **❌ Break Apache** job template from Part 1, but for a different misconfiguration scenario. It deliberately introduces a known issue that the autonomous workflow will detect and fix.
+This is similar to the **❌ Break Apache** job template from Lab 1, but for a different misconfiguration scenario. It deliberately introduces a known issue that the autonomous workflow will detect and fix.
 ====
 
 === Step 2: Observe Splunk detection
@@ -264,35 +264,35 @@ Here is what just happened, end-to-end, without any human intervention:
 ----
 
 [quote]
-💡 **This is the end state of AIOps maturity.** Organizations start with manual response, move to human-in-the-loop (Part 4), and eventually promote well-tested scenarios to fully autonomous (this module). Each step builds confidence in the automation.
+💡 **This is the end state of AIOps maturity.** Organizations start with manual response, move to human-in-the-loop (Lab 4), and eventually promote well-tested scenarios to fully autonomous (this module). Each step builds confidence in the automation.
 
-== Comparing All Five Parts
+== Comparing All Five Labs
 
 [cols="1,2,2,2", options="header"]
 |===
-| Part | Domain | Observability | Human Involvement
+| Lab | Domain | Observability | Human Involvement
 
-| **Part 1**
+| **Lab 1**
 | Linux (Apache)
 | Filebeat → Kafka → EDA
 | Human reviews AI output and prompts
 
-| **Part 2**
+| **Lab 2**
 | Network (OSPF)
 | Splunk → Webhook → EDA
 | Human approves check mode → run mode
 
-| **Part 3**
+| **Lab 3**
 | Windows (AD/Firewall)
 | Winlogbeat → Kafka → EDA
 | Automated ticketing, human reviews tickets
 
-| **Part 4**
+| **Lab 4** (ETX - Scenario 3)
 | RHEL (CVE/Advisor)
 | Red Hat Lightspeed + Claude Code
 | Human reviews in IDE, agent asks permission
 
-| **Part 5**
+| **Lab 5** (ETX - Scenario 4)
 | RHEL (Misconfiguration)
 | Splunk → Webhook → EDA
 | **None** — fully autonomous, pre-approved
@@ -314,8 +314,8 @@ You have completed Module 5.1 — Autonomous AIOps with Splunk and RHEL.
 
 You have now experienced the full spectrum of AIOps approaches:
 
-* ✅ **Parts 1-3**: Event-driven automation with AI-generated content and human review
-* ✅ **Part 4**: Human-in-the-loop agentic workflow with an AI assistant in the IDE
-* ✅ **Part 5**: Fully autonomous self-healing with pre-approved trusted automation
+* ✅ **Labs 1-3**: Event-driven automation with AI-generated content and human review
+* ✅ **Lab 4** (ETX - Scenario 3): Human-in-the-loop agentic workflow with an AI assistant in the IDE
+* ✅ **Lab 5** (ETX - Scenario 4): Fully autonomous self-healing with pre-approved trusted automation
 
 Continue to the **Summary and Call to Actions** to review everything you've learned and explore next steps.

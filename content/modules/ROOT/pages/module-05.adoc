@@ -10,23 +10,23 @@ image::thumbs-up.gif[thumbsup!, link="_images/thumbs-up.gif", window=blank]
 
 Throughout this lab, you experienced the power of AI-driven automation across five domains:
 
-=== Part 1: AIOps with Apache Remediation
+=== Lab 1: AIOps with Apache Remediation
 * Built an intelligent log enrichment workflow using Red Hat AI
 * Automatically generated remediation playbooks with Ansible Lightspeed
 * Fixed a broken Apache service without writing any playbook code manually
 
-=== Part 2: Network Automation
+=== Lab 2: Network Automation
 * Configured Splunk for network observability
 * Set up Event-Driven Ansible to respond to OSPF alerts
 * Used AI to generate network remediation playbooks for Cisco routers
 
-=== Part 3: Windows Automation
+=== Lab 3: Windows Automation
 * Detected Active Directory account creation events using Event-Driven Ansible
 * Automatically generated Mattermost tickets from Windows event payloads
 * Used AI to analyze Windows Firewall changes and enrich tickets with expert insights
 * Demonstrated platform-agnostic AIOps across Linux, network devices, and Windows
 
-=== Part 4: Red Hat Lightspeed & Agentic IDE Workflow
+=== Lab 4: Red Hat Lightspeed & Agentic IDE Workflow (ETX - Scenario 3)
 * Used Red Hat Lightspeed (formerly Insights) to identify CVEs and Advisor recommendations across a RHEL fleet
 * Generated remediation playbooks from Lightspeed for vulnerabilities, misconfigurations, and System Roles
 * Used Automation code assistant (with Gemini backend) to generate an HTTPD fix in the IDE
@@ -34,11 +34,11 @@ Throughout this lab, you experienced the power of AI-driven automation across fi
 * Used Claude Code with the Ansible MCP server to interactively discover servers needing patches
 * Executed remediation through the agent with human-in-the-loop approval at every step
 
-=== Part 5: Autonomous AIOps with Splunk and RHEL
+=== Lab 5: Autonomous AIOps with Splunk and RHEL (ETX - Scenario 4)
 * Observed Splunk detecting a RHEL misconfiguration in real-time
 * Watched Event-Driven Ansible trigger pre-approved automation without human intervention
 * Experienced a fully autonomous self-healing workflow from detection to remediation
-* Compared human-in-the-loop (Part 4) vs fully autonomous (Part 5) approaches
+* Compared human-in-the-loop (Lab 4) vs fully autonomous (Lab 5) approaches
 
 == Summary of Job Templates
 
@@ -268,11 +268,11 @@ If you want to return Apache to a good state (without running AIOps workflows), 
 *Ansible Playbook:*
 https://github.com/ansible-tmm/aiops-summitlab/blob/main/playbooks/httpd_fix.yml[Github Link^]
 
-== Part 2: Network Automation Playbooks
+== Lab 2: Network Automation Playbooks
 
 === Network-AIOps-Workflow Overview
 
-The network automation portion of this lab follows the same AIOps principles as Part 1, but applies them to Cisco router OSPF troubleshooting scenarios.
+The network automation portion of this lab follows the same AIOps principles as Lab 1, but applies them to Cisco router OSPF troubleshooting scenarios.
 
 image::network-aiops-workflow.png[Network AI Workflow, link="_images/network-aiops-workflow.png", window=blank]
 
@@ -407,11 +407,11 @@ The network automation workflows demonstrate:
 
 This creates a complete closed-loop automation system for network troubleshooting that codifies expert knowledge into reusable, AI-generated playbooks.
 
-== Part 4: Red Hat Lightspeed & Agentic IDE Workflow
+== Lab 4: Red Hat Lightspeed & Agentic IDE Workflow (ETX - Scenario 3)
 
 === Lightspeed Remediation Overview
 
-Part 4 introduced a developer-centric approach to AIOps. Instead of fully automated playbook generation via API (as in Parts 1-3), this workflow brings the human into the loop through code-server (VS Code) and Claude Code.
+Lab 4 introduced a developer-centric approach to AIOps. Instead of fully automated playbook generation via API (as in Labs 1-3), this workflow brings the human into the loop through code-server (VS Code) and Claude Code.
 
 === Red Hat Lightspeed Playbook Generation
 
@@ -447,11 +447,11 @@ Demonstrate human-in-the-loop agentic automation using Claude Code in code-serve
 
 *Key principle:* The AI proposes, the human decides. Every action requires explicit approval.
 
-== Part 5: Autonomous AIOps with Splunk and RHEL
+== Lab 5: Autonomous AIOps with Splunk and RHEL (ETX - Scenario 4)
 
 === Autonomous Remediation Overview
 
-Part 5 demonstrated the end state of AIOps maturity: fully autonomous self-healing. This workflow uses the same Splunk infrastructure from Part 2 (Network Automation) but applies it to RHEL system monitoring.
+Lab 5 demonstrated the end state of AIOps maturity: fully autonomous self-healing. This workflow uses the same Splunk infrastructure from Lab 2 (Network Automation) but applies it to RHEL system monitoring.
 
 === `❌ Break RHEL Configuration`
 
@@ -486,25 +486,25 @@ Pre-approved, pre-tested Job Template that fixes the RHEL misconfiguration autom
 - Fixes the misconfiguration without any human intervention
 - Reports success/failure in the AAP job history
 
-*Key principle:* This Job Template was reviewed and approved during Part 4. Its promotion to autonomous execution reflects organizational trust in tested, validated automation.
+*Key principle:* This Job Template was reviewed and approved during Lab 4. Its promotion to autonomous execution reflects organizational trust in tested, validated automation.
 
 === The AIOps Maturity Spectrum
 
 [cols="1,2,2", options="header"]
 |===
-| Maturity Level | Approach | Workshop Part
+| Maturity Level | Approach | Workshop Lab
 
 | **Level 1**
 | Event-driven with AI content generation + human review
-| Parts 1-3
+| Labs 1-3
 
 | **Level 2**
 | Human-in-the-loop with AI agent assistance
-| Part 4
+| Lab 4 (ETX - Scenario 3)
 
 | **Level 3**
 | Fully autonomous with pre-approved trusted automation
-| Part 5
+| Lab 5 (ETX - Scenario 4)
 |===
 
 == Call to action

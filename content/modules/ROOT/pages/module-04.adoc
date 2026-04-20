@@ -562,15 +562,15 @@ This Lab successfully implemented a closed-loop, AI-driven network automation wo
 
 By leveraging Ansible Lightspeed, our network expert could focus on codifying their troubleshooting knowledge in plain language, rather than getting bogged down in low-level syntax like playbook conditionals, operators, or regular expressions. This same process could easily be leveraged to iterate additional trouble shooting scenarios into the same playbook or refactored as roles.
 
-== Congratulations! You've Completed Part 2!
+== Congratulations! You've Completed Lab 2!
 
-You have successfully completed the Network Automation portion of this lab! You've now seen how AI-driven automation can be applied to both server infrastructure (Part 1) and network infrastructure (Part 2).
+You have successfully completed the Network Automation portion of this lab! You've now seen how AI-driven automation can be applied to both server infrastructure (Lab 1) and network infrastructure (Lab 2).
 
 == What's Next?
 
-You've completed Part 2! Ready to extend the AIOps pattern to Windows? Continue to Part 3 to see how Event-Driven Ansible detects Windows security events and automatically creates AI-enriched tickets.
+You've completed Lab 2! Ready to extend the AIOps pattern to Windows? Continue to Lab 3 to see how Event-Driven Ansible detects Windows security events and automatically creates AI-enriched tickets.
 
-xref:module-06.adoc[Next: Part 3 - Windows Event-Driven Automation ->]
+xref:module-06.adoc[Next: Lab 3 - Windows Event-Driven Automation ->]
 
 Or skip directly to the summary:
 

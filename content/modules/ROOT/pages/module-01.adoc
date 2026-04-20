@@ -398,7 +398,7 @@ image::aiops-cool.gif[aiops-cool, link="_images/aiops-cool.gif", window=blank]
 
 '''
 
-== 🎉 Congratulations! You've Completed Part 1!
+== 🎉 Congratulations! You've Completed Lab 1!
 
 You have successfully completed the **basic introduction** to AIOps! You've experienced firsthand how **Red Hat AI**, **Ansible Lightspeed**, and **Ansible Automation Platform** can work together to create intelligent, self-healing infrastructure.
 
@@ -411,13 +411,13 @@ You have successfully completed the **basic introduction** to AIOps! You've expe
 
 '''
 
-== ⭐ Ready for More? Part 2 Awaits!
+== ⭐ Ready for More? Lab 2 Awaits!
 
 image::splunk-logo.png[splunk,150, link="_images/splunk-logo.png", window=blank]
 
 [IMPORTANT]
 ====
-**Highly Recommended!** Part 2 takes the AIOps concepts you just learned and applies them to a **more complex, real-world networking scenario**. While Part 1 provided a basic introduction using Apache service remediation, Part 2 demonstrates the true power of AI-driven automation at scale with network infrastructure.
+**Highly Recommended!** Lab 2 takes the AIOps concepts you just learned and applies them to a **more complex, real-world networking scenario**. While Lab 1 provided a basic introduction using Apache service remediation, Lab 2 demonstrates the true power of AI-driven automation at scale with network infrastructure.
 ====
 
 In the next modules, you'll apply everything you've learned to a **network automation scenario** involving:
@@ -429,9 +429,9 @@ In the next modules, you'll apply everything you've learned to a **network autom
 
 [TIP]
 ====
-**Both parts are independent.** If you've already completed Part 2 or want to skip ahead to the Summary and Call to Actions, you can navigate there directly from the menu. However, we strongly encourage completing Part 2 for a deeper understanding of AIOps capabilities.
+**All labs are independent.** If you've already completed Lab 2 or want to skip ahead to the Summary and Call to Actions, you can navigate there directly from the menu. However, we strongly encourage completing Lab 2 for a deeper understanding of AIOps capabilities.
 ====
 
 == Complete
 
-Click the link below to continue to **Module 3: Splunk** and begin Part 2.
+Click the link below to continue to **Module 3: Splunk** and begin Lab 2.
