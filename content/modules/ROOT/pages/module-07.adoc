@@ -271,11 +271,21 @@ image::console-advisor-openssh-recommendation.png[Advisor OpenSSH LoginGraceTime
 
 === Step 2: Generate the remediation playbook
 
-1. Select the recommendation.
-2. Click **Remediate** to generate a remediation playbook.
-3. Download the generated playbook.
+1. Select `{rhel_node3}` from the **Affected Systems** list by clicking the checkbox next to it.
 
-// TODO: Add screenshot of Advisor remediation generation
+image::console-advisor-select-system.png[Select node3 from affected systems,80%,80%, link="_images/console-advisor-select-system.png", window=blank]
+
+[start=2]
+2. Click the blue **Plan remediation** button.
+
+3. In the **Plan a remediation** dialog, enter a plan name (e.g., `etx-advisor-plan`) and click the blue **Create plan** button.
+
+image::console-advisor-plan-remediation.png[Plan a remediation dialog,60%,60%, link="_images/console-advisor-plan-remediation.png", window=blank]
+
+[start=4]
+4. The screen will switch to the created remediation plan. Click the **Download** button to download the playbook to your workstation.
+
+image::console-advisor-remediation-plan-created.png[Remediation plan created and ready to download,80%,80%, link="_images/console-advisor-remediation-plan-created.png", window=blank]
 
 === Step 3: Move the playbook into code-server
 
