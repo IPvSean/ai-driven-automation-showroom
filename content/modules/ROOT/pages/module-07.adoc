@@ -330,6 +330,8 @@ This pulls the latest playbook from Gitea into AAP's **Lightspeed-Playbooks** pr
 1. In AAP, navigate to **Templates** → **Remediation - SSH LoginGraceTime**.
 2. Click **Launch** and verify the job completes successfully.
 
+image::aap-advisor-remediation-success.png[Advisor remediation job completed successfully,80%,80%, link="_images/aap-advisor-remediation-success.png", window=blank]
+
 [quote]
 💡 **Advisor recommendations** are based on Red Hat's deep expertise supporting thousands of enterprise RHEL deployments. These are not theoretical — they flag real misconfigurations that Red Hat Support has seen cause outages in production.
 
