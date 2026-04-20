@@ -293,11 +293,42 @@ image::console-advisor-playbook-snippet.png[Advisor remediation playbook snippet
 
 NOTE: This is only a snippet — the full playbook may contain additional tasks and configuration depending on the recommendation.
 
-=== Step 3: Move the playbook into code-server
+=== Step 3: Save the playbook to code-server
 
-1. Upload or copy the downloaded playbook into code-server.
-2. Save it as `advisor-remediation.yml` in the playbooks directory.
-3. Review the content in the editor.
+1. In the Red Hat Lightspeed console, navigate to your finding and download the generated Ansible playbook.
+2. Save it as `remediation.yml` in `/home/lab-user/` on code-server.
+
+=== Step 4: Fix the hostname to match your AAP inventory
+
+1. Open `remediation.yml` and find the `hosts:` field — Lightspeed generates the full DNS name (e.g. `node3.lab.sandbox-xxxx-ocp4-cluster.svc.cluster.local`).
+2. Change it to just `node3` to match the host name in your AAP inventory.
+
+=== Step 5: Push the playbook to Gitea
+
+1. Ask Claude Code:
+
+[source]
+----
+push remediation.yml to git
+----
+
+Claude will commit and push to your `lightspeed_playbooks` repo automatically.
+
+=== Step 6: Sync the AAP project
+
+1. Ask Claude Code:
+
+[source]
+----
+sync the AAP project
+----
+
+This pulls the latest playbook from Gitea into AAP's **Lightspeed-Playbooks** project.
+
+=== Step 7: Run the Job Template
+
+1. In AAP, navigate to **Templates** → **Remediation - SSH LoginGraceTime**.
+2. Click **Launch** and verify the job completes successfully.
 
 [quote]
 💡 **Advisor recommendations** are based on Red Hat's deep expertise supporting thousands of enterprise RHEL deployments. These are not theoretical — they flag real misconfigurations that Red Hat Support has seen cause outages in production.
