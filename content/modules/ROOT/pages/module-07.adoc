@@ -470,9 +470,10 @@ You can also ask Claude Code to verify without leaving the terminal:
 
 [source]
 ----
-Check if the CVE we just remediated still affects my systems
-with the k5txp tag.
+Check if CVE-2025-31277 still affects my node2
 ----
+
+image::claude-code-cve-verified.png[Claude Code confirms CVE remediation,80%,80%, link="_images/claude-code-cve-verified.png", window=blank]
 
 [quote]
 💡 **This was entirely agentic.** You never opened a web browser, navigated dashboards, or clicked download buttons. Claude Code used MCP to query Lightspeed, found the CVE, fetched the playbook, pushed it to Git, created a Job Template, and ran it — all through a conversation in the terminal.
