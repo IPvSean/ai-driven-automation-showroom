@@ -110,6 +110,8 @@ claude
 **MCP is pre-configured.** Claude Code is already connected to the Ansible MCP server and the Red Hat Lightspeed MCP server in your lab environment. You do not need to configure anything — just launch the agent and start chatting.
 ====
 
+image::claude-code-mcp-servers.png[Claude Code MCP servers, link="_images/claude-code-mcp-servers.png", window=blank]
+
 [NOTE]
 ====
 **OpenCode** is also installed in this environment but has not been tested with this lab. If you want to experiment with it, you can launch it by typing `opencode` in the terminal. It connects to the same MCP servers, but **Claude Code is the recommended and tested agent** for all exercises.
