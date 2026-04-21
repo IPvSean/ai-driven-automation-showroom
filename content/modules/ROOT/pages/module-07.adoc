@@ -364,6 +364,12 @@ Claude Code will use the **Red Hat Lightspeed MCP server** to:
 * List CVEs with severity ratings
 * Identify which CVEs have remediation playbooks available
 
+Claude Code will prompt you for permission each time it wants to use an MCP tool. Select **1. Yes** or **2. Yes, and don't ask again** to allow it to proceed. You may be prompted multiple times depending on how Claude Code chooses to solve the request — it may use multiple different tools.
+
+image::claude-code-mcp-permission.png[Claude Code MCP tool permission prompt,80%,80%, link="_images/claude-code-mcp-permission.png", window=blank]
+
+At the end, you will get output similar to the following:
+
 image::claude-code-cve-results.png[Claude Code CVE query results,80%,80%, link="_images/claude-code-cve-results.png", window=blank]
 
 === Step 3: Download the remediation playbook
