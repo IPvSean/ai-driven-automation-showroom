@@ -12,12 +12,12 @@ After completing this section, you will be able to:
 * Configure a Splunk alert to detect crond failures on RHEL systems
 * Observe Event-Driven Ansible responding to Splunk alerts for RHEL events
 * Understand how an AI routing agent analyzes syslog messages and selects the correct remediation
-* Compare the autonomous approach (this module) with the human-in-the-loop approach (Module 4.2)
+* Compare the autonomous approach (this module) with the human-in-the-loop approach (Lab 4)
 * Articulate when each approach is appropriate for your organization
 
 [IMPORTANT]
 ====
-**This is a separate demo from Module 4.2 (Agentic IDE Workflow).** Module 4.2 demonstrated a human-in-the-loop workflow where an AI agent assists you and asks for permission before acting. This module demonstrates a more autonomous approach where the detection-to-remediation pipeline runs with minimal human intervention using an **AI routing agent** that selects the correct fix automatically.
+**This is a separate demo from Lab 4 (Red Hat Lightspeed & Agentic IDE Workflow).** Lab 4 demonstrated a human-in-the-loop workflow where an AI agent assists you and asks for permission before acting. This module demonstrates a more autonomous approach where the detection-to-remediation pipeline runs with minimal human intervention using an **AI routing agent** that selects the correct fix automatically.
 ====
 
 == How It Works
@@ -282,7 +282,7 @@ The dispatcher then looks up the selected template by name in AAP and launches i
 
 [cols="1,2,2", options="header"]
 |===
-| Aspect | Module 4.2 (Human-in-the-loop) | Module 5.1 (AI-routed)
+| Aspect | Lab 4 (Human-in-the-loop) | Lab 5 (AI-routed)
 
 | **Trigger**
 | Human types a prompt in Claude Code
@@ -307,7 +307,7 @@ The dispatcher then looks up the selected template by name in AAP and launches i
 
 [TIP]
 ====
-Most organizations use both approaches. Start with human-in-the-loop (Module 4.2) while building confidence in AI-driven analysis. Promote well-tested scenarios to AI-routed workflows (this module) once the failure patterns and fixes are validated.
+Most organizations use both approaches. Start with human-in-the-loop (Lab 4) while building confidence in AI-driven analysis. Promote well-tested scenarios to AI-routed workflows (this module) once the failure patterns and fixes are validated.
 ====
 
 == Key Takeaways

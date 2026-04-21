@@ -8,8 +8,7 @@
 * Lab 3: AIOps with Windows Automation
 ** xref:module-06.adoc[3.1 Windows Events and AI-Driven Ticketing]
 * Lab 4: Red Hat Lightspeed & Agentic IDE Workflow (ETX - Scenario 3)
-** xref:module-07.adoc[4.1 Red Hat Lightspeed — CVE and Advisor Remediation]
-** xref:module-08.adoc[4.2 Agentic IDE Workflow with Ansible MCP]
+** xref:module-07.adoc[4.1 Red Hat Lightspeed & Agentic IDE Workflow]
 * Lab 5: Autonomous AIOps with Splunk and RHEL (ETX - Scenario 4)
 ** xref:module-09.adoc[5.1 Autonomous AIOps — Self-Healing RHEL with Splunk]
 * xref:module-05.adoc[Summary and Call to Actions]

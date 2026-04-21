@@ -708,10 +708,58 @@ The real power of this workflow is not just generating playbooks — it's the **
 
 This is the difference between "AI wrote it" and "AI wrote it, a human reviewed it, and AAP enforces that it runs safely." The IDE is where the review happens; AAP is where the gatekeeping happens.
 
+=== The Agentic Architecture
+
+Throughout this lab, Claude Code connected to Ansible Automation Platform via the Ansible MCP server. Here is how the components fit together:
+
+[source]
+----
+code-server (VS Code in browser)
+    └── Claude Code (AI agent in terminal)
+            ↕ MCP Protocol
+        Ansible MCP Server          Red Hat Lightspeed MCP Server
+            ↕ REST API                      ↕ REST API
+    Ansible Automation Platform     Red Hat Lightspeed (console.redhat.com)
+    (Inventory, Job Templates,      (CVEs, Advisor, Remediation Playbooks)
+     Credentials, Jobs)
+----
+
+The **Ansible MCP server** exposes AAP capabilities (inventory, job templates, projects, jobs) as MCP tools. The **Lightspeed MCP server** exposes vulnerability and advisory data. Claude Code calls both behind the scenes when you ask questions in natural language — you don't need to know the API endpoints.
+
+=== How This Differs from Traditional Workflows
+
+[cols="2,2,2", options="header"]
+|===
+| Aspect | Traditional (Labs 1-3) | Agentic (This Lab)
+
+| **Trigger**
+| Event (Filebeat, Splunk, Winlogbeat)
+| Human prompt in Claude Code
+
+| **Decision Maker**
+| Pre-defined workflow logic
+| AI agent with human approval
+
+| **Flexibility**
+| Fixed workflow steps
+| Dynamic — Claude Code adapts to what it finds
+
+| **Approval**
+| Built into workflow (optional)
+| Always required — Claude Code asks before acting
+
+| **Best For**
+| Known, repeatable scenarios
+| Ad-hoc investigation and remediation
+|===
+
+[quote]
+💡 **Think of it this way**: Traditional automation is like a train on rails — fast and reliable, but it only goes where tracks exist. Agentic automation is like a GPS-guided driver — it can navigate new routes, but you're sitting in the passenger seat and can say "stop" at any time.
+
 == Complete
 
-You have completed Module 4.1 — Red Hat Lightspeed. Your remediation playbooks are now in Git and available as Job Templates in AAP.
+You have completed Lab 4 — Red Hat Lightspeed & Agentic IDE Workflow. You used multiple approaches to generate, review, and deploy remediation playbooks — all through a human-in-the-loop workflow where AI proposes and you decide.
 
-In the next module, you will use **Claude Code with the Ansible MCP server** to interactively discover servers that need patching and execute remediation — with your approval.
+In the next lab, you will see the **opposite approach**: a fully autonomous workflow where Splunk detects a RHEL misconfiguration and pre-approved automation fixes it without any human intervention.
 
-Click the link below to continue to **Module 4.2: Agentic IDE Workflow with Ansible MCP**.
+Click the link below to continue to **Lab 5: Autonomous AIOps — Self-Healing RHEL with Splunk**.
