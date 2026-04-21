@@ -403,23 +403,29 @@ At the end, you will get output similar to the following:
 
 image::claude-code-cve-results.png[Claude Code CVE query results,80%,80%, link="_images/claude-code-cve-results.png", window=blank]
 
-=== Step 3: Download the remediation playbook
+=== Step 3: Choose a CVE to remediate
 
-Ask Claude Code to download the playbook:
+From the results, select a CVE to fix. We recommend **CVE-2025-31277** — _A flaw was found in WebKitGTK. Processing malicious web content can cause memory corruption due to improper memory handling._
+
+NOTE: You will reference this specific CVE in the following steps. If your environment shows a different critical CVE with an available advisory, you can choose that one instead — just adjust the prompts accordingly.
+
+=== Step 4: Download the remediation playbook
+
+Ask Claude Code to download the playbook for the specific CVE:
 
 [source]
 ----
-Download the remediation playbook for that CVE. Save it as cve-remediation.yml
-in the playbooks directory.
+Download the remediation playbook for CVE-2025-31277. Save it as
+cve-remediation.yml in the lightspeed_playbooks directory.
 ----
 
 Claude Code will use the Lightspeed MCP server to fetch the remediation playbook and save it to the `lightspeed_playbooks` directory.
 
-=== Step 4: Review the playbook
+=== Step 5: Review the playbook
 
-The downloaded playbook will automatically be available in the code-server file explorer. Open it and review the YAML content to confirm it addresses the CVE.
+The downloaded playbook will automatically be available in the code-server file explorer. Open it and review the YAML content to confirm it addresses CVE-2025-31277.
 
-=== Step 5: Push to Git
+=== Step 6: Push to Git
 
 1. Ask Claude Code:
 
@@ -430,18 +436,18 @@ push cve-remediation.yml to git
 
 Claude will commit and push to your `lightspeed_playbooks` repo automatically.
 
-=== Step 6: Sync the AAP project and create a Job Template
+=== Step 7: Sync the AAP project and create a Job Template
 
 1. Ask Claude Code:
 
 [source]
 ----
 Sync the AAP project, then create a Job Template called
-"CVE Remediation" that uses the cve-remediation.yml playbook
-from the Lightspeed-Playbooks project. It should target node2.
+"CVE Remediation - CVE-2025-31277" that uses the cve-remediation.yml
+playbook from the Lightspeed-Playbooks project. It should target node2.
 ----
 
-=== Step 7: Run the Job Template
+=== Step 8: Run the Job Template
 
 1. Ask Claude Code:
 
