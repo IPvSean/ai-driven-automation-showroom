@@ -371,7 +371,10 @@ This exercise demonstrates the **fully agentic approach**: you will use Claude C
 
 === Step 1: Launch Claude Code
 
-1. Open a terminal in code-server.
+1. Open a terminal in code-server. Navigate to **Terminal → New Terminal** from the top menu bar.
++
+image::codeserver-new-terminal.png[Open a new terminal in code-server, link="_images/codeserver-new-terminal.png", window=blank]
++
 2. Type `claude` to start Claude Code.
 3. When prompted with the workspace trust dialog, select **1. Yes, I trust this folder** and press Enter.
 
