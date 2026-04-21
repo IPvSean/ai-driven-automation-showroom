@@ -294,8 +294,6 @@ Lab 3 shows you how Event-Driven Ansible can detect Windows security events and 
 
 ==== Lab 4: Red Hat Lightspeed & Agentic IDE Workflow
 
-image::aap_logo.png[aap_logo,150, link="_images/aap_logo.png", window=blank]
-
 Lab 4 introduces two new dimensions to AIOps: **Red Hat Lightspeed** (formerly Insights) for vulnerability and compliance management, and **Claude Code** as an AI agent in **code-server (VS Code)** for interactive infrastructure management. You will generate remediation playbooks for CVEs and Advisor recommendations, use Automation code assistant to generate an HTTPD fix, and use Claude Code with the Ansible MCP server to push playbooks to Git, create Job Templates, and execute remediation — all with human approval at every step.
 
 '''
