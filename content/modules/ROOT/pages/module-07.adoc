@@ -84,9 +84,6 @@ Your lab environment includes **code-server**, which is https://code.visualstudi
 | code-server URL
 | link:{ide_url}[code-server (VS Code)^]
 
-| Username
-| `{ide_username}`
-
 | Password
 | `{ide_password}`
 |===
