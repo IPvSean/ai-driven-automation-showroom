@@ -449,6 +449,8 @@ Sync the AAP project, then create a Job Template called
 playbook from the Lightspeed-Playbooks project. It should target node2.
 ----
 
+image::aap-cve-job-template.png[CVE Remediation Job Template in AAP,60%,60%, link="_images/aap-cve-job-template.png", window=blank]
+
 === Step 8: Run the Job Template
 
 1. Ask Claude Code:
