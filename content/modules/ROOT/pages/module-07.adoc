@@ -103,6 +103,8 @@ image::codeserver-new-terminal.png[Open a new terminal in code-server, link="_im
 +
 image::claude-code-trust-folder.png[Claude Code trust folder prompt,80%,80%, link="_images/claude-code-trust-folder.png", window=blank]
 +
+4. The Claude Code terminal interface will appear.
++
 image::claude-code-welcome.png[Claude Code welcome screen,80%,80%, link="_images/claude-code-welcome.png", window=blank]
 
 [NOTE]
@@ -379,9 +381,11 @@ image::codeserver-new-terminal.png[Open a new terminal in code-server, link="_im
 +
 2. Type `claude` to start Claude Code.
 3. When prompted with the workspace trust dialog, select **1. Yes, I trust this folder** and press Enter.
-
++
 image::claude-code-trust-folder.png[Claude Code trust folder prompt,80%,80%, link="_images/claude-code-trust-folder.png", window=blank]
-
++
+4. The Claude Code terminal interface will appear.
++
 image::claude-code-welcome.png[Claude Code welcome screen,80%,80%, link="_images/claude-code-welcome.png", window=blank]
 
 === Step 2: Ask Claude Code about CVEs
