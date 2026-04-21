@@ -495,11 +495,42 @@ Automation code assistant (previously called Ansible Lightspeed Code Assistant) 
 **Flexible AI backends**: Automation code assistant is no longer tied to a single AI provider. Your lab environment is configured with **Google Gemini** as the backend, but it also supports **Red Hat AI** and **IBM watsonx**. This gives organizations the flexibility to choose the AI provider that best fits their requirements.
 ====
 
-=== Step 1: Open a new playbook file
+=== Step 1: Configure Automation code assistant with Google Gemini
 
-1. In code-server, create a new file called `httpd-fix.yml` in the playbooks directory.
+Before generating a playbook, you need to configure the Automation code assistant extension with the Google Gemini LLM provider.
 
-=== Step 2: Use Automation code assistant to generate the playbook
+1. In code-server, click the **Ansible "A" icon** in the left sidebar to open the Ansible Development Tools panel.
+
+image::codeserver-ansible-plugin.png[Ansible Development Tools plugin,30%,30%, link="_images/codeserver-ansible-plugin.png", window=blank]
+
+[start=2]
+2. Under **GENERATIVE AI**, click **LLM Provider : Google Gemini**.
+3. Fill in the following values:
++
+[cols="2,3", options="header"]
+|===
+| Field | Value
+
+| API Endpoint
+| `http://localhost:4011`
+
+| API Key
+| `dummy`
+
+| Model Name
+| `gemini-2.5-pro`
+|===
+
+[start=4]
+4. Click **Save**.
+
+image::codeserver-gemini-configured.png[Google Gemini configured for Automation code assistant,50%,50%, link="_images/codeserver-gemini-configured.png", window=blank]
+
+=== Step 2: Open a new playbook file
+
+1. In code-server, create a new file called `httpd-fix.yml` in the `lightspeed_playbooks` directory.
+
+=== Step 3: Use Automation code assistant to generate the playbook
 
 With Automation code assistant enabled in your IDE, start typing a task description and let the AI assist:
 
@@ -544,7 +575,7 @@ The resulting playbook should look similar to:
 // TODO: Add screenshot of Automation code assistant generating the playbook in code-server
 // TODO: Confirm Automation code assistant extension is pre-installed and configured
 
-=== Step 3: Review and save
+=== Step 4: Review and save
 
 1. Review the generated playbook in the editor.
 2. Save the file.
