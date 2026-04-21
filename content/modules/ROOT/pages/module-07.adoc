@@ -94,16 +94,16 @@ Your lab environment has **Claude Code** pre-installed — Anthropic's CLI-based
 
 To launch Claude Code:
 
-1. Open a **terminal** inside code-server.
-2. Type:
-
-[source,bash]
-----
-claude
-----
-
-[start=3]
-3. A chat interface will appear in your terminal. You can interact with it using natural language.
+1. Open a **terminal** inside code-server. Navigate to **Terminal → New Terminal** from the top menu bar.
++
+image::codeserver-new-terminal.png[Open a new terminal in code-server, link="_images/codeserver-new-terminal.png", window=blank]
++
+2. Type `claude` to start Claude Code.
+3. When prompted with the workspace trust dialog, select **1. Yes, I trust this folder** and press Enter.
++
+image::claude-code-trust-folder.png[Claude Code trust folder prompt,80%,80%, link="_images/claude-code-trust-folder.png", window=blank]
++
+image::claude-code-welcome.png[Claude Code welcome screen,80%,80%, link="_images/claude-code-welcome.png", window=blank]
 
 [NOTE]
 ====
