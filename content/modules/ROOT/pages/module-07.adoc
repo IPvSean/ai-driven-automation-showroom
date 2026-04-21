@@ -521,10 +521,10 @@ image::codeserver-ansible-plugin.png[Ansible Development Tools plugin,30%,30%, l
 | `gemini-2.5-pro`
 |===
 
+image::codeserver-gemini-configured.png[Google Gemini configured for Automation code assistant,50%,50%, link="_images/codeserver-gemini-configured.png", window=blank]
+
 [start=4]
 4. Click **Save**.
-
-image::codeserver-gemini-configured.png[Google Gemini configured for Automation code assistant,50%,50%, link="_images/codeserver-gemini-configured.png", window=blank]
 
 === Step 2: Open a new playbook file
 
