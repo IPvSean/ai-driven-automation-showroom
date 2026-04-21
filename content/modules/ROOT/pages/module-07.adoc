@@ -396,46 +396,49 @@ Download the remediation playbook for that CVE. Save it as cve-remediation.yml
 in the playbooks directory.
 ----
 
-Claude Code will:
-
-* Use the Lightspeed MCP server to fetch the remediation playbook
-* Save it to the specified location in your code-server workspace
-
-// TODO: Add screenshot of Claude Code downloading the playbook
-// TODO: Confirm specific CVE to target in the lab
+Claude Code will use the Lightspeed MCP server to fetch the remediation playbook and save it to the `lightspeed_playbooks` directory.
 
 === Step 4: Review the playbook
 
-The downloaded playbook will automatically be available in the code-server file explorer. Open it and review the YAML content.
+The downloaded playbook will automatically be available in the code-server file explorer. Open it and review the YAML content to confirm it addresses the CVE.
 
-[source,yaml]
+=== Step 5: Push to Git
+
+1. Ask Claude Code:
+
+[source]
 ----
-# Example CVE remediation playbook (actual content will vary by CVE)
-- name: Remediate CVE-XXXX-XXXXX
-  hosts: all
-  become: true
-  tasks:
-    - name: Update vulnerable package
-      ansible.builtin.dnf:
-        name: <package-name>
-        state: latest
-      when: ansible_os_family == "RedHat"
-
-    - name: Verify package version
-      ansible.builtin.command:
-        cmd: rpm -q <package-name>
-      register: pkg_version
-      changed_when: false
-
-    - name: Display updated version
-      ansible.builtin.debug:
-        msg: "Package updated to {{ pkg_version.stdout }}"
+push cve-remediation.yml to git
 ----
 
-// TODO: Replace with actual CVE playbook content from the lab
+Claude will commit and push to your `lightspeed_playbooks` repo automatically.
+
+=== Step 6: Sync the AAP project and create a Job Template
+
+1. Ask Claude Code:
+
+[source]
+----
+Sync the AAP project, then create a Job Template called
+"CVE Remediation" that uses the cve-remediation.yml playbook
+from the Lightspeed-Playbooks project. It should target node2.
+----
+
+=== Step 7: Run the Job Template
+
+1. Ask Claude Code:
+
+[source]
+----
+Go ahead and launch it
+----
+
+Claude Code will launch the job and monitor it until completion.
+
+image::claude-code-cve-job-success.png[Claude Code CVE remediation job completed successfully,80%,80%, link="_images/claude-code-cve-job-success.png", window=blank]
 
 [quote]
-💡 **This was entirely agentic.** You never opened a web browser, navigated dashboards, or clicked download buttons. Claude Code used MCP to query Lightspeed, found the CVE, and fetched the playbook — all through a conversation in the terminal.
+💡 **This was entirely agentic.** You never opened a web browser, navigated dashboards, or clicked download buttons. Claude Code used MCP to query Lightspeed, found the CVE, fetched the playbook, pushed it to Git, created a Job Template, and ran it — all through a conversation in the terminal.
 
 == Exercise 4: HTTPD Configuration Fix (Automation code assistant)
 
