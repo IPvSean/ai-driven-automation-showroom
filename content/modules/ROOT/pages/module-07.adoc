@@ -421,9 +421,11 @@ cve-remediation.yml in the lightspeed_playbooks directory.
 
 Claude Code will use the Lightspeed MCP server to fetch the remediation playbook and save it to the `lightspeed_playbooks` directory.
 
-=== Step 5: Review the playbook
+=== Step 5: Review the playbook and fix the hostname
 
 The downloaded playbook will automatically be available in the code-server file explorer. Open it and review the YAML content to confirm it addresses CVE-2025-31277.
+
+Just like the Advisor exercise, the Lightspeed playbook will use the full DNS name in the `hosts:` field (e.g. `node2.lab.sandbox-xxxx-ocp4-cluster.svc.cluster.local`). Change it to just `node2` so it matches your AAP inventory and only runs on that one node.
 
 === Step 6: Push to Git
 
