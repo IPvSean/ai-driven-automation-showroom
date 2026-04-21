@@ -145,8 +145,11 @@ In this challenge, you will introduce an invalid crontab entry that causes crond
 
 1. Navigate to **Automation Execution** -> **Templates**
 2. Find **Break Cron - Bad Syntax** and click the launch icon
-3. Set the **Limit** to `node1`
-4. Launch the job and wait for it to complete
+3. Set the **Limit** to `node1` as shown below, then click **Next** and **Launch**
++
+image::cron_aiops_launch_limit.png[Set Limit to node1,80%, link="_images/cron_aiops_launch_limit.png", window=blank]
++
+4. Wait for the job to complete
 
 This writes an invalid crontab file to `/etc/cron.d/broken-job` on node1. When crond tries to parse it, it logs:
 
@@ -208,8 +211,8 @@ In this challenge, you will create a crontab entry that references a user that d
 
 1. Navigate to **Automation Execution** -> **Templates**
 2. Find **Break Cron - Invalid User** and click the launch icon
-3. Set the **Limit** to `node1`
-4. Launch the job and wait for it to complete
+3. Set the **Limit** to `node1` (same as Challenge 1), then click **Next** and **Launch**
+4. Wait for the job to complete
 
 This writes a crontab file to `/etc/cron.d/bad-user-job` with a nonexistent user. Every minute, crond tries to run the job and logs:
 
