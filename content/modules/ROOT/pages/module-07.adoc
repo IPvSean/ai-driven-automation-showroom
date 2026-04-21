@@ -250,6 +250,11 @@ image::console-vulnerability-reports.png[Vulnerability Reports navigation,40%,40
 [quote]
 💡 **Why start with a report?** The Executive Report gives you a high-level view of your environment's vulnerability posture. This context helps you prioritize which CVEs and Advisor recommendations to remediate first in the exercises that follow.
 
+[IMPORTANT]
+====
+**Our goal:** Take a moment to look at the Advisor recommendations and CVEs listed in your Lightspeed dashboard. Note how many issues are flagged across your three RHEL nodes. In the next two exercises, we are going to fix these issues — first an Advisor recommendation (Exercise 2), then a CVE (Exercise 3). By the end, you should see the remediated issues disappear from the dashboard. The nodes we _didn't_ fix will still show the issue, proving the remediation actually worked.
+====
+
 == Exercise 2: Advisor Remediation (Manual)
 
 The Advisor section of Red Hat Lightspeed provides proactive recommendations — misconfigurations, compliance issues, and best practices flagged by Red Hat Support.
@@ -345,6 +350,18 @@ Claude Code will use the Ansible MCP server to create the Job Template in AAP.
 
 image::aap-advisor-remediation-success.png[Advisor remediation job completed successfully,80%,80%, link="_images/aap-advisor-remediation-success.png", window=blank]
 
+=== Verify the remediation
+
+Go back to **Operations** → **Advisor** → **Recommendations** in console.redhat.com and revisit the **Decreased security: OpenSSH LoginGraceTime settings** recommendation. You should see that `{rhel_node3}` is no longer listed as an affected system — the remediation worked. The other nodes that were not remediated will still show the issue.
+
+You can also verify using Claude Code by asking the Lightspeed MCP server directly:
+
+[source]
+----
+Check if the OpenSSH LoginGraceTime Advisor recommendation still
+affects my systems with the k5txp tag.
+----
+
 [quote]
 💡 **Advisor recommendations** are based on Red Hat's deep expertise supporting thousands of enterprise RHEL deployments. These are not theoretical — they flag real misconfigurations that Red Hat Support has seen cause outages in production.
 
@@ -436,6 +453,18 @@ Go ahead and launch it
 Claude Code will launch the job and monitor it until completion.
 
 image::claude-code-cve-job-success.png[Claude Code CVE remediation job completed successfully,80%,80%, link="_images/claude-code-cve-job-success.png", window=blank]
+
+=== Verify the remediation
+
+Go back to **Security** → **Vulnerability** → **CVEs** in console.redhat.com and check the CVE you just remediated. You should see that `{rhel_node2}` is no longer listed as affected. The nodes that were not targeted will still show the vulnerability.
+
+You can also ask Claude Code to verify without leaving the terminal:
+
+[source]
+----
+Check if the CVE we just remediated still affects my systems
+with the k5txp tag.
+----
 
 [quote]
 💡 **This was entirely agentic.** You never opened a web browser, navigated dashboards, or clicked download buttons. Claude Code used MCP to query Lightspeed, found the CVE, fetched the playbook, pushed it to Git, created a Job Template, and ran it — all through a conversation in the terminal.
