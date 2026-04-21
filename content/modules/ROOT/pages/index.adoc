@@ -48,7 +48,7 @@ In AIOps there are three major parts:
 - Inference
 - Automation
 
-image::aiops-circle.png[aiops diagram,55%,55%, link="_images/aiops-circle.png", window=blank]
+image::aiops-circle.png[aiops diagram,300, link="_images/aiops-circle.png", window=blank]
 
 - *Observability* is the ability to understand the internal state of a system by collecting, analyzing, and visualizing data from logs, metrics, and traces.  This _can_ be another AI tool such as *IBM Instana Observability*.  For this lab we are simply relaying logs using https://www.elastic.co/beats/filebeat[Filebeat^], a Lightweight shipper for logs.  Ansible Automation Platform can integrate with observability tools using Event-Driven Ansible (EDA).
 
