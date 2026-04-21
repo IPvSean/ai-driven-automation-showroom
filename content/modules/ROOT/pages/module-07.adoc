@@ -325,12 +325,23 @@ sync the AAP project
 
 This pulls the latest playbook from Gitea into AAP's **Lightspeed-Playbooks** project.
 
-=== Step 7: Run the Job Template
+=== Step 7: Create the Job Template
 
-1. In AAP, navigate to **Templates** and find the Job Template that Claude Code created (e.g., **Remediation - SSH LoginGraceTime**).
+1. Ask Claude Code:
+
+[source]
+----
+Create a Job Template called "Remediation - SSH LoginGraceTime" that uses
+the remediation.yml playbook from the Lightspeed-Playbooks project.
+It should target node3.
+----
+
+Claude Code will use the Ansible MCP server to create the Job Template in AAP.
+
+=== Step 8: Run the Job Template
+
+1. In AAP, navigate to **Templates** → **Remediation - SSH LoginGraceTime**.
 2. Click **Launch** and verify the job completes successfully.
-
-NOTE: Claude Code may choose a different name for the Job Template. Check the AAP Templates list to see what it created, or be more specific in your prompt (e.g., _"create a Job Template called Remediation - SSH LoginGraceTime"_).
 
 image::aap-advisor-remediation-success.png[Advisor remediation job completed successfully,80%,80%, link="_images/aap-advisor-remediation-success.png", window=blank]
 
