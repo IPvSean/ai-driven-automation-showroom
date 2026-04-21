@@ -296,11 +296,11 @@ The playbook you downloaded in the previous step is on your **local laptop/works
 
 1. In your code-server browser tab, right-click the file explorer panel and select **Upload Files...** (or use **File → Upload Files...**).
 2. Navigate to your local Downloads folder and select the playbook you just downloaded.
-3. Rename or save it as `remediation.yml` in `/home/lab-user/`.
+3. Save it as `remediation.yml` in the `lightspeed_playbooks` directory (`/home/lab-user/lightspeed_playbooks/`). This is the directory synced with Git.
 
 === Step 4: Fix the hostname to match your AAP inventory
 
-1. Open `remediation.yml` and find the `hosts:` field — Lightspeed generates the full DNS name (e.g. `node3.lab.sandbox-xxxx-ocp4-cluster.svc.cluster.local`).
+1. Open `lightspeed_playbooks/remediation.yml` and find the `hosts:` field — Lightspeed generates the full DNS name (e.g. `node3.lab.sandbox-xxxx-ocp4-cluster.svc.cluster.local`).
 2. Change it to just `node3` to match the host name in your AAP inventory.
 
 === Step 5: Push the playbook to Gitea
