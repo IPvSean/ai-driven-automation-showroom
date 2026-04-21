@@ -553,7 +553,20 @@ image::codeserver-generate-playbook-result.png[Generated playbook from Automatio
 
 [start=7]
 7. Click **Open editor** to load the playbook into the code-server editor.
-8. Click **File** → **Save** and save the playbook as `httpd-fix.yml`.
+8. Click **File** → **Save** and save the playbook as `httpd-fix.yml` in the `lightspeed_playbooks` directory so it can be pushed to Git.
+
+=== Step 3: Push, create Job Template, and run
+
+1. Ask Claude Code to handle the full workflow:
+
+[source]
+----
+Push httpd-fix.yml to git, sync the AAP project, create a Job Template
+called "HTTPD Fix" using httpd-fix.yml from the Lightspeed-Playbooks
+project targeting node1, and then launch it.
+----
+
+Claude Code will push the playbook to Gitea, sync the AAP project, create the Job Template, and run it — all in one go.
 
 [quote]
 💡 **IDE-first workflow**: In Labs 1-3, playbooks were generated programmatically via API calls and pushed to Git without human review. Here, you are working in the IDE as a developer would — using AI assistance to write the playbook, reviewing the output, and making any adjustments before committing. This is the modern developer workflow for infrastructure as code.
