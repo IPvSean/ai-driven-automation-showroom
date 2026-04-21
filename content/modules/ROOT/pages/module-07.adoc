@@ -290,10 +290,13 @@ image::console-advisor-playbook-snippet.png[Advisor remediation playbook snippet
 
 NOTE: This is only a snippet — the full playbook may contain additional tasks and configuration depending on the recommendation.
 
-=== Step 3: Save the playbook to code-server
+=== Step 3: Upload the playbook to code-server
 
-1. In the Red Hat Lightspeed console, navigate to your finding and download the generated Ansible playbook.
-2. Save it as `remediation.yml` in `/home/lab-user/` on code-server.
+The playbook you downloaded in the previous step is on your **local laptop/workstation**. You need to upload it to the **code-server** instance running in your lab environment.
+
+1. In your code-server browser tab, right-click the file explorer panel and select **Upload Files...** (or use **File → Upload Files...**).
+2. Navigate to your local Downloads folder and select the playbook you just downloaded.
+3. Rename or save it as `remediation.yml` in `/home/lab-user/`.
 
 === Step 4: Fix the hostname to match your AAP inventory
 
