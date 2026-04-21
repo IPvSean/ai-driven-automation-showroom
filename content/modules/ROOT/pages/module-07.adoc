@@ -349,7 +349,7 @@ This exercise demonstrates the **fully agentic approach**: you will use Claude C
 
 image::claude-code-trust-folder.png[Claude Code trust folder prompt,80%,80%, link="_images/claude-code-trust-folder.png", window=blank]
 
-image::claude-code-launch.png[Claude Code successfully launched,80%,80%, link="_images/claude-code-launch.png", window=blank]
+image::claude-code-welcome.png[Claude Code welcome screen,80%,80%, link="_images/claude-code-welcome.png", window=blank]
 
 === Step 2: Ask Claude Code about CVEs
 
