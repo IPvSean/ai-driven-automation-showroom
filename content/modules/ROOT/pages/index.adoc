@@ -352,19 +352,15 @@ Welcome to the ETX infrastructure track. In this focused workshop, you will comp
 
 In **Lab 4 (Scenario 3)**, you will:
 
-* Log in to **Red Hat Lightspeed** (console.redhat.com) and register your RHEL nodes
-* Generate an **Executive Vulnerability Report** (PDF) from the Lightspeed dashboard
-* Create remediation playbooks for **Advisor recommendations** and **CVEs** — both manually through the web UI and agentically through **Claude Code** with the Lightspeed MCP server
-* Use **Automation code assistant** (powered by Google Gemini) to generate an HTTPD configuration fix directly in the IDE
-* Push all playbooks to Git and create AAP Job Templates using Claude Code and the **Ansible MCP server**
-* **Verify** that remediated issues disappear from the Lightspeed dashboard
+* **Identify risk** — use Red Hat Lightspeed to see which CVEs and misconfigurations affect your RHEL fleet
+* **Fix it with AI** — generate and deploy remediation playbooks using Claude Code (MCP), Automation code assistant (Gemini), and the Lightspeed web UI
+* **Prove it's fixed** — verify remediated issues disappear from the dashboard, closing the loop
 
 In **Lab 5 (Scenario 4)**, you will:
 
-* Experience the **end state of AIOps maturity**: fully autonomous remediation
-* Watch Splunk detect a RHEL misconfiguration in real-time
-* See Event-Driven Ansible automatically trigger a pre-approved Job Template
-* Observe the issue being fixed **without any human intervention**
+* **See the end state** — experience fully autonomous detection-to-remediation with zero human intervention
+* **Watch it happen** — Splunk detects a RHEL misconfiguration, Event-Driven Ansible triggers a pre-approved fix automatically
+* **Understand the spectrum** — compare human-in-the-loop (Lab 4) with fully autonomous (Lab 5) to know when each approach fits
 
 === The AIOps Maturity Spectrum
 
