@@ -458,6 +458,8 @@ image::claude-code-cve-job-success.png[Claude Code CVE remediation job completed
 
 Go back to **Security** → **Vulnerability** → **CVEs** in console.redhat.com and check the CVE you just remediated. You should see that `{rhel_node2}` is no longer listed as affected. The nodes that were not targeted will still show the vulnerability.
 
+image::console-cve-remediation-verified.png[CVE remediation verified in console,80%,80%, link="_images/console-cve-remediation-verified.png", window=blank]
+
 You can also ask Claude Code to verify without leaving the terminal:
 
 [source]
