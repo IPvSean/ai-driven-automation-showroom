@@ -684,13 +684,67 @@ Source: https://github.com/ansible-tmm/aiops-summitlab/blob/feat/rhel-self-heali
 
 This playbook:
 
-* Uses the `redhat.rhel_system_roles.timesync` role (no raw module calls needed)
-* Configures two NTP servers with sensible defaults and overridable variables
-* Explicitly sets `chrony` as the NTP provider
-* Works identically across RHEL 8 and RHEL 9
+* Uses the `redhat.rhel_system_roles.timesync` role — no raw module calls needed
+* Configures two NTP servers with sensible defaults and overridable survey variables
+* Works identically across RHEL 8 and RHEL 9 because System Roles abstract the underlying implementation
 
-// TODO: Confirm pre-built playbook location in the lab environment
-// TODO: Determine if we want students to run this playbook or just review it
+=== Step 1: Explore the Job Template in AAP
+
+Before using the agentic workflow, take a moment to see what is already configured in AAP.
+
+1. Switch to the **AAP** tab in your lab interface.
+2. Navigate to **Automation Execution** → **Templates**.
+3. In the search/filter bar, type `time` to filter the list.
+4. Click on the **RHEL System Roles - Timesync** Job Template.
+5. Click the **Survey** tab.
+
+image::aap-timesync-survey-tab.png[Survey tab on the Timesync Job Template, link="_images/aap-timesync-survey-tab.png", window=blank]
+
+Notice that this Job Template is not just a playbook — it has a **survey** that prompts the operator for NTP provider, server hostnames, pool, and iburst settings. This is how AAP administrators create guardrails: the playbook logic is locked down, but specific parameters are exposed through a controlled form.
+
+[start=6]
+6. Click **Launch template**.
+7. When prompted for **Limit**, type `node1` and click **Next**.
+8. Review the survey form that appears:
+
+image::aap-timesync-survey-fields.png[Timesync survey fields with NTP configuration options, link="_images/aap-timesync-survey-fields.png", window=blank]
+
+You can see the default values — `0.pool.ntp.org` and `1.pool.ntp.org` — along with the NTP provider and iburst options. You are welcome to launch this manually if you'd like, but **cancel out for now** — in the next step, we will have Claude Code do this for us.
+
+[quote]
+💡 **Why does the survey matter?** Surveys are how AAP administrators define the boundaries of what an operator (or an AI agent) can change. The playbook itself is fixed and tested; only the survey variables are open for input. This means when an AI agent launches this template, it is constrained to the same guardrails as a human operator — it can only fill in the fields the administrator chose to expose.
+
+=== Step 2: Launch Claude Code
+
+1. Open a terminal in code-server. Navigate to **Terminal → New Terminal** from the top menu bar.
+2. Type `claude` to start Claude Code.
+
+=== Step 3: Configure NTP via the Agentic Workflow
+
+In the Claude Code chat, type the following prompt:
+
+[source]
+----
+configure time.google.com and time.cloudflare.com as the NTP servers for node1 using AAP
+----
+
+Claude Code will use the Ansible MCP server to find the **RHEL System Roles - Timesync** Job Template, read the survey spec to understand which parameters are required, fill in the survey variables with the requested NTP servers, and launch the job — all from a single natural language request.
+
+image::claude-code-timesync-success.png[Claude Code configures NTP via RHEL System Roles, link="_images/claude-code-timesync-success.png", window=blank]
+
+[quote]
+💡 **Notice what happened here.** You saw the survey form in AAP — the AI agent sees the exact same thing through MCP. Claude Code discovered the Job Template, read its survey definition, understood the parameters, and filled them in correctly. The administrator's guardrails are fully enforced: the AI can only supply values for the fields the survey exposes. It cannot modify the playbook, change the credentials, or bypass the inventory limit. This is how you keep AI on the rails that the administrator sets for that particular piece of automation.
+
+=== Step 4: (Optional) Explore Other Pre-Built Templates
+
+Your lab environment has several other Job Templates pre-configured in AAP. Take a few minutes to browse the **Templates** list and try launching one through Claude Code. For example, you might ask:
+
+[source]
+----
+What job templates are available in AAP?
+----
+
+Then pick one and ask Claude Code to run it. This is a great way to see how the agentic workflow handles different template types, surveys, and parameters.
 
 [NOTE]
 ====
