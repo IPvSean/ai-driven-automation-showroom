@@ -692,23 +692,6 @@ This playbook:
 **Stretch goal — AI-generated System Roles playbooks**: A known challenge in the Ansible community is getting AI code assistants to generate playbooks that use System Roles instead of raw module calls. This is an active area of work. In a future version of this lab, you may use a custom AI skill that instructs Automation code assistant to prefer System Roles when generating RHEL automation.
 ====
 
-== The General Workflow
-
-Here is the complete flow you covered in this section:
-
-[source]
-----
-Red Hat Lightspeed (CVE/Advisor)
-    → Generate Remediation Playbooks
-        → Review in code-server (VS Code)
-            → Human Reviews & Validates
-                → Push to Git (Gitea)
-                    → Sync Project in AAP
-                        → Create Job Templates
-----
-
-This is the **human-in-the-loop** approach to AIOps remediation. Red Hat Lightspeed identifies issues, AI generates fixes (via MCP or Automation code assistant), but a human validates everything in the IDE before it reaches production.
-
 == Key Takeaways
 
 === Where Do Good Playbooks Come From?
