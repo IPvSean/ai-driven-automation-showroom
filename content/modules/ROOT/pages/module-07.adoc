@@ -130,11 +130,11 @@ image::codeserver-new-terminal.png[Open a new terminal in code-server, link="_im
 2. Type `claude` to start Claude Code.
 3. When prompted with the workspace trust dialog, select **1. Yes, I trust this folder** and press Enter.
 +
-image::claude-code-trust-folder.png[Claude Code trust folder prompt,80%,80%, link="_images/claude-code-trust-folder.png", window=blank]
+image::claude-code-trust-folder.png[Claude Code trust folder prompt, link="_images/claude-code-trust-folder.png", window=blank]
 +
 4. The Claude Code terminal interface will appear.
 +
-image::claude-code-welcome.png[Claude Code welcome screen,80%,80%, link="_images/claude-code-welcome.png", window=blank]
+image::claude-code-welcome.png[Claude Code welcome screen, link="_images/claude-code-welcome.png", window=blank]
 
 [NOTE]
 ====
@@ -175,7 +175,7 @@ image::claude-code-mcp-servers.png[Claude Code MCP servers, link="_images/claude
 2. Log in using the **Username** and **Password** shown in the table above.
 3. Click the **Red Hat Hybrid Cloud Console** dropdown (top-left) and select **Red Hat Enterprise Linux**.
 
-image::console-rhel-platform.png[Select Red Hat Enterprise Linux,60%,60%, link="_images/console-rhel-platform.png", window=blank]
+image::console-rhel-platform.png[Select Red Hat Enterprise Linux, link="_images/console-rhel-platform.png", window=blank]
 
 **Keep this browser tab open** — you will come back to it shortly. Right now the dashboards are empty because your RHEL nodes have not been registered yet. In the next step, we will use Ansible Automation Platform to register them so they appear here.
 
@@ -185,18 +185,18 @@ Before you can view CVEs, Advisor recommendations, or generate remediation playb
 
 1. Switch to the **AAP** tab in your lab interface (or open link:{controller_url}[AAP Web UI^] in a new tab).
 
-image::lab-tabs-aap.png[AAP tab in lab interface,20%,20%, link="_images/lab-tabs-aap.png", window=blank]
+image::lab-tabs-aap.png[AAP tab in lab interface, link="_images/lab-tabs-aap.png", window=blank]
 
 [start=2]
 2. In the left navigation, click **Automation Execution** → **Templates**.
 
-image::aap-templates-nav.png[AAP Templates navigation,30%,30%, link="_images/aap-templates-nav.png", window=blank]
+image::aap-templates-nav.png[AAP Templates navigation, link="_images/aap-templates-nav.png", window=blank]
 
 [start=3]
 3. Find and click the **Register with Red Hat Lightspeed** job template.
 4. Click **Launch**.
 
-image::aap-launch-template.png[Launch template button,20%,20%, link="_images/aap-launch-template.png", window=blank]
+image::aap-launch-template.png[Launch template button, link="_images/aap-launch-template.png", window=blank]
 
 [start=5]
 5. When prompted for **Limit**, type:
@@ -206,7 +206,7 @@ image::aap-launch-template.png[Launch template button,20%,20%, link="_images/aap
 node1,node2,node3
 ----
 
-image::aap-register-limit-prompt.png[Prompt on Launch with Limit field,60%,60%, link="_images/aap-register-limit-prompt.png", window=blank]
+image::aap-register-limit-prompt.png[Prompt on Launch with Limit field, link="_images/aap-register-limit-prompt.png", window=blank]
 
 [start=6]
 6. Click the blue **Finish** button to launch the job.
@@ -221,7 +221,7 @@ image::aap-register-limit-prompt.png[Prompt on Launch with Limit field,60%,60%, 
 
 When the job completes, note the **Group/Tag** value in the job output. This is your unique lab identifier that you will use to filter your systems in console.redhat.com.
 
-image::aap-register-job-output.png[Registration job output showing Group/Tag,80%,80%, link="_images/aap-register-job-output.png", window=blank]
+image::aap-register-job-output.png[Registration job output showing Group/Tag, link="_images/aap-register-job-output.png", window=blank]
 
 In this screenshot, our unique identifier is `k5txp` — yours will be different. Make a note of it.
 
@@ -230,7 +230,7 @@ In this screenshot, our unique identifier is `k5txp` — yours will be different
 9. Navigate to **Inventory** → **Systems**.
 10. Click **Filter by tags**, then filter by `group=` followed by your unique identifier from the job output (e.g., `group=k5txp`).
 
-image::console-inventory-tags-filter.png[Filter systems by tag in console.redhat.com,80%,80%, link="_images/console-inventory-tags-filter.png", window=blank]
+image::console-inventory-tags-filter.png[Filter systems by tag in console.redhat.com, link="_images/console-inventory-tags-filter.png", window=blank]
 
 You should see your three RHEL nodes listed. It may take a minute or two after registration for the systems to fully populate.
 
@@ -274,7 +274,7 @@ Red Hat Lightspeed can generate PDF reports summarizing CVEs affecting your envi
 
 1. In the console.redhat.com browser tab you already have open, expand **Security** → **Vulnerability** → **Reports** in the left navigation.
 
-image::console-vulnerability-reports.png[Vulnerability Reports navigation,40%,40%, link="_images/console-vulnerability-reports.png", window=blank]
+image::console-vulnerability-reports.png[Vulnerability Reports navigation, link="_images/console-vulnerability-reports.png", window=blank]
 
 [start=2]
 2. Click **Executive Report** to generate the report.
@@ -297,34 +297,34 @@ The Advisor section of Red Hat Lightspeed provides proactive recommendations —
 
 1. In the console.redhat.com browser tab you already have open, navigate to **Operations** → **Advisor** → **Recommendations**.
 
-image::console-advisor-nav.png[Advisor Recommendations navigation,40%,40%, link="_images/console-advisor-nav.png", window=blank]
+image::console-advisor-nav.png[Advisor Recommendations navigation, link="_images/console-advisor-nav.png", window=blank]
 
 [start=2]
 2. Find a recommendation affecting `{rhel_node3}`. We recommend selecting **Decreased security: OpenSSH LoginGraceTime settings**.
 
-image::console-advisor-openssh-recommendation.png[Advisor OpenSSH LoginGraceTime recommendation,80%,80%, link="_images/console-advisor-openssh-recommendation.png", window=blank]
+image::console-advisor-openssh-recommendation.png[Advisor OpenSSH LoginGraceTime recommendation, link="_images/console-advisor-openssh-recommendation.png", window=blank]
 
 === Step 2: Generate the remediation playbook
 
 1. Select `{rhel_node3}` from the **Affected Systems** list by clicking the checkbox next to it.
 
-image::console-advisor-select-system.png[Select node3 from affected systems,80%,80%, link="_images/console-advisor-select-system.png", window=blank]
+image::console-advisor-select-system.png[Select node3 from affected systems, link="_images/console-advisor-select-system.png", window=blank]
 
 [start=2]
 2. Click the blue **Plan remediation** button.
 
 3. In the **Plan a remediation** dialog, enter a plan name (e.g., `etx-advisor-plan`) and click the blue **Create plan** button.
 
-image::console-advisor-plan-remediation.png[Plan a remediation dialog,60%,60%, link="_images/console-advisor-plan-remediation.png", window=blank]
+image::console-advisor-plan-remediation.png[Plan a remediation dialog, link="_images/console-advisor-plan-remediation.png", window=blank]
 
 [start=4]
 4. The screen will switch to the created remediation plan. Click the **Download** button to download the playbook to your workstation.
 
-image::console-advisor-remediation-plan-created.png[Remediation plan created and ready to download,80%,80%, link="_images/console-advisor-remediation-plan-created.png", window=blank]
+image::console-advisor-remediation-plan-created.png[Remediation plan created and ready to download, link="_images/console-advisor-remediation-plan-created.png", window=blank]
 
 Once downloaded, you can view the Ansible Playbook on your workstation. Below is a snippet of the generated playbook:
 
-image::console-advisor-playbook-snippet.png[Advisor remediation playbook snippet,40%,40%, link="_images/console-advisor-playbook-snippet.png", window=blank]
+image::console-advisor-playbook-snippet.png[Advisor remediation playbook snippet, link="_images/console-advisor-playbook-snippet.png", window=blank]
 
 NOTE: This is only a snippet — the full playbook may contain additional tasks and configuration depending on the recommendation.
 
@@ -381,7 +381,7 @@ Claude Code will use the Ansible MCP server to create the Job Template in AAP.
 1. In AAP, navigate to **Templates** → **Remediation - SSH LoginGraceTime**.
 2. Click **Launch** and verify the job completes successfully.
 
-image::aap-advisor-remediation-success.png[Advisor remediation job completed successfully,80%,80%, link="_images/aap-advisor-remediation-success.png", window=blank]
+image::aap-advisor-remediation-success.png[Advisor remediation job completed successfully, link="_images/aap-advisor-remediation-success.png", window=blank]
 
 === Verify the remediation
 
@@ -411,11 +411,11 @@ image::codeserver-new-terminal.png[Open a new terminal in code-server, link="_im
 2. Type `claude` to start Claude Code.
 3. When prompted with the workspace trust dialog, select **1. Yes, I trust this folder** and press Enter.
 +
-image::claude-code-trust-folder.png[Claude Code trust folder prompt,80%,80%, link="_images/claude-code-trust-folder.png", window=blank]
+image::claude-code-trust-folder.png[Claude Code trust folder prompt, link="_images/claude-code-trust-folder.png", window=blank]
 +
 4. The Claude Code terminal interface will appear.
 +
-image::claude-code-welcome.png[Claude Code welcome screen,80%,80%, link="_images/claude-code-welcome.png", window=blank]
+image::claude-code-welcome.png[Claude Code welcome screen, link="_images/claude-code-welcome.png", window=blank]
 
 === Step 2: Ask Claude Code about CVEs
 
@@ -435,11 +435,11 @@ Claude Code will use the **Red Hat Lightspeed MCP server** to:
 
 Claude Code will prompt you for permission each time it wants to use an MCP tool. Select **1. Yes** or **2. Yes, and don't ask again** to allow it to proceed. You may be prompted multiple times depending on how Claude Code chooses to solve the request — it may use multiple different tools.
 
-image::claude-code-mcp-permission.png[Claude Code MCP tool permission prompt,80%,80%, link="_images/claude-code-mcp-permission.png", window=blank]
+image::claude-code-mcp-permission.png[Claude Code MCP tool permission prompt, link="_images/claude-code-mcp-permission.png", window=blank]
 
 At the end, you will get output similar to the following:
 
-image::claude-code-cve-results.png[Claude Code CVE query results,80%,80%, link="_images/claude-code-cve-results.png", window=blank]
+image::claude-code-cve-results.png[Claude Code CVE query results, link="_images/claude-code-cve-results.png", window=blank]
 
 === Step 3: Choose a CVE to remediate
 
@@ -487,7 +487,7 @@ Sync the AAP project, then create a Job Template called
 playbook from the Lightspeed-Playbooks project. It should target node2.
 ----
 
-image::aap-cve-job-template.png[CVE Remediation Job Template in AAP,60%,60%, link="_images/aap-cve-job-template.png", window=blank]
+image::aap-cve-job-template.png[CVE Remediation Job Template in AAP, link="_images/aap-cve-job-template.png", window=blank]
 
 === Step 8: Run the Job Template
 
@@ -500,13 +500,13 @@ Go ahead and launch it
 
 Claude Code will launch the job and monitor it until completion.
 
-image::claude-code-cve-job-success.png[Claude Code CVE remediation job completed successfully,80%,80%, link="_images/claude-code-cve-job-success.png", window=blank]
+image::claude-code-cve-job-success.png[Claude Code CVE remediation job completed successfully, link="_images/claude-code-cve-job-success.png", window=blank]
 
 === Verify the remediation
 
 Go back to **Security** → **Vulnerability** → **CVEs** in console.redhat.com and check the CVE you just remediated. You should see that `{rhel_node2}` is no longer listed as affected. The nodes that were not targeted will still show the vulnerability.
 
-image::console-cve-remediation-verified.png[CVE remediation verified in console,80%,80%, link="_images/console-cve-remediation-verified.png", window=blank]
+image::console-cve-remediation-verified.png[CVE remediation verified in console, link="_images/console-cve-remediation-verified.png", window=blank]
 
 You can also ask Claude Code to verify without leaving the terminal:
 
@@ -515,7 +515,7 @@ You can also ask Claude Code to verify without leaving the terminal:
 Check if CVE-2025-31277 still affects my node2
 ----
 
-image::claude-code-cve-verified.png[Claude Code confirms CVE remediation,80%,80%, link="_images/claude-code-cve-verified.png", window=blank]
+image::claude-code-cve-verified.png[Claude Code confirms CVE remediation, link="_images/claude-code-cve-verified.png", window=blank]
 
 [quote]
 💡 **This was entirely agentic.** You never opened a web browser, navigated dashboards, or clicked download buttons. Claude Code used MCP to query Lightspeed, found the CVE, fetched the playbook, pushed it to Git, created a Job Template, and ran it — all through a conversation in the terminal.
@@ -542,7 +542,7 @@ Before generating a playbook, you need to configure the Automation code assistan
 
 1. In code-server, click the **Ansible "A" icon** in the left sidebar to open the Ansible Development Tools panel.
 
-image::codeserver-ansible-plugin.png[Ansible Development Tools plugin,30%,30%, link="_images/codeserver-ansible-plugin.png", window=blank]
+image::codeserver-ansible-plugin.png[Ansible Development Tools plugin, link="_images/codeserver-ansible-plugin.png", window=blank]
 
 [start=2]
 2. Under **GENERATIVE AI**, click **LLM Provider : Google Gemini**.
@@ -562,7 +562,7 @@ image::codeserver-ansible-plugin.png[Ansible Development Tools plugin,30%,30%, l
 | `gemini-2.5-pro`
 |===
 
-image::codeserver-gemini-configured.png[Google Gemini configured for Automation code assistant,50%,50%, link="_images/codeserver-gemini-configured.png", window=blank]
+image::codeserver-gemini-configured.png[Google Gemini configured for Automation code assistant, link="_images/codeserver-gemini-configured.png", window=blank]
 
 [start=4]
 4. Click **Save**.
@@ -571,7 +571,7 @@ image::codeserver-gemini-configured.png[Google Gemini configured for Automation 
 
 1. Click the **Ansible icon** in the left sidebar of code-server to open the Ansible Development Tools panel.
 
-image::codeserver-ansible-icon.png[Ansible plugin icon,5%,5%, link="_images/codeserver-ansible-icon.png", window=blank]
+image::codeserver-ansible-icon.png[Ansible plugin icon, link="_images/codeserver-ansible-icon.png", window=blank]
 
 [start=2]
 2. Under **GENERATIVE AI**, click **Generate Playbook**.
@@ -590,7 +590,7 @@ Fix Apache httpd configuration by removing InvalidDirectiveHere and restarting t
 
 The wizard will generate an Ansible Playbook:
 
-image::codeserver-generate-playbook-result.png[Generated playbook from Automation code assistant,60%,60%, link="_images/codeserver-generate-playbook-result.png", window=blank]
+image::codeserver-generate-playbook-result.png[Generated playbook from Automation code assistant, link="_images/codeserver-generate-playbook-result.png", window=blank]
 
 [start=7]
 7. Click **Open editor** to load the playbook into the code-server editor.
@@ -609,14 +609,14 @@ project targeting node1, and then launch it.
 
 Claude Code will push the playbook to Gitea, sync the AAP project, create the Job Template, and run it — all in one go.
 
-image::claude-code-httpd-fix-success.png[Claude Code HTTPD fix completed successfully,80%,80%, link="_images/claude-code-httpd-fix-success.png", window=blank]
+image::claude-code-httpd-fix-success.png[Claude Code HTTPD fix completed successfully, link="_images/claude-code-httpd-fix-success.png", window=blank]
 
 === Step 4: (Optional) Verify in AAP
 
 1. Switch to the **AAP tab** in your lab interface.
 2. Navigate to **Jobs** and look for the most recent job run — you should see the **HTTPD Fix** job completed successfully.
 
-image::aap-httpd-fix-job-success.png[HTTPD Fix job success in AAP,60%,60%, link="_images/aap-httpd-fix-job-success.png", window=blank]
+image::aap-httpd-fix-job-success.png[HTTPD Fix job success in AAP, link="_images/aap-httpd-fix-job-success.png", window=blank]
 
 === Step 5: (Optional) Break and fix Apache again
 
@@ -625,7 +625,7 @@ Want to try the full break-and-fix cycle yourself? You can intentionally break A
 1. In the AAP Web UI, navigate to **Rulebook Activations**.
 2. Find the **Web App** rulebook activation and disable it (toggle it off so EDA does not auto-remediate).
 
-image::aap-rulebook-activation-running.png[Web App Rulebook Activation,30%,30%, link="_images/aap-rulebook-activation-running.png", window=blank]
+image::aap-rulebook-activation-running.png[Web App Rulebook Activation, link="_images/aap-rulebook-activation-running.png", window=blank]
 
 [start=3]
 3. Navigate to **Templates** and run the **Break Apache** Job Template.
