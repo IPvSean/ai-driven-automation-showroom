@@ -657,9 +657,9 @@ System Roles cover areas like:
 
 === Example: Configuring NTP with System Roles
 
-For this exercise, a **pre-built playbook** using the `rhel-system-roles.timesync` role is provided in your lab environment. This playbook configures NTP time synchronization across your RHEL fleet.
+For this exercise, a **pre-built playbook** using the `redhat.rhel_system_roles.timesync` role is already configured as a Job Template in Ansible Automation Platform called **RHEL System Roles - Timesync**. This playbook configures NTP time synchronization across your RHEL fleet.
 
-Open the file `system-roles-timesync.yml` in code-server and review the content:
+Here is the playbook content for reference:
 
 [source,yaml]
 ----
