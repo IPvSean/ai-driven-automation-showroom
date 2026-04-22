@@ -1,6 +1,35 @@
 = Module 4.1 — Red Hat Lightspeed — CVE and Advisor Remediation
 :navtitle: Red Hat Lightspeed — CVE and Advisor Remediation
 
+== Agenda
+
+[cols="1,3", options="header"]
+|===
+| Section | Description
+
+| <<Logging in to Red Hat Lightspeed>>
+| Sign in to console.redhat.com and explore the dashboard
+
+| <<Register RHEL Nodes to Red Hat Lightspeed>>
+| Use an AAP Job Template to register and tag your RHEL nodes
+
+| <<Exercise 1: Executive PDF Report>>
+| Generate a vulnerability report from the Lightspeed dashboard
+
+| <<Exercise 2: Advisor Remediation (Manual)>>
+| Download an Advisor playbook, review it, and run it through AAP
+
+| <<Exercise 3: CVE Remediation (Agentic via MCP)>>
+| Use Claude Code + MCP to find and fix a CVE end-to-end
+
+| <<Exercise 4: HTTPD Configuration Fix (Automation code assistant)>>
+| Generate an HTTPD fix with Google Gemini in the IDE
+
+| <<Exercise 5: RHEL System Roles (Pre-Built)>>
+| Apply a pre-built System Role for NTP configuration
+
+|===
+
 == Objective
 
 *Estimated time: 30-40 minutes*
