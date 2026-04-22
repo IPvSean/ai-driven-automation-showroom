@@ -663,24 +663,29 @@ Open the file `system-roles-timesync.yml` in code-server and review the content:
 
 [source,yaml]
 ----
-- name: Configure NTP using RHEL System Roles
+---
+- name: RHEL System Roles - Timesync
   hosts: all
   become: true
+  vars:
+    timesync_ntp_provider: "{{ ntp_provider | default('chrony') }}"
+    timesync_ntp_servers:
+      - hostname: "{{ ntp_server_1 | default('0.pool.ntp.org') }}"
+        pool: "{{ ntp_server_1_pool | default(true) }}"
+        iburst: "{{ ntp_server_1_iburst | default(true) }}"
+      - hostname: "{{ ntp_server_2 | default('1.pool.ntp.org') }}"
+        pool: "{{ ntp_server_2_pool | default(true) }}"
+        iburst: "{{ ntp_server_2_iburst | default(true) }}"
   roles:
-    - role: rhel-system-roles.timesync
-      vars:
-        timesync_ntp_servers:
-          - hostname: time.google.com
-            iburst: true
-          - hostname: time.cloudflare.com
-            iburst: true
-        timesync_ntp_provider: chrony
+    - redhat.rhel_system_roles.timesync
 ----
+
+Source: https://github.com/ansible-tmm/aiops-summitlab/blob/feat/rhel-self-healing/playbooks/rhel_system_roles_timesync.yml[rhel_system_roles_timesync.yml on GitHub^]
 
 This playbook:
 
-* Uses the `rhel-system-roles.timesync` role (no raw module calls needed)
-* Configures two NTP servers (Google and Cloudflare) with `iburst` for fast initial sync
+* Uses the `redhat.rhel_system_roles.timesync` role (no raw module calls needed)
+* Configures two NTP servers with sensible defaults and overridable variables
 * Explicitly sets `chrony` as the NTP provider
 * Works identically across RHEL 8 and RHEL 9
 
