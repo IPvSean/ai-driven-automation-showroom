@@ -410,6 +410,8 @@ image::cron_aiops_workflow_running.png[Cron-AIOps-Workflow running, link="_image
 1. **Splunk** matches `getpwnam() failed` and fires the webhook
 2. **AI Router** analyzes the error and selects **Fix Cron - Invalid User** (not the syntax fix)
 3. **Approval Gate** pauses for your review
++
+image::aap_notification_bell.png[AAP notification bell showing pending approval, link="_images/aap_notification_bell.png", window=blank]
 
 === Step 5.3: Check Mattermost
 
