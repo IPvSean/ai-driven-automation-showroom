@@ -27,6 +27,12 @@ ui:
         .doc .imageblock img{border:1px solid #c0c4ca;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.15);background-color:#f0f1f3;padding:8px;max-width:100%;height:auto}
         video{border:solid 1px black;box-shadow:0 4px 8px 0 rgba(0,0,0,.2),0 6px 20px 0 rgba(0,0,0,.19)}
         .doc{max-width:none}
+        .doc table.tableblock{border:1px solid #c0c4ca!important;border-radius:6px!important;border-collapse:separate!important;border-spacing:0!important;overflow:hidden!important;box-shadow:0 2px 6px rgba(0,0,0,.1)!important}
+        .doc table.tableblock thead th{background-color:#2d3039!important;color:#fff!important;border-bottom:2px solid #c0c4ca!important;padding:10px 14px!important}
+        .doc table.tableblock tbody tr:nth-child(even){background-color:#f4f5f7!important}
+        .doc table.tableblock tbody tr:nth-child(odd){background-color:#fff!important}
+        .doc table.tableblock td,.doc table.tableblock th{border-right:1px solid #e0e2e6!important;padding:10px 14px!important}
+        .doc table.tableblock td:last-child,.doc table.tableblock th:last-child{border-right:none!important}
         </style>
 
 runtime:
