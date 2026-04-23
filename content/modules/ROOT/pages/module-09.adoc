@@ -357,6 +357,18 @@ Now that you know what the playbook does, verify it worked:
 
 image::cron_aiops_jobs_list.png[AAP Jobs showing the full remediation chain, link="_images/cron_aiops_jobs_list.png", window=blank]
 
+To confirm the fix directly on the host, SSH into node1 from the bastion terminal and check the crond service:
+
+[source,bash]
+----
+ssh node1
+sudo systemctl status crond.service
+----
+
+You should see crond in an **active (running)** state with no errors in the recent log output. The invalid crontab file is gone and crond is back to its normal scheduling cycle.
+
+image::crond_status_healthy.png[crond service healthy and running on node1, link="_images/crond_status_healthy.png", window=blank]
+
 == Challenge 2: Cron Invalid User
 
 In this challenge, you will create a crontab entry that references a user that does not exist. This produces a different syslog error, and the AI must route to a different fix.
