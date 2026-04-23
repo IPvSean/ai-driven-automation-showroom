@@ -80,6 +80,9 @@ sourcetype=syslog
 ----
 +
 4. Set the time range to **Last 15 minutes**
++
+image::splunk_time_range.png[Time range Last 15 minutes, link="_images/splunk_time_range.png", window=blank]
++
 5. You should see syslog messages from node1, node2, and node3 arriving on `source = tcp:1514`
 
 If you see events, rsyslog forwarding is working. The RHEL nodes are sending system logs to Splunk.
