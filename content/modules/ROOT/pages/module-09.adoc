@@ -559,6 +559,8 @@ Most organizations use both approaches. Start with human-in-the-loop (Lab 4) whi
 * **AI selects from pre-approved automation, not improvised scripts.** The AI routing agent chose the right fix from a curated catalog of tested playbooks. Your organization controls what goes into that catalog. This gives you the speed of AI-driven decisions with the safety of human-reviewed, production-hardened automation.
 * **One workflow handles an expanding library of failure types.** You saw two different cron failures routed to two different fixes without changing any workflow logic. As your team adds more fix templates to the catalog, the system handles more scenarios automatically — scaling your operations without scaling your headcount.
 
+image::iknow_aiops.png[I know AIOps, link="_images/iknow_aiops.png", window=blank]
+
 == Complete
 
 You have completed Module 5.1, Autonomous AIOps with Splunk and RHEL.
