@@ -95,23 +95,29 @@ You need to create a Splunk saved search that detects crond errors and sends a w
 
 === Find the right search
 
-First, test the search that will detect cron failures:
+First, create the search that will detect cron failures:
 
 [source]
 ----
 sourcetype=syslog ("bad minute" OR "bad hour" OR "bad day" OR "getpwnam() failed")
 ----
 
-This search catches two types of crond errors:
+[IMPORTANT]
+====
+Run the search now. You should see no results yet — nothing is broken. This is expected. You are creating the search so it can be saved as an alert in the next step.
+====
+
+This search will catch two types of crond errors:
 
 * **Syntax errors**: crond reports `bad minute`, `bad hour`, or `bad day` when a crontab file has invalid scheduling syntax
 * **Invalid user errors**: crond reports `getpwnam() failed` when a crontab references a user that does not exist on the system
 
-Run the search now. You should see no results yet (nothing is broken).
-
 === Save as alert
 
 1. Click **Save As** -> **Alert**
++
+image::splunk_save_as_alert.png[Save As Alert, link="_images/splunk_save_as_alert.png", window=blank]
++
 2. Configure the alert:
 +
 [cols="2,2", options="header"]
@@ -138,6 +144,9 @@ Run the search now. You should see no results yet (nothing is broken).
 |===
 +
 3. For the **Webhook URL**, enter your EDA webhook URL: `{eda_webhook_url}`
++
+image::splunk_edit_alert.png[Edit Alert with Webhook URL, link="_images/splunk_edit_alert.png", window=blank]
++
 4. Click **Save**
 
 [IMPORTANT]
@@ -156,10 +165,15 @@ Before triggering failures, confirm the automation pipeline is in place:
 image::cron_aiops_eda_activation.png[EDA Rulebook Activations showing RHEL Cron AIOps running, link="_images/cron_aiops_eda_activation.png", window=blank]
 4. Navigate to **Automation Execution** -> **Templates**
 5. Verify that **Cron-AIOps-Workflow** exists
++
+image::cron_aiops_workflow_template.png[Cron-AIOps-Workflow template, link="_images/cron_aiops_workflow_template.png", window=blank]
++
 6. Click into the workflow and open the **Visualizer**. You should see three nodes:
    * **ai_router**: the AI routing agent
    * **approval_gate**: human review step
    * **dispatch_fix**: launches the selected fix
+
+image::cron_aiops_workflow_visualizer_nodes.png[Workflow Visualizer showing ai_router approval_gate and dispatch_fix nodes, link="_images/cron_aiops_workflow_visualizer_nodes.png", window=blank]
 
 == Challenge 1: Cron Syntax Error
 
@@ -168,12 +182,20 @@ In this challenge, you will introduce an invalid crontab entry that causes crond
 === Step 4.1: Break cron with bad syntax
 
 1. Navigate to **Automation Execution** -> **Templates**
++
+image::break_cron_bad_syntax_template.png[Break Cron - Bad Syntax template, link="_images/break_cron_bad_syntax_template.png", window=blank]
++
 2. Find **Break Cron - Bad Syntax** and click the launch icon
-3. Set the **Limit** to `node1` as shown below, then click **Next** and **Launch**
++
+image::launch_template_icon.png[Launch template icon, link="_images/launch_template_icon.png", window=blank]
++
+3. Set the **Limit** to `node1` as shown below, then click **Next** and **Finish**
 +
 image::cron_aiops_launch_limit.png[Set Limit to node1,80%, link="_images/cron_aiops_launch_limit.png", window=blank]
 +
 4. Wait for the job to complete
++
+image::break_cron_bad_syntax_output.png[Break Cron Bad Syntax job output, link="_images/break_cron_bad_syntax_output.png", window=blank]
 
 This writes an invalid crontab file to `/etc/cron.d/broken-job` on node1. When crond tries to parse it, it logs:
 
@@ -199,16 +221,61 @@ It may take 30-60 seconds for the full chain to execute. The sequence is: crond 
 
 === Step 4.3: Check Mattermost
 
-Open **Mattermost** and look for the AI incident report. You should see a card with:
+==== Accessing Mattermost
+[cols="2,2", options="header"]
+|===
+| Component
+| Value
 
-* **What Happened**: the AI explains that crond encountered an invalid scheduling entry
-* **Root Cause**: `syntax_error`
-* **Confidence**: typically 95%+
-* **Recommended Fix**: remove the invalid crontab file and restart crond
-* **Job Template**: `Fix Cron - Syntax Error`
-* **Action Required**: approve in AAP
+| Mattermost URL
+| link:{mattermost_url}[Mattermost^]
+
+| Username
+| `{mattermost_username}`
+
+| Password
+| `{mattermost_password}`
+|===
+
+	1.	Open Mattermost using the above details
+	2.	Click on "View in Browser" to open the console
+	3.	Login using the credentials provided
+	4.	Click on the team "Automators"
+
+Once logged in, click on the **Town Square** channel from the left-hand navigation.
+
+Look for the AI incident report. You should see a card with the following details:
+
+[cols="2,3", options="header"]
+|===
+| Field
+| Value
+
+| What Happened
+| The AI explains that crond encountered an invalid scheduling entry
+
+| Root Cause
+| `syntax_error`
+
+| Confidence
+| Typically 95%+
+
+| Recommended Fix
+| Remove the invalid crontab file and restart crond
+
+| Job Template
+| `Fix Cron - Syntax Error`
+
+| Action Required
+| Approve in AAP
+|===
 
 image::cron_aiops_mattermost_reports.png[Mattermost AI incident report for syntax error, link="_images/cron_aiops_mattermost_reports.png", window=blank]
+
+[TIP]
+====
+**Stop and consider what just happened.** Less than a minute ago, this system had a silent failure — crond was broken and no one knew. Now you have a full incident report: root cause identified, confidence scored, and a recommended fix ready to approve. This is the power of AIOps. Even before the fix is applied, you already have **automated ticket enrichment** — the kind of context that normally takes an engineer 30 minutes of investigation was delivered in seconds. The gap between "something broke" and "here's exactly what happened and how to fix it" just collapsed.
+====
 
 === Step 4.4: Approve the fix
 
@@ -235,7 +302,7 @@ In this challenge, you will create a crontab entry that references a user that d
 
 1. Navigate to **Automation Execution** -> **Templates**
 2. Find **Break Cron - Invalid User** and click the launch icon
-3. Set the **Limit** to `node1` (same as Challenge 1), then click **Next** and **Launch**
+3. Set the **Limit** to `node1` (same as Challenge 1), then click **Next** and **Finish**
 4. Wait for the job to complete
 
 This writes a crontab file to `/etc/cron.d/bad-user-job` with a nonexistent user. Every minute, crond tries to run the job and logs:
