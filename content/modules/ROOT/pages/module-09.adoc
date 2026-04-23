@@ -405,6 +405,8 @@ Unlike the syntax error which fires immediately, the invalid user error only app
 
 The same automated pipeline fires, but this time the AI sees a different error:
 
+image::cron_aiops_workflow_running.png[Cron-AIOps-Workflow running, link="_images/cron_aiops_workflow_running.png", window=blank]
+
 1. **Splunk** matches `getpwnam() failed` and fires the webhook
 2. **AI Router** analyzes the error and selects **Fix Cron - Invalid User** (not the syntax fix)
 3. **Approval Gate** pauses for your review
