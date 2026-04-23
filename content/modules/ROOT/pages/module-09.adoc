@@ -279,7 +279,51 @@ image::cron_aiops_mattermost_reports.png[Mattermost AI incident report for synta
 
 image::aiops_meme.png[Engineers who use AIOps looking at their coworkers, link="_images/aiops_meme.png", window=blank]
 
-=== Step 4.4: Approve the fix
+=== Step 4.4: Understand what the AI selected
+
+Before you approve the fix, take a moment to understand **what** the AI chose and **why that matters**.
+
+The AI routing agent analyzed the syslog message and selected the job template **Fix Cron - Syntax Error**. This is not a random script the AI wrote on the fly. This is a **pre-approved, curated job template** that your organization has already reviewed, tested, and promoted to production. The AI's job is to pick the right fix from a catalog of trusted automation — not to improvise.
+
+This is a critical distinction. The AI is **not** running arbitrary shell commands, firing off untested API calls, or generating code at runtime. It is selecting from a library of vetted playbooks that your team controls. The automation only does what your organization has already approved.
+
+==== Viewing the source code
+
+If you want to inspect exactly what this fix does:
+
+1. Navigate to **Automation Execution** -> **Templates**
+2. Open **Fix Cron - Syntax Error** and note the **Project** field
+3. Click into the Project to see the **Source Control URL** — this is the Git repository containing the playbook source
+
+The playbook itself is straightforward:
+
+[source,yaml]
+----
+- name: Fix cron syntax error
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Remove invalid crontab file
+      ansible.builtin.file:
+        path: /etc/cron.d/broken-job
+        state: absent
+
+    - name: Restart crond
+      ansible.builtin.systemd:
+        name: crond
+        state: restarted
+        enabled: true
+----
+
+It removes the invalid crontab file and restarts crond. No surprises, no side effects. This is the kind of automation you can trust to run at 3 AM without waking anyone up.
+
+[TIP]
+====
+**This is how AIOps should work in production.** In the real world, most remediations are not novel — they are well-known fixes applied to well-known problems. Engineers log into machines, make ad-hoc changes, and drift from the golden configuration. The fix is often just a config sync that brings the system back into compliance. Pre-approved automation captures that institutional knowledge in code, so the AI selects from a curated catalog of safe, tested, repeatable fixes rather than improvising solutions that could cause more harm than good.
+====
+
+=== Step 4.5: Approve the fix
 
 1. Navigate to **Automation Execution** -> **Jobs**
 +
@@ -302,10 +346,12 @@ image::approve_workflow_confirm.png[Approve workflow approvals confirmation, lin
 +
 image::cron_aiops_workflow_visualizer.png[Cron-AIOps-Workflow completed successfully, link="_images/cron_aiops_workflow_visualizer.png", window=blank]
 
-=== Step 4.5: Verify the fix
+=== Step 4.6: Verify the fix
+
+Now that you know what the playbook does, verify it worked:
 
 1. In AAP **Jobs**, confirm that **Fix Cron - Syntax Error** ran successfully on node1
-2. The fix removed `/etc/cron.d/broken-job` and restarted crond
+2. The fix removed `/etc/cron.d/broken-job` and restarted crond — exactly what you saw in the playbook source
 
 image::cron_aiops_jobs_list.png[AAP Jobs showing the full remediation chain, link="_images/cron_aiops_jobs_list.png", window=blank]
 
