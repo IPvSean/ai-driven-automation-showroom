@@ -415,11 +415,31 @@ image::aap_notification_bell.png[AAP notification bell showing pending approval,
 
 === Step 5.3: Check Mattermost
 
-Open **Mattermost** and look for the new incident report. Compare it with the previous one:
+Open **Mattermost** and look for the new incident report. Compare it with the previous one — notice how the AI identified a completely different root cause and selected a different fix:
 
-* **What Happened**: the AI explains that crond tried to run a job for a user that does not exist on the system
-* **Root Cause**: `invalid_user`
-* **Job Template**: `Fix Cron - Invalid User` (different from Challenge 1)
+[cols="2,3", options="header"]
+|===
+| Field
+| Value
+
+| What Happened
+| crond on node1 attempted to run a scheduled job for `nonexistent_user`, but `getpwnam()` failed because no such user exists on the system — a crontab file in `/etc/cron.d/` references a username that was never created or was deleted
+
+| Root Cause
+| `invalid_user`
+
+| Confidence
+| 97%
+
+| Recommended Fix
+| Remove the offending crontab file `/etc/cron.d/bad-user-job` that references the nonexistent user, eliminating the recurring crond errors
+
+| Job Template
+| `Fix Cron - Invalid User` (different from Challenge 1)
+
+| Action Required
+| Approve this remediation in AAP
+|===
 
 This is the value of the AI routing agent: the same workflow handles both failures, but the AI selects a different fix based on what it reads in the syslog message.
 
