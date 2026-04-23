@@ -316,6 +316,8 @@ The playbook itself is straightforward:
         enabled: true
 ----
 
+Source: link:https://github.com/ansible-tmm/aiops-summitlab/blob/feat/rhel-self-healing/playbooks/fix_cron_syntax.yml[fix_cron_syntax.yml on GitHub^]
+
 It removes the invalid crontab file and restarts crond. No surprises, no side effects. This is the kind of automation you can trust to run at 3 AM without waking anyone up.
 
 [TIP]
