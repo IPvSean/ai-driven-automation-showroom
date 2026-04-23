@@ -376,8 +376,17 @@ In this challenge, you will create a crontab entry that references a user that d
 === Step 5.1: Break cron with invalid user
 
 1. Navigate to **Automation Execution** -> **Templates**
++
+image::break_cron_bad_syntax_template.png[Templates navigation, link="_images/break_cron_bad_syntax_template.png", window=blank]
++
 2. Find **Break Cron - Invalid User** and click the launch icon
++
+image::break_cron_invalid_user_template.png[Break Cron - Invalid User template, link="_images/break_cron_invalid_user_template.png", window=blank]
++
 3. Set the **Limit** to `node1` (same as Challenge 1), then click **Next** and **Finish**
++
+image::cron_aiops_launch_limit.png[Set Limit to node1, link="_images/cron_aiops_launch_limit.png", window=blank]
++
 4. Wait for the job to complete
 
 This writes a crontab file to `/etc/cron.d/bad-user-job` with a nonexistent user. Every minute, crond tries to run the job and logs:
