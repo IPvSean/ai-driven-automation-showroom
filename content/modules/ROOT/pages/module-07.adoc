@@ -214,7 +214,7 @@ image::aap-templates-nav.png[AAP Templates navigation, link="_images/aap-templat
 
 [start=3]
 3. Find and click the **Register with Red Hat Lightspeed** job template.
-4. Click **Launch**.
+4. Click **Launch Template**.
 
 image::aap-launch-template.png[Launch template button, link="_images/aap-launch-template.png", window=blank]
 
@@ -229,8 +229,9 @@ node1,node2,node3
 image::aap-register-limit-prompt.png[Prompt on Launch with Limit field, link="_images/aap-register-limit-prompt.png", window=blank]
 
 [start=6]
-6. Click the blue **Finish** button to launch the job.
-7. Wait for the job to complete successfully.
+6. Click the blue **Next** button to proceed to the review screen.
+7. Click the blue **Finish** button to launch the job.
+8. Wait for the job to complete successfully.
 
 [NOTE]
 ====
