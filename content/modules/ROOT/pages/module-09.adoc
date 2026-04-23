@@ -555,20 +555,14 @@ Most organizations use both approaches. Start with human-in-the-loop (Lab 4) whi
 
 == Key Takeaways
 
-* **Splunk monitors RHEL systems** and can trigger EDA for any syslog pattern, not just network events
-* **AI routing replaces hard-coded workflows**: one workflow handles multiple failure types because the AI selects the correct fix at runtime
-* **The AI explains its reasoning**: the Mattermost report shows what happened, why, and what fix was selected, giving operators confidence in the automated decision
-* **Approval gates provide safety**: even with AI-driven routing, a human reviews the decision before the fix is applied
-* **The same AIOps pattern applies everywhere**: observe (Splunk), analyze (AI), respond (AAP), regardless of the platform or failure type
+* **Mean time to remediation drops from hours to seconds.** Across both challenges, the pipeline went from silent failure to root cause analysis to approved fix in under a minute — without an engineer manually logging in, reading logs, or guessing at a solution. That speed compounds across every incident your team would otherwise triage by hand.
+* **AI selects from pre-approved automation, not improvised scripts.** The AI routing agent chose the right fix from a curated catalog of tested playbooks. Your organization controls what goes into that catalog. This gives you the speed of AI-driven decisions with the safety of human-reviewed, production-hardened automation.
+* **One workflow handles an expanding library of failure types.** You saw two different cron failures routed to two different fixes without changing any workflow logic. As your team adds more fix templates to the catalog, the system handles more scenarios automatically — scaling your operations without scaling your headcount.
 
 == Complete
 
 You have completed Module 5.1, Autonomous AIOps with Splunk and RHEL.
 
-You have now experienced the full spectrum of AIOps approaches:
-
-* Parts 1-3: Event-driven automation with AI-generated content and human review
-* Part 4: Human-in-the-loop agentic workflow with an AI assistant in the IDE
-* Part 5: AI-routed autonomous remediation with pre-approved trusted automation
+Across both challenges, you built an end-to-end self-healing pipeline: Splunk detected the failure, Event-Driven Ansible triggered the response, and an AI routing agent analyzed the error, selected the correct fix, and presented it for approval. You saw how pre-approved, curated automation gives your organization the confidence to let AI-driven decisions operate at machine speed while keeping humans in control of what gets deployed.
 
 Continue to the **Summary and Call to Actions** to review everything you learned and explore next steps.
