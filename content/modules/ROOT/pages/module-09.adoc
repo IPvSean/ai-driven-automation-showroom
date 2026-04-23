@@ -445,7 +445,51 @@ This is the value of the AI routing agent: the same workflow handles both failur
 
 image::cron_aiops_mattermost_both_reports.png[Mattermost AI incident report for invalid user, link="_images/cron_aiops_mattermost_both_reports.png", window=blank]
 
-=== Step 5.4: Approve and verify
+=== Step 5.4: (Optional) See the error on the host
+
+Before approving the fix, you can SSH into node1 to see what crond is actually reporting:
+
+[source,bash]
+----
+ssh node1
+sudo systemctl status crond.service
+----
+
+You will see repeated `ERROR (getpwnam() failed - user unknown)` messages every minute as crond tries and fails to run the job for the nonexistent user. This is the exact error the AI analyzed in the Mattermost report above.
+
+image::crond_status_invalid_user_errors.png[crond showing repeated getpwnam errors, link="_images/crond_status_invalid_user_errors.png", window=blank]
+
+=== Step 5.5: Understand what the AI selected
+
+Just like Challenge 1, the AI selected a **pre-approved, curated job template** — this time **Fix Cron - Invalid User**. The AI did not write a new script or guess at a fix. It analyzed the syslog message, recognized the `getpwnam() failed` pattern, and selected the correct template from the catalog.
+
+==== Viewing the source code
+
+The playbook for this fix is even simpler than the syntax error fix:
+
+[source,yaml]
+----
+- name: Fix cron invalid user entry
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Remove crontab with nonexistent user
+      ansible.builtin.file:
+        path: /etc/cron.d/bad-user-job
+        state: absent
+----
+
+Source: link:https://github.com/ansible-tmm/aiops-summitlab/blob/feat/rhel-self-healing/playbooks/fix_cron_permissions.yml[fix_cron_permissions.yml on GitHub^]
+
+It removes the offending crontab file. Once the file is gone, crond stops trying to run the job and the errors disappear. No restart needed — crond automatically picks up changes to `/etc/cron.d/`.
+
+[TIP]
+====
+**Two different failures, two different fixes, one workflow.** This is the pattern that scales. Your team writes and tests a library of fix playbooks. The AI routing agent matches failures to fixes at runtime. As your catalog grows, the system handles more failure types without anyone writing new workflow logic.
+====
+
+=== Step 5.6: Approve and verify
 
 1. Approve the workflow in AAP
 2. Confirm that **Fix Cron - Invalid User** ran successfully on node1
