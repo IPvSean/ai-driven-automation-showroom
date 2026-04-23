@@ -179,6 +179,26 @@ image::console-rhel-platform.png[Select Red Hat Enterprise Linux, link="_images/
 
 **Keep this browser tab open** — you will come back to it shortly. Right now the dashboards are empty because your RHEL nodes have not been registered yet. In the next step, we will use Ansible Automation Platform to register them so they appear here.
 
+== Accessing Ansible Automation Platform
+
+[cols="2,2", options="header"]
+|===
+| Component
+| Value
+
+| AAP URL
+| AAP is preloaded in the lab interface. Click to open in a full tab: link:{controller_url}[AAP Web UI^]
+
+| Username
+| `{controller_username}`
+
+| Password
+| `{controller_password}`
+|===
+
+	1.	Open AAP using the above details or click the **AAP** tab in your lab interface
+	2.	Login using the credentials provided
+
 == Register RHEL Nodes to Red Hat Lightspeed
 
 Before you can view CVEs, Advisor recommendations, or generate remediation playbooks, your RHEL nodes must be registered with Red Hat Lightspeed (formerly Red Hat Insights). Normally you would do this manually on each host by running `insights-client --register`, but in this lab we will use **Red Hat Ansible Automation Platform** to register all three nodes at once.

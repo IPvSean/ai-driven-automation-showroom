@@ -154,11 +154,31 @@ image::splunk_edit_alert.png[Edit Alert with Webhook URL, link="_images/splunk_e
 The alert title **must** be exactly `rhel-cron-failure`. The EDA rulebook matches on this name. If it does not match, the workflow will not trigger.
 ====
 
+== Accessing Ansible Automation Platform
+
+[cols="2,2", options="header"]
+|===
+| Component
+| Value
+
+| AAP URL
+| AAP is preloaded in the lab interface. Click to open in a full tab: link:{controller_url}[AAP Web UI^]
+
+| Username
+| `{controller_username}`
+
+| Password
+| `{controller_password}`
+|===
+
+	1.	Open AAP using the above details or click the **AAP** tab in your lab interface
+	2.	Login using the credentials provided
+
 == Step 3: Verify EDA and Workflow Are Ready
 
 Before triggering failures, confirm the automation pipeline is in place:
 
-1. Open **Ansible Automation Platform**
+1. Once logged in to **Ansible Automation Platform**
 2. Navigate to **Automation Decisions** -> **Rulebook Activations**
 3. Verify that **RHEL Cron AIOps** shows **Running** status
 +
