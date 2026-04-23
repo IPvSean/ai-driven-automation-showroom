@@ -9,11 +9,9 @@ In this section, you will build and observe a **fully autonomous AIOps workflow*
 
 After completing this section, you will be able to:
 
-* Configure a Splunk alert to detect crond failures on RHEL systems
-* Observe Event-Driven Ansible responding to Splunk alerts for RHEL events
-* Understand how an AI routing agent analyzes syslog messages and selects the correct remediation
-* Compare the autonomous approach (this module) with the human-in-the-loop approach (Lab 4)
-* Articulate when each approach is appropriate for your organization
+* Build an end-to-end observability pipeline connecting Splunk alerting to Event-Driven Ansible, reducing mean time to remediation from hours to seconds
+* See how an AI routing agent analyzes syslog messages in real time, selects the correct fix from a catalog of job templates, and applies it — turning reactive firefighting into proactive self-healing infrastructure
+* Evaluate when to use autonomous AI-routed remediation versus human-in-the-loop workflows so you can adopt the right approach for your organization's risk tolerance and maturity
 
 [IMPORTANT]
 ====
@@ -47,10 +45,33 @@ The key innovation is the **AI routing agent**. Instead of hard-coding a single 
 * **Approval Gate** pauses the workflow so you can review the AI decision before applying
 * **Dispatcher** launches the AI-selected fix template against the affected host
 
+== Accessing Splunk
+
+[cols="2,2", options="header"]
+|===
+| Component
+| Value
+
+| Splunk URL
+| link:{splunk_url}[Splunk^]
+
+| Username
+| `{splunk_username}`
+
+| Password
+| `{splunk_password}`
+|===
+
+	1.	Open Splunk using the above details ( use incognito window if needed )
+	2.	Login using the credentials provided
+
 == Step 1: Verify Splunk Is Receiving RHEL Logs
 
-1. Open **Splunk** using the credentials from your lab interface
+1. Once logged in to Splunk
 2. Go to **Search & Reporting**
++
+image::splunk_search_reporting.png[Search & Reporting, link="_images/splunk_search_reporting.png", window=blank]
++
 3. Search for:
 +
 [source]
