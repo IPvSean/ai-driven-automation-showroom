@@ -277,13 +277,28 @@ image::cron_aiops_mattermost_reports.png[Mattermost AI incident report for synta
 **Stop and consider what just happened.** Less than a minute ago, this system had a silent failure — crond was broken and no one knew. Now you have a full incident report: root cause identified, confidence scored, and a recommended fix ready to approve. This is the power of AIOps. Even before the fix is applied, you already have **automated ticket enrichment** — the kind of context that normally takes an engineer 30 minutes of investigation was delivered in seconds. The gap between "something broke" and "here's exactly what happened and how to fix it" just collapsed.
 ====
 
+image::aiops_meme.png[Engineers who use AIOps looking at their coworkers, link="_images/aiops_meme.png", window=blank]
+
 === Step 4.4: Approve the fix
 
 1. Navigate to **Automation Execution** -> **Jobs**
++
+image::aap_jobs_nav.png[Automation Execution Jobs navigation, link="_images/aap_jobs_nav.png", window=blank]
++
 2. Find the **Cron-AIOps-Workflow** job
 3. The workflow should be paused at the **approval_gate** node
++
+image::approval_gate_paused.png[Workflow paused at approval_gate, link="_images/approval_gate_paused.png", window=blank]
++
 4. Click **Approve** to allow the dispatcher to launch the fix
-5. Wait for the workflow to complete. All nodes should show green
++
+image::approve_button.png[Approve button, link="_images/approve_button.png", window=blank]
++
+5. Check the confirmation box and click **Approve workflow approvals** to execute the fix
++
+image::approve_workflow_confirm.png[Approve workflow approvals confirmation, link="_images/approve_workflow_confirm.png", window=blank]
++
+6. Wait for the workflow to complete. All nodes should show green
 +
 image::cron_aiops_workflow_visualizer.png[Cron-AIOps-Workflow completed successfully, link="_images/cron_aiops_workflow_visualizer.png", window=blank]
 
