@@ -199,61 +199,26 @@ image::console-rhel-platform.png[Select Red Hat Enterprise Linux, link="_images/
 	1.	Open AAP using the above details or click the **AAP** tab in your lab interface
 	2.	Login using the credentials provided
 
-== Register RHEL Nodes to Red Hat Lightspeed
+== RHEL Node Registration (Already Complete)
 
-Before you can view CVEs, Advisor recommendations, or generate remediation playbooks, your RHEL nodes must be registered with Red Hat Lightspeed (formerly Red Hat Insights). Normally you would do this manually on each host by running `insights-client --register`, but in this lab we will use **Red Hat Ansible Automation Platform** to register all three nodes at once.
-
-1. Switch to the **AAP** tab in your lab interface (or open link:{controller_url}[AAP Web UI^] in a new tab).
-
-image::lab-tabs-aap.png[AAP tab in lab interface, link="_images/lab-tabs-aap.png", window=blank]
-
-[start=2]
-2. In the left navigation, click **Automation Execution** → **Templates**.
-
-image::aap-templates-nav.png[AAP Templates navigation, link="_images/aap-templates-nav.png", window=blank]
-
-[start=3]
-3. Find and click the **Register with Red Hat Lightspeed** job template.
-4. Click **Launch Template**.
-
-image::aap-launch-template.png[Launch template button, link="_images/aap-launch-template.png", window=blank]
-
-[start=5]
-5. When prompted for **Limit**, type:
-
-[source]
-----
-node1,node2,node3
-----
-
-image::aap-register-limit-prompt.png[Prompt on Launch with Limit field, link="_images/aap-register-limit-prompt.png", window=blank]
-
-[start=6]
-6. Click the blue **Next** button to proceed to the review screen.
-7. Click the blue **Finish** button to launch the job.
-8. Wait for the job to complete successfully.
+Your RHEL nodes have already been registered with Red Hat Lightspeed (formerly Red Hat Insights) during lab provisioning. The **Register with Red Hat Lightspeed** job template ran automatically when your environment was set up, connecting all three nodes (`node1`, `node2`, `node3`) to https://console.redhat.com[console.redhat.com^].
 
 [NOTE]
 ====
-**Why automate registration?** Manually SSH-ing into each host to run `insights-client --register` is tedious and error-prone at scale. Using an AAP Job Template means you can register dozens or hundreds of hosts with a single click — and the same template can be reused for new hosts added later.
+**How was this done?** The lab provisioning process ran the **Register with Red Hat Lightspeed** job template against all RHEL nodes. This template uses `rhc connect` to register each node with the Red Hat CDN and Insights service, and tags them with your lab's unique sandbox identifier for easy filtering. In a production environment, you would use the same approach to register hosts at scale using Ansible Automation Platform.
 ====
 
 === Finding Your Nodes in Red Hat Lightspeed
 
-When the job completes, note the **Group/Tag** value in the job output. This is your unique lab identifier that you will use to filter your systems in console.redhat.com.
+To verify registration and locate your nodes:
 
-image::aap-register-job-output.png[Registration job output showing Group/Tag, link="_images/aap-register-job-output.png", window=blank]
-
-In this screenshot, our unique identifier is `k5txp` — yours will be different. Make a note of it.
-
-[start=8]
-8. Return to your https://console.redhat.com[console.redhat.com^] browser tab.
-9. Navigate to **Inventory** → **Systems**.
-10. Click **Filter by tags**, then filter by `group=` followed by your unique identifier from the job output (e.g., `group=k5txp`).
+1. Return to your https://console.redhat.com[console.redhat.com^] browser tab.
+2. Navigate to **Inventory** -> **Systems**.
+3. You should see your three RHEL nodes listed. Use **Filter by tags** with your lab's sandbox ID if needed to narrow the list.
 
 image::console-inventory-tags-filter.png[Filter systems by tag in console.redhat.com, link="_images/console-inventory-tags-filter.png", window=blank]
 
-You should see your three RHEL nodes listed. It may take a minute or two after registration for the systems to fully populate.
+You can also verify registration from the AAP Jobs history. Look for the **Register with Red Hat Lightspeed** job that ran during provisioning.
 
 == Generating Remediation Playbooks
 

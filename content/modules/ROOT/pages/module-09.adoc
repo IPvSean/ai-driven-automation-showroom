@@ -45,6 +45,30 @@ The key innovation is the **AI routing agent**. Instead of hard-coding a single 
 * **Approval Gate** pauses the workflow so you can review the AI decision before applying
 * **Dispatcher** launches the AI-selected fix template against the affected host
 
+== Before You Begin: Switch EDA Rulebook Activations
+
+This module uses a different EDA rulebook activation than the OSPF network module (Part 2). Both the OSPF and Cron rulebooks listen for Splunk webhooks on the same port (5000), so only one can be active at a time.
+
+In a production environment, you would combine multiple rules into a single rulebook with different conditions for each alert type. For this lab, we kept the rulebooks separate so each module is self-contained and easier to follow.
+
+1. Open **Ansible Automation Platform**
+2. Navigate to **Automation Decisions** -> **Rulebook Activations**
+3. **Disable** the **OSPF Neighbor** activation:
+   * Select the checkbox next to **OSPF Neighbor**
+   * Click **Disable rulebook activations**
+   * Confirm and close
+4. **Enable** the **RHEL Cron AIOps** activation:
+   * Click on **RHEL Cron AIOps**
+   * Toggle it to **Enabled**
+   * Wait for the status to show **Running**
+
+image::cron_aiops_eda_activation.png[EDA Rulebook Activations showing RHEL Cron AIOps running, link="_images/cron_aiops_eda_activation.png", window=blank]
+
+[IMPORTANT]
+====
+The **RHEL Cron AIOps** activation must show **Running** before you proceed. If it shows **Failed**, check that the **OSPF Neighbor** activation is fully disabled, then try enabling the Cron activation again.
+====
+
 == Accessing Splunk
 
 [cols="2,2", options="header"]
