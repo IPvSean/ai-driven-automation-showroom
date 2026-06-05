@@ -104,6 +104,14 @@ When Claude Code starts for the first time, it will display a safety prompt aski
 Claude Code is already configured to connect to the Ansible Automation Platform MCP server. No additional setup is required. When you ask Claude about Ansible Automation Platform, it will automatically discover and use the MCP tools.
 ====
 
+[IMPORTANT]
+====
+**Model availability.** This lab environment provides access to **Claude Sonnet 4.6** (`claude-sonnet-4-6`). If Claude Code fails to respond or shows a model error, switch to the correct model:
+
+* **CLI**: Type `/model` and select `claude-sonnet-4-6`
+* **VS Code extension**: Click the model name in the status bar or use `Ctrl+Shift+P` -> "Claude Code: Set Model"
+====
+
 === Step 1.3: Discover available automation
 
 Claude Code is connected to the MCP server. Type the following prompt and press *Enter*:

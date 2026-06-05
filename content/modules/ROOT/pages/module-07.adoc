@@ -138,7 +138,15 @@ image::claude-code-welcome.png[Claude Code welcome screen, link="_images/claude-
 
 [NOTE]
 ====
-**MCP is pre-configured.** Claude Code is already connected to the Ansible MCP server and the Red Hat Lightspeed MCP server in your lab environment. You do not need to configure anything — just launch the agent and start chatting.
+**MCP is pre-configured.** Claude Code is already connected to the Ansible MCP server and the Red Hat Lightspeed MCP server in your lab environment. You do not need to configure anything.
+====
+
+[IMPORTANT]
+====
+**Model availability.** This lab environment provides access to **Claude Sonnet 4.6** (`claude-sonnet-4-6`). If Claude Code fails to respond or shows a model error, switch to the correct model:
+
+* **CLI**: Type `/model` and select `claude-sonnet-4-6`
+* **VS Code extension**: Click the model name in the status bar or use `Ctrl+Shift+P` -> "Claude Code: Set Model"
 ====
 
 image::claude-code-mcp-servers.png[Claude Code MCP servers, link="_images/claude-code-mcp-servers.png", window=blank]
