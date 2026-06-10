@@ -383,7 +383,7 @@ Now run all three agents in sequence (triage, execute, and report) with a simula
 
 [source,bash]
 ----
-python3 incident_agent.py all --break-first "Apache web server is down on node1"
+python3 incident_agent.py all "Apache web server is down on node1" --break-first
 ----
 
 [NOTE]
