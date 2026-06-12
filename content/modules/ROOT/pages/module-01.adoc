@@ -1,437 +1,384 @@
-= Section 2 - Remediation Workflow
+= Section 1.1 - Log Enrichment and Prompt Generation Workflow
+
+[NOTE]
+====
+**Terminology Note**: Red Hat has recently consolidated its AI-powered services under new branding. Throughout Parts 1-3, you will see references to **Ansible Lightspeed**. This technology is now called **Automation code assistant** and supports multiple AI backends (Gemini, Red Hat AI, or IBM watsonx). Similarly, **Red Hat Insights** on console.redhat.com is now branded as **Red Hat Lightspeed**. The functionality is the same; only the names have changed. You will work with the new naming in Parts 4 and 5.
+====
 
 == Objective
 
-For this section, we will build another workflow called the **Remediation Workflow**. The goal for this workflow is to take the information we learned from Section 1 with Red Hat AI and now prompt Ansible Lightspeed to automatically create an Ansible Playbook to fix the issue. By combining these two workflows, we can create an AIOps workflow capable of self-healing infrastructure.
+In this section, we will build the first workflow called the **AI Insights and Lightspeed prompt generation** workflow. This workflow will be triggered by Event-Driven Ansible (EDA) whenever an issue is detected in the system. Specifically, this demo is set up to respond to an Apache (httpd) service failure.
 
-image::remediation_workflow.png[remediation_workflow, link="_images/remediation_workflow.png", window=blank]
+This workflow will check the status of the Apache service, notify a Mattermost channel with details, ask Red Hat AI to analyze the incident, and finally create a new job template using the AI-generated prompt for Ansible Lightspeed.
 
-By separating these two parts into distinct workflows, we allow for manual review of the response from Red Hat AI and can take corrective action if necessary. This creates a natural stopping point in our automation workflow where we can ensure the automation is performing as expected.
+== Learning Objectives
+
+After completing this module, you will be able to:
+
+* Create a workflow job template in Ansible Automation Platform
+* Connect Red Hat AI inference services to analyze system logs
+* Configure Mattermost integration for incident notifications
+* Use AI-generated prompts to prepare for automated remediation
+* Understand how Event-Driven Ansible triggers workflows automatically
+
+image::enrichment_workflow_diagram.png[Enrichment and Prompt Generation Workflow, link="_images/enrichment_workflow_diagram.png", window=blank]
+
+By organizing these steps into a workflow, we simulate how multiple tools can collaborate to enrich a ticket or alert and prepare the remediation plan—all before a human even reviews the problem.
 
 [quote]
-⚠️ Before we get started you need to make sure you have run the first workflow.
+⚠️ This workflow will be automatically triggered by EDA once the `❌ Break Apache` job template is run. You must create this workflow before simulating the failure.
+
+== Introducing AI with Ansible
+
+This lab uses a managed AI inference service powered by the **Granite LLM** model. You can interact with this AI using simple `curl` commands or trigger it through Job Templates via Ansible Automation Platform.
 
 [quote]
-⚠️ Reminder that the way we purposely broke httpd with the *❌ Break Apache* Job Template was by inserting *InvalidDirectiveHere* into the configuration file and restarting the service.  This crashed the httpd service as you can see by running the *systemctl status httpd.service* Linux command.
+💡 **Want to deploy your own AI infrastructure?** Red Hat AI can be deployed using Ansible Content Collections like `redhat.ai` (Certified) and `infra.ai` (Validated), available as part of your Ansible Automation Platform (AAP) subscription. These collections provide a validated path to deploy generative AI models using automation. For this lab, we're using a managed service to simplify the setup, but the same workflow concepts apply whether you're using a managed service or self-hosted AI infrastructure.
 
-== Verify webserver failure
+=== Try It Yourself: Talk to the AI!
 
-1. Connect to your bastion host either via SSH or Visual Studio Code.  The connection information is provided by your instructor.
+Before diving into the workflow, let’s see how easy it is to test this out yourself.
 
-2. SSH over to node1
+1. Open the **Terminal** in the lab.
+2. Run the following `curl` command:
 
-[source,bash]
+[source, shell, role="execute", subs="attributes+"]
 ----
-[lab-user@bastion ~]$ sudo ssh node1
-Last login: Tue Apr  8 15:56:41 2025 from 192.168.0.37
-[ec2-user@node1 ~]$
-----
-
-[start=3]
-3. Verify httpd is down with the *systemctl status httpd.service* command
-
-[source,bash]
-----
-[ec2-user@node1 ~]$ sudo systemctl status httpd.service
-× httpd.service - The Apache HTTP Server
-     Loaded: loaded (/usr/lib/systemd/system/httpd.service; disabled; preset: disabled)
-     Active: failed (Result: exit-code) since Tue 2025-04-08 15:56:15 UTC; 1h 11min ago
-   Duration: 1min 9.506s
-       Docs: man:httpd.service(8)
-    Process: 4099 ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND (code=exited, status=1/FAILURE)
-   Main PID: 4099 (code=exited, status=1/FAILURE)
-     Status: "Reading configuration..."
-        CPU: 58ms
-
-Apr 08 15:56:15 node1.example.com systemd[1]: Starting The Apache HTTP Server...
-Apr 08 15:56:15 node1.example.com httpd[4099]: AH00526: Syntax error on line 35 of /etc/httpd/conf/httpd.conf:
-Apr 08 15:56:15 node1.example.com httpd[4099]: Invalid command 'InvalidDirectiveHere', perhaps misspelled or defined by a module not included in the server configuration
-Apr 08 15:56:15 node1.example.com systemd[1]: httpd.service: Main process exited, code=exited, status=1/FAILURE
-Apr 08 15:56:15 node1.example.com systemd[1]: httpd.service: Failed with result 'exit-code'.
-Apr 08 15:56:15 node1.example.com systemd[1]: Failed to start The Apache HTTP Server.
-[ec2-user@node1 ~]$
+curl -X POST {litellm_api_base_url}/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {litellm_virtual_key}" \
+  -d '{
+    "model": "openai/granite-3-2-8b-instruct",
+    "prompt": "What is the capital of USA?",
+    "max_tokens": 100,
+    "temperature": 0
+  }' | jq -r '.choices[0].text'
 ----
 
-As you can see in the above output, the httpd.service has failed.
+You can also try real-world prompts like:
 
-== Create Remediation Workflow
+[source, shell, role="execute", subs="attributes+"]
+----
+curl -X POST {litellm_api_base_url}/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {litellm_virtual_key}" \
+  -d '{
+    "model": "openai/granite-3-2-8b-instruct",
+    "prompt": "systemd[1]: httpd.service: Failed with result exit-code. Suggest a fix for Apache.",
+    "max_tokens": 150,
+    "temperature": 0.6
+  }' | jq -r .choices[0].text
+----
 
-1. Log in to the web UI for Ansible Automation Platform if you are not already logged in.
-2. In the left navigation menu, click on *Automation Execution* → *Templates*.
+This returns a JSON response with helpful AI suggestions. This is exactly what’s being automated in the next step via the **🤖 RHEL AI: Analyze Incident** job template.
 
-image::automation_execution_templates.png[automation_execution_templates, link="_images/automation_execution_templates.png", window=blank]
+== Exploring Mattermost Integration
 
-[start=3]
-3. Navigate to the Templates page and select the *Remediation Workflow* Workflow job template
+In this lab environment, we’ve included Mattermost, a lightweight, open-source chat client that serves as a central place to view error logs and AI insights as part of your AIOps workflow.
 
-image::remediation_workflow_list.png[create_workflow, link="_images/remediation_workflow_list.png", window=blank]
-
-[quote]
-💡 The last workflow (specifically the job template *Build Ansible Lightspeed Job Template*) used the *ansible.controller.workflow_job_template* module to automatically create this blank workflow. We could have Ansible automatically create the entire workflow but we want to illustrate each part and what it is doing.  The most important part is that Ansible automatically created a survey with output from Red Hat AI.  You will see this called out below when we run the workflow.  Ask your instructor if you need clarification.
-
-[start=4]
-4. Click on the blue *View workflow visualizer* button
-
-image::view_workflow_visualizer_button.png[visualizer_button,300, link="_images/view_workflow_visualizer_button.png", window=blank]
-
-[start=5]
-5. Verify you have a window that looks like this:
-
-image::currently_no_nodes_workflow.png[currently_no_nodes_workflow,400, link="_images/currently_no_nodes_workflow.png", window=blank]
-
-[start=6]
-6. Click on the blue *Add step*
-
-7. Fill out the following values
-
-[options="header"]
-|===
-| Parameter | Value
-| Node type | Job Template
-| Job Template | 🧠 Lightspeed Remediation Playbook Generator
-| Convergence | Any
-| Node alias | (You can leave this blank)
-|===
-
-image::add_step_lightspeed_remediation.png[add_step_lightspeed_remediation,500, link="_images/add_step_lightspeed_remediation.png", window=blank]
-
-[start=8]
-8. Click on the blue *Next*.
-
-image::blue_next_button.png[blue_next_button,150, link="_images/blue_next_button.png", window=blank]
-
-[start=9]
-9. Review and click the blue *Finish* button.
-
-image::blue_finish_button.png[blue_finish_button,150, link="_images/blue_finish_button.png", window=blank]
-
-Your workflow will now look like this:
-
-image::remediation_workflow_part_one.png[remediation_workflow_part_one,500, link="_images/remediation_workflow_part_one.png", window=blank]
-
-[start=10]
-10. Click on the three dots (kebab menu) next to the *🧠 Lightspeed Remediation Playbook Generator* node
-
-11. Click on *⊕ Add step and link*
-
-image::workflow_add_step_and_link.png[workflow_add_step_and_link,200, link="_images/workflow_add_step_and_link.png", window=blank]
-
-[start=12]
-12. Fill out the following values
-
-[options="header"]
-|===
-| Parameter | Value
-| Node type | Job Template
-| Job Template | 🧾 Commit Fix to Gitea
-| Status | Run on success
-| Convergence | Any
-| Node alias | (You can leave this blank)
-|===
-
-image::remediation_workflow_part_two.png[remediation_workflow_part_two,500, link="_images/remediation_workflow_part_two.png", window=blank]
-
-[start=13]
-13. Click on the blue *Next*.
-
-image::blue_next_button.png[blue_next_button,150, link="_images/blue_next_button.png", window=blank]
-
-[start=14]
-14. Review and click the blue *Finish* button
-
-image::blue_finish_button.png[blue_finish_button,150, link="_images/blue_finish_button.png", window=blank]
-
-Your workflow will now look like this:
-
-image::remediation_workflow_part_two_final.png[remediation_workflow_part_two_final,500, link="_images/remediation_workflow_part_two_final.png", window=blank]
-
-[start=15]
-15. Click on the three dots (kebab menu) next to the *🧾 Commit Fix to Gitea* node
-
-16 Click on *⊕ Add step and link*
-
-image::workflow_add_step_and_link.png[workflow_add_step_and_link,200, link="_images/workflow_add_step_and_link.png", window=blank]
-
-[start=17]
-17. Fill out the following values
-
-[options="header"]
-|===
-| Parameter | Value
-| Node type | Project Sync
-| Job Template | Lightspeed-Playbooks
-| Status | Run on success
-| Convergence | Any
-| Node alias | (You can leave this blank)
-|===
-
-image::remediation_workflow_part_three.png[remediation_workflow_part_three,500, link="_images/remediation_workflow_part_three.png", window=blank]
+Think of Mattermost as a stand-in for ServiceNow in this demonstration.
 
 [quote]
-⚠️ Notice this node type is different.  This is a *built-in* node type that will force a **Project Sync** to the repository that will hold our auto-generated Ansible Playbooks.  This is effectively a *git pull*  The previous node: *🧾 Commit Fix to Gitea*  synced the Ansible Playbook from Ansible Lightspeed to Gitea, now we are retrieving that playbook from Gitea to use in Ansible Automation Platform.
+💡 In a real-world production environment, you can easily replace Mattermost with ServiceNow (or any other ITSM tool). This enables a more advanced automated workflow, where tickets are automatically created and enriched with logs and insights — all before a human even picks up the ticket!
 
-[start=18]
-18. Click on the blue *Next*.
-
-image::blue_next_button.png[blue_next_button,150, link="_images/blue_next_button.png", window=blank]
-
-[start=19]
-19. Review and click the blue *Finish* button.
-
-image::blue_finish_button.png[blue_finish_button,150, link="_images/blue_finish_button.png", window=blank]
-
-Your workflow will now look like this:
-
-image::remediation_workflow_part_three_final.png[remediation_workflow_part_three_final,500, link="_images/remediation_workflow_part_three_final.png", window=blank]
-
-[start=20]
-20. Click on the three dots (kebab menu) next to the *🧠 Lightspeed-Playbooks* node
-
-21. Click on *⊕ Add step and link*
-
-image::workflow_add_step_and_link.png[workflow_add_step_and_link,200, link="_images/workflow_add_step_and_link.png", window=blank]
-
-[start=22]
-22. Fill out the following values
-
-[options="header"]
-|===
-| Parameter | Value
-| Node type | Job Template
-| Job Template | ⚙️ Build HTTPD Remediation Template
-| Status | Run on success
-| Convergence | Any
-| Node alias | (You can leave this blank)
-|===
-
-image::remediation_workflow_part_four.png[remediation_workflow_part_four,500, link="_images/remediation_workflow_part_four.png", window=blank]
-
-[start=23]
-23. Click on the blue *Next*.
-
-image::blue_next_button.png[blue_next_button,150, link="_images/blue_next_button.png", window=blank]
-
-[start=24]
-24. Review and click the blue *Finish* button
-
-image::blue_finish_button.png[blue_finish_button,150, link="_images/blue_finish_button.png", window=blank]
-
-Your workflow will now look like this:
-
-image::remediation_workflow_part_four_final.png[remediation_workflow_part_four_final,500, link="_images/remediation_workflow_part_four_final.png", window=blank]
-
-You are now done creating the workflow!
-
-[start=25]
-25. Click on the blue **Save** button at the top.
-
-image::save_button.png[save_button,150, link="_images/save_button.png", window=blank]
-
-[start=26]
-26. Exit out of the Workflow Visualizer by clicking the *x* at the top right
-
-27. Click the *🚀 Launch template* button to execute the *Remediation Workflow*
-
-image::launch_template_button.png[launch_template_button,150, link="_images/launch_template_button.png", window=blank]
-
-[quote]
-💡 This is the really cool part!  A survey prompt will appear with two text boxes side-by-side:
-
-* **Left text box (required field with red asterisk *)**: This is where you enter the prompt that will be sent to Ansible Lightspeed to generate the remediation playbook. This field is currently pre-populated with a manually crafted prompt created by the Ansible Tech Marketing team.
-
-* **Right text box (AI-generated suggestion)**: This contains the prompt that was automatically generated by Red Hat AI during the previous workflow based on its analysis of the Apache failure logs.
-
-You have the flexibility to use either prompt. If you're satisfied with the AI-generated prompt on the right, you can copy and paste it into the left box to test the AI's solution. **This is the key benefit of separating AIOps into two workflows** - it gives you (the administrator) the ability to review and validate AI-generated responses for accuracy before proceeding with automated remediation!
-
-image::workflow_prompt.png[workflow_prompt, link="_images/workflow_prompt.png", window=blank]
-
-[start=28]
-28. Review the AI-generated prompt (right side) and update the required field (left side with the red asterisk *) as needed. Feel free to copy and paste from the right side to the left side.
-
-[quote]
-💡 **Why this matters**: This step allows you to course-correct any output that AI has provided. You can review what the AI suggests before prompting Ansible Lightspeed, ensuring the prompt is accurate and appropriate for your environment. This human-in-the-loop validation is a best practice for AI-driven automation.
-
-[start=29]
-29. Click on the blue *Next*.
-
-image::blue_next_button.png[blue_next_button,150, link="_images/blue_next_button.png", window=blank]
-
-[start=29]
-29. Review and click the blue *Finish* button.
-
-image::blue_finish_button.png[blue_finish_button,150, link="_images/blue_finish_button.png", window=blank]
-
-[start=30]
-30. Wait for the workflow to complete
-
-When the workflow completes you will see a green ✅ Success
-
-image::remediation_workflow_success.png[remediation_workflow_success,150, link="_images/remediation_workflow_success.png", window=blank]
-
-[quote]
-🎉 You have used Ansible Automation Platform in an AIOps workflow to automatically create an Ansible Job Template to fix your issue. This has created an Ansible Job Template called *🔧✅ Execute HTTPD Remediation*. You could also add this to the workflow, but it might be another natural breakpoint where you schedule this job template during an approved change window. For example, some organizations might only want to apply changes to production servers on Sundays at 3AM.
-
-== Review the AI-Generated Playbook in Gitea
-
-Before we proceed with executing the final job, let’s take a step back and review what was automatically created for us.
-
-Red Hat AI was able to:
-
-* Analyze the Apache failure logs collected by Filebeat and forwarded to RHEL AI
-* Generate a root cause explanation for the issue (RCA)
-* Create a concise and relevant prompt based on the RCA
-* Use that prompt to call Ansible Lightspeed
-* Ansible Lightspeed with IBM watsonx Code Assistant, generated an Ansible Playbook to fix the issue
-* The playbook was automatically pushed to Gitea in the `lightspeed-playbooks` repository
-
-This showcases a complete AI-driven automation loop — from incident detection to automated remediation content generation — all before a human steps in. Gitea here acts as the version control source of truth, where you can review the generated fix.
-
-=== How to Review the Playbook
-
-=== Gitea Access Details
-
-Use the following information to log in to Gitea and review the generated playbook:
-
+=== Accessing Mattermost
 [cols="2,2", options="header"]
 |===
 | Component
 | Value
 
-| Gitea URL
-| link:{gitea_url}[Gitea Web UI,window=_blank]
+| Mattermost URL
+| link:{mattermost_url}[Mattermost^]
 
 | Username
-| `{gitea_username}`
+| `{mattermost_username}`
 
 | Password
-| `{gitea_password}`
+| `{mattermost_password}`
 |===
 
+	1.	Open mattermost using the above details
+	2.	Click on “View in Browser” to open the console.
+	3.	Login using the credentials provided.
+  	4.      Click on the team "Automators".
 
-1. Login using the credentials provided.
-2. Navigate to the `lightspeed-playbooks` repository.
-3. Review the most recent commits — you should see one that corresponds to the Lightspeed-generated fix.
+Once logged in, click on the Town Square channel from the left-hand navigation.
+
+image::mattermost_town_square_placeholder.png[Click on Town Square, link="_images/mattermost_town_square_placeholder.png", window="_blank"]
+
+=== What You’ll See in Town Square
+
+In the Town Square channel, you will eventually see:
+
+	•	🔍 Error logs from the Apache HTTPD service (collected by Filebeat and forwarded via Kafka)
+	•	🧠 AI Insights generated from the logs using RHEL AI
+
+This real-time feed mimics how production environments might use automated ticket enrichment — by capturing logs and insights and sending them directly to a ticketing system like ServiceNow.
 
 [quote]
-💡 You can open the playbook file and inspect the contents. This is your opportunity to validate the AI-generated output before executing it. Just like in production systems, automated changes should be reviewed—either manually or through automated policy enforcement tools.
+You won’t see any messages just yet — this step is simply to explain where Mattermost fits in and why this channel matters. Logs and insights will start appearing once the first workflow runs.
 
 [quote]
-*Pro Tip:* If you're planning to use this in a real-world setup, consider inserting an approval step here or sending the commit as a Pull Request to a `staging` branch. This way, your remediation workflow includes guardrails for human validation before running automated fixes.
+💡 With this integration, you are essentially watching AI and automation work together — detecting the issue, diagnosing it, and preparing remediation guidance before anyone intervenes.
 
-== Fix webserver issue
 
-1. In the left navigation menu, click on *Automation Execution* → *Templates*.
+== Build the Workflow
+
+[cols="2,2,2", options="header"]
+|===
+| System | URL | Credentials
+
+| Ansible Automation Platform
+| AAP is preloaded in the lab interface.
+Click link if you want to open it in full tab:
+link:{controller_url}[AAP Web UI^]
+| Username: `{controller_username}`
+Password: `{controller_password}`
+
+|===
+
+1. Login to Ansible Automation Platform.
+2. Go to Automation Execution → Templates.
 
 image::automation_execution_templates.png[automation_execution_templates, link="_images/automation_execution_templates.png", window=blank]
 
-[start=2]
-2. Scroll down to the *🔧✅ Execute HTTPD Remediation* job template and click the 🚀 to launch the job.
+[start=3]
+3. Click Create template → Create workflow job template.
 
-3. Type in `node1` for the Limit
-
-image::limit_node1.png[limit_node1,300, link="_images/limit_node1.png", window=blank]
-
-[quote]
-💡 A limit in Ansible Automation Platform is equivalent to `--limit` with the `ansible-playbook` command.  The limit specifies the host or hosts you want to run the Ansible Job on versus the entire inventory, effectively *limiting* it to only running on those host(s).
+image::create_workflow.png[create_workflow,300, link="_images/create_workflow.png", window=blank]
 
 [start=4]
-4. Click on the blue *Next*.
+4. Fill in the details:
 
-image::blue_next_button.png[blue_next_button,150, link="_images/blue_next_button.png", window=blank]
+[options="header"]
+|===
+| Parameter | Value
+| Name | AI Insights and Lightspeed prompt generation
+| Organization | Default
+|===
 
 [start=5]
-5 Review and click the blue *Finish* button.
+5. Click Create workflow job template.
 
+image::create_workflow_job_template.png[create_workflow_job_template,300, link="_images/create_workflow_job_template.png", window=blank]
+
+[start=6]
+6. You’ll see the empty workflow visualizer.
+
+image::currently_no_nodes_workflow.png[currently_no_nodes_workflow,400, link="_images/currently_no_nodes_workflow.png", window=blank]
+
+[start=7]
+7. Add the Apache Service Status Check node:
+
+[options="header"]
+|===
+| Parameter | Value
+| Node type | Job Template
+| Job Template | ⚙️ Apache Service Status Check
+| Convergence | Any
+| Node alias | (You can leave this blank)
+|===
+
+image::add_apache_status_check_step.png[Add Apache Status Check Step, link="_images/add_apache_status_check_step.png", window=blank]
+
+[start=8]
+8. Click Next, then Finish.
+
+image::blue_next_button.png[blue_next_button,150, link="_images/blue_next_button.png", window=blank]
 image::blue_finish_button.png[blue_finish_button,150, link="_images/blue_finish_button.png", window=blank]
-== Check Success
 
-1. Connect to your bastion host either via SSH or Visual Studio Code.  The connection information is provided by your instructor.
+[start=9]
+9. Visual after first node:
 
-2. SSH over to node1
+image::workflow_after_apache_status_node.png[Workflow after Apache node, link="_images/workflow_after_apache_status_node.png", window=blank]
 
-[source,bash]
-----
-[lab-user@bastion ~]$ sudo ssh node1
-Last login: Tue Apr  8 15:56:41 2025 from 192.168.0.37
-[ec2-user@node1 ~]$
-----
+[start=10]
+10. Add RHEL AI: Analyze Incident step:
 
-3. Verify httpd is fixed with the *systemctl status httpd.service* command
+11. Click on the three dots (⋮ kebab menu) next to the *⚙️ Apache Service Status Check* node.
 
-[source,bash]
-----
-[ec2-user@node1 ~]$ sudo systemctl status httpd.service
-● httpd.service - The Apache HTTP Server
-     Loaded: loaded (/usr/lib/systemd/system/httpd.service; disabled; preset: disabled)
-     Active: active (running) since Tue 2025-04-08 17:16:02 UTC; 1min 55s ago
-       Docs: man:httpd.service(8)
-   Main PID: 6024 (httpd)
-     Status: "Total requests: 0; Idle/Busy workers 100/0;Requests/sec: 0; Bytes served/sec:   0 B/sec"
-      Tasks: 177 (limit: 48028)
-     Memory: 23.5M
-        CPU: 193ms
-     CGroup: /system.slice/httpd.service
-             ├─6024 /usr/sbin/httpd -DFOREGROUND
-             ├─6025 /usr/sbin/httpd -DFOREGROUND
-             ├─6026 /usr/sbin/httpd -DFOREGROUND
-             ├─6027 /usr/sbin/httpd -DFOREGROUND
-             └─6028 /usr/sbin/httpd -DFOREGROUND
+12. Click on *⊕ Add step and link* to insert the next node into the workflow.
 
-Apr 08 17:16:02 node1.example.com systemd[1]: Starting The Apache HTTP Server...
-Apr 08 17:16:02 node1.example.com httpd[6024]: Server configured, listening on: port 80
-Apr 08 17:16:02 node1.example.com systemd[1]: Started The Apache HTTP Server.
-[ec2-user@node1 ~]$
-----
+image::workflow_add_step_and_link.png[workflow_add_step_and_link,200, link="_images/workflow_add_step_and_link.png", window=blank]
 
-If you see *(running)* above it means httpd has been fixed!  You have successfully completed the lab.
+[options="header"]
+|===
+| Parameter | Value
+| Node type | Job Template
+| Job Template | 🤖 RHEL AI: Analyze Incident
+| Status | Run on success
+| Convergence | Any
+| Node alias | (You can leave this blank)
+|===
 
-== Takeaways
+image::add_rhel_ai_step.png[Add RHEL AI Step, link="_images/add_rhel_ai_step.png", window=blank]
 
-You have
+[start=13]
+13. Click Next, then Finish.
 
-* Created a Workflow template that automatically creates an Ansible Playbook, pushes the Ansible Playbook to Gitea and then automatically creates a Job Template to fix the issue.
-* Fixed the httpd service using the prompt generated by Red Hat AI
-* Completed an AIOps workflow, by utilizing two different AI endpoints
-* Used the *limit* feature in a Job Template
+image::blue_next_button.png[link="_images/blue_next_button.png", window=blank]
+image::blue_finish_button.png[link="_images/blue_finish_button.png", window=blank]
 
-image::aiops-cool.gif[aiops-cool, link="_images/aiops-cool.gif", window=blank]
+[start=14]
+14. Workflow with two nodes:
 
-'''
+image::workflow_after_rhel_ai_step.png[After RHEL AI step, link="_images/workflow_after_rhel_ai_step.png", window=blank]
 
-== 🎉 Congratulations! You've Completed Part 1!
+[start=15]
+15. Add Notify via Mattermost:
 
-You have successfully completed the **basic introduction** to AIOps! You've experienced firsthand how **Red Hat AI**, **Ansible Lightspeed**, and **Ansible Automation Platform** can work together to create intelligent, self-healing infrastructure.
+16. Click on the three dots (⋮ kebab menu) next to the *🤖 RHEL AI: Analyze Incident* node.
 
-=== What You Accomplished
+17. Click on *⊕ Add step and link* to insert the next node into the workflow.
 
-* ✅ Built an AI-powered log enrichment workflow
-* ✅ Used Red Hat AI to analyze incidents and generate insights
-* ✅ Leveraged Ansible Lightspeed to automatically create remediation playbooks
-* ✅ Fixed a broken Apache service without writing a single line of playbook code
+image::workflow_add_step_and_link.png[workflow_add_step_and_link,200, link="_images/workflow_add_step_and_link.png", window=blank]
 
-'''
+[options="header"]
+|===
+| Parameter | Value
+| Node type | Job Template
+| Job Template | 📣 Notify via Mattermost
+| Status | Run on success
+| Convergence | Any
+| Node alias | (You can leave this blank)
+|===
 
-== ⭐ Ready for More? Part 2 Awaits!
+image::add_mattermost_step.png[Add Mattermost Step, link="_images/add_mattermost_step.png", window=blank]
 
-image::splunk-logo.png[splunk,150, link="_images/splunk-logo.png", window=blank]
+[start=18]
+18. Click Next, then Finish.
 
-[IMPORTANT]
-====
-**Highly Recommended!** Part 2 takes the AIOps concepts you just learned and applies them to a **more complex, real-world networking scenario**. While Part 1 provided a basic introduction using Apache service remediation, Part 2 demonstrates the true power of AI-driven automation at scale with network infrastructure.
-====
+image::workflow_after_mattermost_step.png[After Mattermost step, link="_images/workflow_after_mattermost_step.png", window=blank]
 
-In the next modules, you'll apply everything you've learned to a **network automation scenario** involving:
+[start=19]
+19. Add Build Ansible Lightspeed Job Template:
 
-* 🔍 **Splunk** for network observability and alerting
-* 📡 **Event-Driven Ansible** responding to OSPF routing issues
-* 🧠 **Ansible Lightspeed** generating network remediation playbooks
-* 🌐 **Cisco routers** with OSPF configuration challenges
+20. Click on the three dots (⋮ kebab menu) next to the *📣 Notify via Mattermost* node.
 
-[TIP]
-====
-**Both parts are independent.** If you've already completed Part 2 or want to skip ahead to the Summary and Call to Actions, you can navigate there directly from the menu. However, we strongly encourage completing Part 2 for a deeper understanding of AIOps capabilities.
-====
+21. Click on *⊕ Add step and link* to insert the next node into the workflow.
+
+image::workflow_add_step_and_link.png[workflow_add_step_and_link,200, link="_images/workflow_add_step_and_link.png", window=blank]
+
+[options="header"]
+|===
+| Parameter | Value
+| Node type | Job Template
+| Job Template | ⚙️ Build Ansible Lightspeed Job Template
+| Status | Run on success
+| Convergence | Any
+| Node alias | (You can leave this blank)
+|===
+
+image::add_lightspeed_jt_creator.png[Add Lightspeed JT Creator Step, link="_images/add_lightspeed_jt_creator.png", window=blank]
+
+[start=21]
+22. Click Next, then Finish.
+
+image::blue_next_button.png[link="_images/blue_next_button.png", window=blank]
+image::blue_finish_button.png[link="_images/blue_finish_button.png", window=blank]
+
+[start=23]
+23. Final workflow visual:
+
+image::workflow_final_prompt_generation.png[Final Workflow, link="_images/workflow_final_prompt_generation.png", window=blank]
+
+[start=24]
+24. Click Save to finalize.
+
+image::save_button.png[link="_images/save_button.png", window=blank]
+
+=== Verify workflow creation
+
+Before triggering the workflow, verify you have successfully created it:
+
+✅ **Expected result:**
+
+* Workflow named "AI Insights and Lightspeed prompt generation" exists in Templates list
+* Workflow contains 4 nodes in sequence:
+  1. ⚙️ Apache Service Status Check
+  2. 🤖 RHEL AI: Analyze Incident
+  3. 📣 Notify via Mattermost
+  4. ⚙️ Build Ansible Lightspeed Job Template
+* All nodes show green connections (Run on success)
+* Workflow is saved and ready to launch
+
+If your workflow matches this configuration, proceed to trigger it.
+
+== Trigger the Workflow
+
+[start=25]
+25. Run the `❌ Break Apache` job template. This inserts an invalid directive in Apache config and restarts the service.
+
+image::run_break_apache.png[link="_images/run_break_apache.png", window=blank]
+
+[start=26]
+26. Go to Automation Decisions(Event-Driven Ansible) → Rulebook Activations. Confirm EDA(Event-Driven Ansible) picked up the event.
+
+image::eda_trigger_capture.png[link="_images/eda_trigger_capture.png", window=blank]
+
+[start=27]
+27. Go to Automation Controller → Jobs. Confirm workflow execution. When the workflow completes you will see a green ✅ Success.
+
+image::workflow_triggered_jobs.png[link="_images/workflow_triggered_jobs.png", window=blank]
+
+
+[start=28]
+28. Go to Templates and you should be able to see a new job template called "🧠 Lightspeed Remediation Playbook Generator" generated. This step also creates a blank Workflow Job Template called "Remediation Workflow" that will be used in next challenge.
+
+== Final Checks & Observations
+
+Before you move on to the remediation phase, take a moment to explore the **Mattermost Town Square** channel.
+
+Here’s what to look for:
+
+- 🛑 *HTTPD Error Logs*: These logs were automatically collected from the webserver.
+- 🧠 *AI Insights (RCA)*: Red Hat AI parsed the logs and generated a root cause analysis. These insights help you understand exactly **why** the failure occurred.
+
+This is what real-world AIOps looks like! Imagine this in a production setting:
+
+[quote]
+💡 A ticket appears in your ITSM tool with:
+- Attached logs
+- Root Cause Analysis (RCA)
+- A prompt ready for Lightspeed to generate the fix
+
+And all of this *before anyone has even opened the ticket*.
+
+We used **Mattermost** in this lab because it's a lightweight, open-source chat platform that’s easy to run per student. But the same flow would work with **ServiceNow**, **Jira**, or any ITSM of your choice.
+
+[quote]
+💡 Think of this as **automated ticket enrichment**. Logs and RCA can be pre-attached to incidents or alerts, helping teams respond faster and more effectively.
+
+link:_images/mattermost_logs_and_rca_placeholder.png[image:mattermost_logs_and_rca_placeholder.png[Mattermost logs and RCA message preview], window=_blank]
+
+🎯 In short: You now have an intelligent incident response pipeline that goes from *failure detection* to *context* to *fix suggestion* — powered by Red Hat AI and Ansible Automation Platform.
+
+== Summary
+
+You created a workflow that:
+
+* Uses logs for root cause analysis via Red Hat AI
+
+* Notifies Mattermost
+
+* Prepares a Lightspeed prompt for automated playbook generation
+
+In the next step, we’ll use that prompt to fix Apache automatically!
 
 == Complete
+You have completed this module. Move forward to the next one to use the created templates.
 
-Click the link below to continue to **Module 3: Splunk** and begin Part 2.
+ifeval::["{run_e2e_load_test}" == "true"]
+=====
+.End-to-End Validation (RHDP Only) ✅
+[%collapsible]
+====
+++++
+<div class="solve-button-placeholder" data-module="module-00"></div>
+++++
+++++
+<div class="validate-button-placeholder" data-module="module-00"></div>
+++++
+====
+=====
+endif::[]

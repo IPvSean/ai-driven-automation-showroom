@@ -1,122 +1,281 @@
-= Section 4 - Event Driven Ansible
+= Section 2.1 - Splunk for Network Observability
 
-What is Event-Driven Ansible?
+[quote]
+**Part 2: AIOps with Network Automation** - Welcome to Part 2! In Part 1, you learned how Red Hat AI and Ansible Lightspeed work together to create self-healing infrastructure for Apache services. Now you'll apply those same AIOps concepts to **network infrastructure**, using Splunk for observability, Event-Driven Ansible for automation triggers, and Ansible Lightspeed code assistant to generate network remediation playbooks automatically.
 
-Event-Driven Ansible (EDA) is an automation capability that listens for events in your IT environment—like system alerts, security warnings, or network issues—and automatically triggers predefined actions in response. Instead of running tasks on a schedule, EDA uses "if-this-then-that" logic defined in Ansible Rulebooks to react to situations in real time.
+== Learning Objectives
 
-How does EDA create a feedback loop (Observe, Evaluate, Respond)?
+After completing this module, you will be able to:
 
-EDA works by creating a continuous, automated feedback loop that mirrors the Observe-Evaluate-Respond model:
+* Configure Splunk data inputs to receive network syslog messages
+* Create Splunk alerts for OSPF neighbor state changes
+* Set up webhook integration between Splunk and Event-Driven Ansible
+* Configure Cisco routers to forward syslog messages to Splunk
+* Verify network observability data flow from routers to Splunk
 
-image::eda.png[EDA, 150%, link="_images/eda.png", window=blank]
+== What is Splunk?
 
-*Observe*: It constantly listens to event sources like monitoring tools (e.g., Prometheus, Datadog) or security systems for notifications about the state of your infrastructure.
+In this lab environment, we use Splunk to send events into Ansible Automation Platform using Event-Driven Ansible. Splunk collects and indexes log data from network sources in real time, enabling fast and flexible searching and analysis. Based on a Splunk search for OSPF-related events, we configure a Splunk alert that sends a webhook to Event-Driven Ansible to trigger automation.
 
-*Evaluate*: When an event is received, an Ansible Rulebook instantly evaluates it against a set of rules to determine what needs to be done.
+Think of Splunk as an observability tool.
 
-*Respond*: Based on the decision, it automatically executes an action, such as running an Ansible Playbook to fix the problem, update a system, or send a notification.
+[quote]
+Observability tools, such as Splunk, Prometheus, Grafana, Dynatrace, and others, provide deep insights into the health and performance of IT systems. They excel at collecting metrics, logs, and traces to identify when something is wrong. However, they traditionally rely on human intervention to interpret the alerts and take corrective action. This is where Ansible EDA steps in, creating effective integration between observability and automation.
 
-*Key Applications*: Ticket Triage & Self-Healing Networks
-This automated loop directly enables advanced IT operations:
+== Splunk Setup and Router Configuration
 
-*Automated Ticket Triage*: EDA can catch an alert, automatically run diagnostics, and then create a service desk ticket that is already enriched with all the necessary information, drastically reducing manual effort and response times.
+=== Red Hat + Splunk
+The integration between Red Hat Ansible Automation Platform and Splunk creates a two-way bridge that transforms IT operations by connecting Splunk's deep data analysis and observability with Ansible's automation capabilities. This is achieved through an add-on that allows for a seamless flow of information. 
 
-*Self-Healing Networks*: When a network monitoring tool detects a problem like a failed link, EDA can immediately trigger a playbook to re-route traffic and restore service without any human intervention, creating a resilient, self-healing system.
+image::redhat_splunk.png[Red Hat + Splunk, 100%, link="_images/redhat_splunk.png", window=blank]
 
-In short, Event-Driven Ansible connects your tools, codifies your operational knowledge into rules, and automates your response to create faster, more reliable, and more efficient IT operations.
-
-== Event Driven Ansible Setup
-
-Earlier we configured a Splunk alert, now we need to configure Event Driven Ansible to receive the splunk alert as a webhook.
-
-=== Accessing EDA
-
-EDA is accessed from AAP. Login to AAP and then go to Automation Decisions from the left menu.
-
+=== Accessing Splunk
 [cols="2,2", options="header"]
 |===
 | Component
 | Value
 
+| Splunk URL
+| link:{splunk_url}[Splunk^]
+
 | Username
-| `{controller_username}`
+| `{splunk_username}`
 
 | Password
-| `{controller_password}`
+| `{splunk_password}`
 |===
 
-Step 1: Open EDA from the AAP tab
+	1.	Open Splunk using the above details ( use incognito window if needed )
+	2.	Login using the credentials provided
 
-image::bastion2.png[AAP, link="_images/bastion2.png", window=blank]
+=== Data Inputs
+In Splunk, "data inputs" are the various methods and sources from which the platform can ingest data for indexing, searching, and analysis. They are the pathways that feed raw machine data into the Splunk system.
+  	
+Once logged into Splunk, click on the settings at the top of the screen and data inputs
 
-Step 2: Navigate to "Automation Decisions" and select "Rulebook Activations"
+image::data_inputs.png[Data Inputs, 250%, link="_images/data_inputs.png", window=blank]
+
+==== TCP Port 5514
+Splunk has been pre-loaded to open TCP port 5514. We simply need to add a data input to receive Cisco IOS syslogs using this port.
+
+Step 1:  Add a new TCP input
+
+
+image::tcp_1.png[Add TCP, 200%, link="_images/tcp_1.png", window=blank]
+
+Step 2: Click on "New Local TCP"
+
+image::tcp2.png[Add TCP, 200%, link="_images/tcp2.png", window=blank]
+
+Step 3: Select TCP, port 5514, and click "next" 
+
+image::tcp_3.png[Add TCP, 200%, link="_images/tcp_3.png", window=blank]
+
+Step 4: Configure the following input settings
+
+=== Input Settings
+[cols="2,2", options="header"]
+|===
+| Component
+| Value
+
+| Source Type
+| cisco:ios
+
+| App Context
+| Cisco Networks (cisco:ios)
+
+| Host 
+| IP
+|===
+
+image::tcp_4.png[Add TCP, 100%, link="_images/tcp_4.png", window=blank]
+
+Step 5: Validate your configuration and submit
+
+image::tcp_5.png[Add TCP, 150%, link="_images/tcp_5.png", window=blank]
+
+=== Cisco Routers 
+
+This lab includes two Cisco Cat8000v routers. Both routers use interface tunnel0 for the OPSF connection. 
+
+==== Router setup playbook
+This job template, "Network-Router-Setup," automates the initial configuration of network routers.
+
+In addition to establishing OSPF routing, this playbook now configures the target device (e.g., cisco-rtr1) to send all syslog messages to Splunk over TCP port 5514 for centralized logging and monitoring.
+
+Access AAP and run the job-template
+
+image::router_setup.png[Router Setup, 150%, link="_images/router_setup.png", window=blank]
+
+=== Verify Syslogs
+Step 1: After the Cisco router setup completes, return to splunk and click on the Cisco Networks App
+
+image::cisco_networks.png[Cisco networks, 150%, link="_images/cisco_networks.png", window=blank]
+
+Step 2: Enter the routing dashboard
+
+image::routing_dashboard1.png[Routing Dash, 150%, link="_images/routing_dashboard1.png", window=blank]
+
+Step 3: Verify that there is an entry of an OSPF event with a full adjacency 
+
+image::routing_dashboard2.png[Routing Dash, 250%, link="_images/routing_dashboard2.png", window=blank]
+
+=== Configure an Alert
+In splunk we can create an alert from a search. A Splunk search is when you manually run a query to find and analyze information in your data.
+
+An alert is simply that search saved to run automatically. When the search results meet a trigger condition you set (like `%OSPF-5-ADJCHG: Process 1, Nbr 192.168.2.2 on Tunnel0 from FULL to DOWN`), Splunk automatically performs an action, such as sending a webhook to EDA.
+
+Step 1: Access the Splunk search field
+
+image::search1.png[Search, 150%, link="_images/search1.png", window=blank]
 
 [quote]
-____
-The EDA controller has been pre-configured with the following:
+**Note:** You will return to this browser tab after completing the next step
 
-* **Project**: `ai-eda` - syncs from `https://github.com/ansible-tmm/aiops-summitlab.git`
-* **Rulebook Activation**: `OSPF Neighbor` - runs the `ospf.yml` rulebook
-* **Webhook Listener**: Listening on port 5000 for Splunk alerts
+Step 2: Create an OPSF neighbor down event
+Access cisco-rtr1 from the bastion console to shut down interface tunnel0
 
-These components were automatically created during lab provisioning. You just need to verify they're running correctly.
-____
-
-Step 3: Verify the Rulebook Activation is Running
-
-Look for the **OSPF Neighbor** rulebook activation and confirm it shows a "Running" status.
-
-image::rulebook_validate.png[rulebook validate, 150%, link="_images/rulebook_validate.png", window=blank]
-
-Step 4: Review the Rulebook `ospf.yml`
-
-To view the rulebook content, click on the **OSPF Neighbor** rulebook activation name, then navigate to the **Details** tab to see the rulebook source code.
+image::bastion.png[bastion, 150%, link="_images/bastion.png", window=blank]
 
 [quote]
-💡 **Tip:** You can also view the complete rulebook source code in the GitHub repository at https://github.com/ansible-tmm/aiops-summitlab/blob/main/rulebooks/ospf.yml[github.com/ansible-tmm/aiops-summitlab/rulebooks/ospf.yml^]. All playbooks and rulebooks used in this lab are available there.
+💡 *Lab Credentials*: The SSH password `ansible123!` is provided for this lab environment only. In production environments, always use SSH keys or vault-encrypted credentials instead of plaintext passwords.
 
-The rulebook should contain the following configuration:
+* SSH password=`ansible123!`
+* SSH into cisco-rtr1 and add the following commands
 
-[source, YAML]
+[source, BASH]
 ----
----
-- name: "Listen for OSPF neighbor events on a webhook"
-  hosts: all
-
-  sources:
-    - name: "Webhook listener for OSPF events"
-      ansible.eda.webhook:
-        host: 0.0.0.0
-        port: 5000
-
-  rules:
-    - name: "Process OSPF neighbor event from webhook"
-      condition: event.payload.search_name == 'ospf-neighbor'
-      actions:
-        - debug:
-            msg: |
-              ✅ OSPF Webhook Received!
-              Search Name: {{ event.payload.search_name }}
-              Triggering workflow...
-
-        - run_workflow_template:
-            name: "Network-AIOps-Workflow"
-            organization: "Default"
-            job_args:
-              extra_vars:
-                webhook_payload: "{{ event.payload }}"
+ssh admin@cisco-rtr1
+config t
+int tu 0
+shut
 ----
-This Event-Driven Ansible rulebook uses a webhook source plugin to listen for events on TCP port 5000. Its rule is configured to trigger an activation only when an incoming event payload contains the exact key-value pair of 'search_name': 'ospf-neighbor', which corresponds to the Splunk event configuration from the previous module. When this condition is met, the primary action is to launch the Network-AIOps-Workflow in the AAP controller. The entire webhook payload is passed to the workflow as an extra variable named webhook_payload, making the event data available for subsequent automation steps.
+
+Step 3: Return to the Splunk search
+
+paste in the following line and search: 
+
+[source, BASH]
+----
+ %OSPF-5-ADJCHG: Process 1, Nbr 192.168.2.2 on Tunnel0 from FULL to DOWN
+----
+
+image::search2.png[Search, 150%, link="_images/search2.png", window=blank]
+image::search-3.png[Search, 150%, link="_images/search-3.png", window=blank]
+
+
+Step 4: Save as an Alert (ospf-neighbor)
+
+image::save_as_alert.png[Save As, 150%, link="_images/save_as_alert.png", window=blank]
+
+Complete the pop-up screen for save as an alert
+
+=== Alert Settings
+Configure the alert with the following settings:
+
+[cols="2,2", options="header"]
+|===
+| Setting
+| Value
+
+| Title
+| ospf-neighbor
+
+| Permissions
+| Shared in App
+
+| Alert type
+| Real-time
+
+| Add Actions (first)
+| Add to Triggered Alerts
+
+| Add Actions (second)
+| Webhook
+
+| Webhook URL
+| `{eda_webhook_url}`
+|===
+
+[quote]
+💡 **Important**: When configuring the Webhook action, use the `{eda_webhook_url}` variable shown above. The screenshot may show `controller.example.com` but you should use the EDA webhook URL specific to your lab environment.
+
+image::save_as_alert2.png[Save As, 100%, link="_images/save_as_alert2.png", window=blank]
+
+=== Event Driven Ansible Addon (Reference Only)
+For this lab environment we are using a simple webhook. However, for a more secure webhook, Splunk offers the Ansible EDA addon to integrate with EDA event streams. EDA event streams allow for token based authentication as well as storing a history of events. 
+
+[quote]
+**Note:** Do not actually configure, this section is for reference only. The steps below are apart of the reference to set up EDA event streams. 
+
+Step 1: Access the Ansible addon (REFERENCE ONLY)
+
+From the Splunk Apps menu, navigate to the Event-Driven Ansible app.
+
+image::eda_addon.png[Add on, 100%, link="_images/eda_addon.png", window=blank]
+
+Step 2: Create a webhook to EDA event-stream configuration (REFERENCE ONLY)
+
+Click on **Configuration** and then **Event Streams**. Create a new event stream with the following details:
+
+* **Name**: ospf-eda-stream
+* **EDA Controller URL**: Your EDA controller URL
+* **Token**: Authentication token from EDA
+* **Verify SSL**: Depends on your environment (typically disabled for lab environments)
+
+image::example_eventstream.png[example, 150%, link="_images/example_eventstream.png", window=blank]
+
+Step 3: Return to Edit Alert (REFERENCE ONLY)
+
+Navigate back to your alert configuration by going to **Settings** > **Searches, reports, and alerts**, then click on your `ospf-neighbor` alert to edit it.
+
+image::return_edit_alert.png[return, 100%, link="_images/return_edit_alert.png", window=blank]
+
+=== Router State (Returning to the Lab)
+Here we need to return the router's OPSF neighbor to a steady state.
+
+Step 1: Return the OPSF neighbor to a full adjacency
+
+Access cisco-rtr1 from the bastion console to no shut interface tunnel0
+
+image::bastion.png[bastion, 150%, link="_images/bastion.png", window=blank]
+
+[quote]
+💡 *Lab Credentials*: The SSH password `ansible123!` is provided for this lab environment only. In production environments, always use SSH keys or vault-encrypted credentials instead of plaintext passwords.
+
+* SSH password=`ansible123!`
+* SSH into cisco-rtr1 and add the following commands
+
+[source, BASH]
+----
+ssh admin@cisco-rtr1
+config t
+int tu 0
+no shut
+----
 
 == Summary
 
-At this point, you've verified that the EDA rulebook activation is running and listening for OSPF webhooks from Splunk. The **OSPF Neighbor** rulebook activation is now waiting to receive OSPF down messages from Splunk alerts.
+The Cisco router and Splunk are configured to observe and create alerts for OSPF neighbor down states. 
 
-image::rulebook_history.png[history, 100%, link="_images/rulebook_history.png", window=blank]
 
-[quote]
-The rulebook activation history will show events as they are received from Splunk. In the next module, you'll trigger an OSPF neighbor down event and see how the entire closed-loop automation workflow responds automatically.
 
 == Complete
 
-You have verified the EDA controller configuration. In the next section, you'll see the complete AI-driven network automation workflow in action - from OSPF failure detection in Splunk, through Event-Driven Ansible triggering, to Lightspeed AI generating the remediation playbook automatically.
+You have completed this module. Move forward to the next section to configure the Ansible EDA controller.
+
+ifeval::["{run_e2e_load_test}" == "true"]
+=====
+.End-to-End Validation (RHDP Only) ✅
+[%collapsible]
+====
+++++
+<div class="solve-button-placeholder" data-module="module-02"></div>
+++++
+++++
+<div class="validate-button-placeholder" data-module="module-02"></div>
+++++
+====
+=====
+endif::[]

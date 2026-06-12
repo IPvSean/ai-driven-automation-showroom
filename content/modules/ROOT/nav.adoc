@@ -1,10 +1,16 @@
-* Part 1: AIOps with Apache Remediation
-** xref:module-00.adoc[1. Log Enrichment and Prompt Generation Workflow]
-** xref:module-01.adoc[2. Remediation Workflow]
-* Part 2: AIOps with Network Automation
-** xref:module-02.adoc[3. Splunk]
-** xref:module-03.adoc[4. Event Driven Ansible - Splunk Webhook Setup]
-** xref:module-04.adoc[5. Network Workflow]
-* Part 3: AIOps with Windows Automation
-** xref:module-06.adoc[6. Windows Events and AI-Driven Ticketing]
-* xref:module-05.adoc[7. Summary and Call to Actions]
+* Section 1: AIOps with Apache Remediation
+** xref:module-01.adoc[1.1 Log Enrichment and Prompt Generation Workflow]
+** xref:module-02.adoc[1.2 Remediation Workflow]
+* Section 2: AIOps with Network Automation
+** xref:module-03.adoc[2.1 Splunk for Network Observability]
+** xref:module-04.adoc[2.2 Event Driven Ansible: Splunk Webhook Setup]
+** xref:module-05.adoc[2.3 Network Workflow]
+* Section 3: AIOps with Windows Automation
+** xref:module-06.adoc[3. Windows Events and AI-Driven Ticketing]
+* Section 4: Red Hat Lightspeed and Agentic IDE Workflow
+** xref:module-07.adoc[4. Red Hat Lightspeed: CVE and Advisor Remediation]
+* Section 5: Autonomous AIOps with Self-Healing RHEL
+** xref:module-08.adoc[5. Autonomous AIOps: Self-Healing RHEL with Splunk]
+* Section 6: AI-Driven Incident Response
+** xref:module-09.adoc[6. AI Agents and AAP via MCP]
+* xref:module-10.adoc[Summary and Call to Actions]

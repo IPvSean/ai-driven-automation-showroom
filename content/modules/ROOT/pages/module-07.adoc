@@ -1,0 +1,839 @@
+= Section 4 - Red Hat Lightspeed: CVE and Advisor Remediation
+:navtitle: Red Hat Lightspeed: CVE and Advisor Remediation
+
+== Agenda
+
+[cols="1,3", options="header"]
+|===
+| Section | Description
+
+| <<Logging in to Red Hat Lightspeed>>
+| Sign in to console.redhat.com and explore the dashboard
+
+| <<Register RHEL Nodes to Red Hat Lightspeed>>
+| Use an AAP Job Template to register and tag your RHEL nodes
+
+| <<Exercise 1: Executive PDF Report>>
+| Generate a vulnerability report from the Lightspeed dashboard
+
+| <<Exercise 2: Advisor Remediation (Manual)>>
+| Download an Advisor playbook, review it, and run it through AAP
+
+| <<Exercise 3: CVE Remediation (Agentic via MCP)>>
+| Use Claude Code + MCP to find and fix a CVE end-to-end
+
+| <<Exercise 4: HTTPD Configuration Fix (Automation code assistant)>>
+| Generate an HTTPD fix with Google Gemini in the IDE
+
+| <<Exercise 5: RHEL System Roles (Pre-Built)>>
+| Apply a pre-built System Role for NTP configuration
+
+|===
+
+== Objective
+
+*Estimated time: 30-40 minutes*
+
+In this section, you will use **Red Hat Lightspeed** (on https://console.redhat.com[console.redhat.com^]) to identify vulnerabilities and misconfigurations across your RHEL fleet, generate remediation playbooks, review them in a developer IDE, push them to Git, and create Job Templates in Ansible Automation Platform. This is the foundation for both human-guided and fully autonomous remediation workflows in the subsequent sections.
+
+After completing this section, you will be able to:
+
+* 🔍 **Identify and report** — Use Red Hat Lightspeed to discover CVEs and Advisor recommendations across your RHEL fleet, and generate executive vulnerability reports
+* 🤖 **Generate and remediate** — Create remediation playbooks through multiple methods: manually via the Lightspeed web UI, agentically via Claude Code + MCP, and with AI assistance from Automation code assistant
+* 🚀 **Promote to production** — Review playbooks in code-server, push them to Git, and create AAP Job Templates ready for execution
+
+[NOTE]
+====
+**Terminology Update — Red Hat Lightspeed**
+
+Red Hat has consolidated its AI-powered services under the **Lightspeed** brand. Here is a quick reference for the new naming:
+
+[cols="2,2", options="header"]
+|===
+| Previous Name | New Name
+
+| Red Hat Insights (console.redhat.com)
+| **Red Hat Lightspeed**
+
+| Ansible Lightspeed Code Assistant (with IBM watsonx)
+| **Automation code assistant** (supports Gemini, Red Hat AI, or IBM watsonx)
+
+| Ansible Lightspeed Intelligent Assistant
+| **Automation intelligent assistant**
+|===
+
+If you have used Insights or Ansible Lightspeed before, the functionality is the same — only the branding has changed. In Labs 1-3 of this workshop, you may see references to "Ansible Lightspeed" — this is the same technology now called **Automation code assistant**.
+====
+
+== Background: Red Hat Lightspeed
+
+https://console.redhat.com[Red Hat Lightspeed^] (formerly Red Hat Insights) is a managed service included with every RHEL subscription. It continuously analyzes your connected RHEL systems and provides:
+
+* **Vulnerability reports** — identifies CVEs affecting your systems, with severity ratings and remediation guidance
+* **Advisor recommendations** — proactive suggestions from Red Hat Support to improve stability, performance, and security (e.g., "SELinux is in permissive mode" or "system would not survive a reboot due to a bad policy")
+* **Remediation playbooks** — auto-generated Ansible Playbooks that fix identified issues, ready to download and execute
+
+[quote]
+💡 **Advisor vs CVE**: Think of CVEs as *reactive* — patching known vulnerabilities. Advisor recommendations are *proactive* — fixing misconfigurations and applying best practices before they become incidents. Both are critical for a healthy RHEL fleet.
+
+== Lab Environment
+
+=== RHEL Instances
+
+This part of the lab uses **three RHEL instances**, each dedicated to a specific use case:
+
+[cols="2,3,2", options="header"]
+|===
+| Host | Purpose | Use Case
+
+| `{rhel_node1}`
+| Apache web server (from xref:module-01.adoc[Section 1])
+| HTTPD configuration remediation
+
+| `{rhel_node2}`
+| CVE remediation target
+| Patch a known CVE
+
+| `{rhel_node3}`
+| Advisor recommendation target
+| Fix an Advisor-flagged misconfiguration
+|===
+
+[quote]
+💡 **Why three RHEL instances?** Each use case runs on its own node so that if one breaks during the exercise, the lab continues on the others. This also keeps scenarios cleanly separated for simplicity.
+
+=== Developer IDE: code-server
+
+Your lab environment includes **code-server**, which is https://code.visualstudio.com/[Visual Studio Code^] running in your browser. This gives you a full VS Code experience — editor, terminal, extensions — without installing anything locally.
+
+[cols="2,2", options="header"]
+|===
+| Component | Value
+
+| code-server URL
+| link:{ide_url}[code-server (VS Code)^]
+
+| Password
+| `{ide_password}`
+|===
+
+=== AI Agent: Claude Code
+
+Your lab environment has **Claude Code** pre-installed — Anthropic's CLI-based AI agent that runs in the terminal inside code-server. It supports MCP and connects to both the Ansible MCP server and the Red Hat Lightspeed MCP server.
+
+To launch Claude Code:
+
+1. Open a **terminal** inside code-server. Navigate to **Terminal → New Terminal** from the top menu bar.
++
+image::codeserver-new-terminal.png[Open a new terminal in code-server, link="_images/codeserver-new-terminal.png", window=blank]
++
+2. Type `claude` to start Claude Code.
+3. When prompted with the workspace trust dialog, select **1. Yes, I trust this folder** and press Enter.
++
+image::claude-code-trust-folder.png[Claude Code trust folder prompt, link="_images/claude-code-trust-folder.png", window=blank]
++
+4. The Claude Code terminal interface will appear.
++
+image::claude-code-welcome.png[Claude Code welcome screen, link="_images/claude-code-welcome.png", window=blank]
+
+[NOTE]
+====
+**MCP is pre-configured.** Claude Code is already connected to the Ansible MCP server and the Red Hat Lightspeed MCP server in your lab environment. You do not need to configure anything.
+====
+
+[IMPORTANT]
+====
+**Model availability.** This lab environment provides access to **Claude Sonnet 4.6** (`claude-sonnet-4-6`). If Claude Code fails to respond or shows a model error, switch to the correct model:
+
+* **CLI**: Type `/model` and select `claude-sonnet-4-6`
+* **VS Code extension**: Click the model name in the status bar or use `Ctrl+Shift+P` -> "Claude Code: Set Model"
+====
+
+image::claude-code-mcp-servers.png[Claude Code MCP servers, link="_images/claude-code-mcp-servers.png", window=blank]
+
+[NOTE]
+====
+**OpenCode** is also installed in this environment but has not been tested with this lab. If you want to experiment with it, you can launch it by typing `opencode` in the terminal. It connects to the same MCP servers, but **Claude Code is the recommended and tested agent** for all exercises.
+====
+
+=== Red Hat Lightspeed (console.redhat.com)
+
+[cols="2,2", options="header"]
+|===
+| Component | Value
+
+| Red Hat Lightspeed URL
+| link:https://console.redhat.com[Red Hat Lightspeed (console.redhat.com)^]
+
+| Username
+| `{insights_username}`
+
+| Password
+| `{insights_password}`
+|===
+
+== Logging in to Red Hat Lightspeed
+
+[IMPORTANT]
+====
+**Manual login required.** You must log in to https://console.redhat.com[console.redhat.com^] with the credentials above. This is a shared Red Hat account that has your lab RHEL systems already registered. Open the link in a new browser tab and sign in before proceeding.
+====
+
+1. Open https://console.redhat.com[console.redhat.com^] in a new browser tab.
+2. Log in using the **Username** and **Password** shown in the table above.
+3. Click the **Red Hat Hybrid Cloud Console** dropdown (top-left) and select **Red Hat Enterprise Linux**.
+
+image::console-rhel-platform.png[Select Red Hat Enterprise Linux, link="_images/console-rhel-platform.png", window=blank]
+
+**Keep this browser tab open** — you will come back to it shortly. Right now the dashboards are empty because your RHEL nodes have not been registered yet. In the next step, we will use Ansible Automation Platform to register them so they appear here.
+
+== Accessing Ansible Automation Platform
+
+[cols="2,2", options="header"]
+|===
+| Component
+| Value
+
+| AAP URL
+| AAP is preloaded in the lab interface. Click to open in a full tab: link:{controller_url}[AAP Web UI^]
+
+| Username
+| `{controller_username}`
+
+| Password
+| `{controller_password}`
+|===
+
+	1.	Open AAP using the above details or click the **AAP** tab in your lab interface
+	2.	Login using the credentials provided
+
+== RHEL Node Registration (Already Complete)
+
+Your RHEL nodes have already been registered with Red Hat Lightspeed (formerly Red Hat Insights) during lab provisioning. The **Register with Red Hat Lightspeed** job template ran automatically when your environment was set up, connecting all three nodes (`node1`, `node2`, `node3`) to https://console.redhat.com[console.redhat.com^].
+
+[NOTE]
+====
+**How was this done?** The lab provisioning process ran the **Register with Red Hat Lightspeed** job template against all RHEL nodes. This template uses `rhc connect` to register each node with the Red Hat CDN and Insights service, and tags them with your lab's unique sandbox identifier for easy filtering. In a production environment, you would use the same approach to register hosts at scale using Ansible Automation Platform.
+====
+
+=== Finding Your Nodes in Red Hat Lightspeed
+
+To verify registration and locate your nodes:
+
+1. Return to your https://console.redhat.com[console.redhat.com^] browser tab.
+2. Navigate to **Inventory** -> **Systems**.
+3. You should see your three RHEL nodes listed. Use **Filter by tags** with your lab's sandbox ID if needed to narrow the list.
+
+image::console-inventory-tags-filter.png[Filter systems by tag in console.redhat.com, link="_images/console-inventory-tags-filter.png", window=blank]
+
+You can also verify registration from the AAP Jobs history. Look for the **Register with Red Hat Lightspeed** job that ran during provisioning.
+
+== Generating Remediation Playbooks
+
+You will work through **five exercises** in this section. The first generates a vulnerability report, and the remaining four each produce a remediation playbook:
+
+[cols="1,2,2,2", options="header"]
+|===
+| # | Exercise | Description | Method
+
+| 1
+| Executive PDF Report
+| Generate a PDF report summarizing CVEs affecting your environment
+| **Manual** — Lightspeed web UI
+
+| 2
+| Advisor Remediation
+| Fixes an Advisor-flagged misconfiguration on `{rhel_node3}`
+| **Manual** — Lightspeed web UI
+
+| 3
+| CVE Remediation
+| Patches a specific CVE identified by Lightspeed on `{rhel_node2}`
+| **Agentic** — Claude Code + MCP
+
+| 4
+| HTTPD Configuration Fix
+| Remediates the Apache configuration issue using Automation code assistant
+| **AI-generated** — Automation code assistant (Gemini)
+
+| 5
+| System Roles Playbook
+| Uses RHEL System Roles for NTP configuration
+| **Pre-built** — provided in the lab
+|===
+
+== Exercise 1: Executive PDF Report
+
+Red Hat Lightspeed can generate PDF reports summarizing CVEs affecting your environment. You will generate an Executive Report to understand the vulnerability landscape before creating remediation playbooks.
+
+1. In the console.redhat.com browser tab you already have open, expand **Security** → **Vulnerability** → **Reports** in the left navigation.
+
+image::console-vulnerability-reports.png[Vulnerability Reports navigation, link="_images/console-vulnerability-reports.png", window=blank]
+
+[start=2]
+2. Click **Executive Report** to generate the report.
+3. Download and review the PDF — it summarizes the CVEs affecting your connected RHEL systems, organized by severity.
+
+[quote]
+💡 **Why start with a report?** The Executive Report gives you a high-level view of your environment's vulnerability posture. This context helps you prioritize which CVEs and Advisor recommendations to remediate first in the exercises that follow.
+
+[IMPORTANT]
+====
+**Our goal:** Take a moment to look at the Advisor recommendations and CVEs listed in your Lightspeed dashboard. Note how many issues are flagged across your three RHEL nodes. In the next two exercises, we are going to fix these issues — first an Advisor recommendation (Exercise 2), then a CVE (Exercise 3). By the end, you should see the remediated issues disappear from the dashboard. The nodes we _didn't_ fix will still show the issue, proving the remediation actually worked.
+====
+
+== Exercise 2: Advisor Remediation (Manual)
+
+The Advisor section of Red Hat Lightspeed provides proactive recommendations — misconfigurations, compliance issues, and best practices flagged by Red Hat Support.
+
+
+=== Step 1: Navigate to Advisor
+
+1. In the console.redhat.com browser tab you already have open, navigate to **Operations** → **Advisor** → **Recommendations**.
+
+image::console-advisor-nav.png[Advisor Recommendations navigation, link="_images/console-advisor-nav.png", window=blank]
+
+[start=2]
+2. Find a recommendation affecting `{rhel_node3}`. We recommend selecting **Decreased security: OpenSSH LoginGraceTime settings**.
+
+image::console-advisor-openssh-recommendation.png[Advisor OpenSSH LoginGraceTime recommendation, link="_images/console-advisor-openssh-recommendation.png", window=blank]
+
+=== Step 2: Generate the remediation playbook
+
+1. Select `{rhel_node3}` from the **Affected Systems** list by clicking the checkbox next to it.
+
+image::console-advisor-select-system.png[Select node3 from affected systems, link="_images/console-advisor-select-system.png", window=blank]
+
+[start=2]
+2. Click the blue **Plan remediation** button.
+
+3. In the **Plan a remediation** dialog, enter a plan name (e.g., `etx-advisor-plan`) and click the blue **Create plan** button.
+
+image::console-advisor-plan-remediation.png[Plan a remediation dialog, link="_images/console-advisor-plan-remediation.png", window=blank]
+
+[start=4]
+4. The screen will switch to the created remediation plan. Click the **Download** button to download the playbook to your workstation.
+
+image::console-advisor-remediation-plan-created.png[Remediation plan created and ready to download, link="_images/console-advisor-remediation-plan-created.png", window=blank]
+
+Once downloaded, you can view the Ansible Playbook on your workstation. Below is a snippet of the generated playbook:
+
+image::console-advisor-playbook-snippet.png[Advisor remediation playbook snippet, link="_images/console-advisor-playbook-snippet.png", window=blank]
+
+NOTE: This is only a snippet — the full playbook may contain additional tasks and configuration depending on the recommendation.
+
+=== Step 3: Upload the playbook to code-server
+
+The playbook you downloaded in the previous step is on your **local laptop/workstation**. You need to upload it to the **code-server** instance running in your lab environment.
+
+1. In your code-server browser tab, right-click the file explorer panel and select **Upload Files...** (or use **File → Upload Files...**).
+2. Navigate to your local Downloads folder and select the playbook you just downloaded.
+3. Save it as `remediation.yml` in the `lightspeed_playbooks` directory (`/home/lab-user/lightspeed_playbooks/`). This is the directory synced with Git.
+
+=== Step 4: Fix the hostname to match your AAP inventory
+
+1. Open `lightspeed_playbooks/remediation.yml` and find the `hosts:` field — Lightspeed generates the full DNS name (e.g. `node3.lab.sandbox-xxxx-ocp4-cluster.svc.cluster.local`).
+2. Change it to just `node3` to match the host name in your AAP inventory.
+
+=== Step 5: Push the playbook to Gitea
+
+1. Ask Claude Code:
+
+[source]
+----
+push remediation.yml to git
+----
+
+Claude will commit and push to your `lightspeed_playbooks` repo automatically.
+
+=== Step 6: Sync the AAP project
+
+1. Ask Claude Code:
+
+[source]
+----
+sync the AAP project
+----
+
+This pulls the latest playbook from Gitea into AAP's **Lightspeed-Playbooks** project.
+
+=== Step 7: Create the Job Template
+
+1. Ask Claude Code:
+
+[source]
+----
+Create a Job Template called "Remediation - SSH LoginGraceTime" that uses
+the remediation.yml playbook from the Lightspeed-Playbooks project.
+It should target node3.
+----
+
+Claude Code will use the Ansible MCP server to create the Job Template in AAP.
+
+=== Step 8: Run the Job Template
+
+1. In AAP, navigate to **Templates** → **Remediation - SSH LoginGraceTime**.
+2. Click **Launch** and verify the job completes successfully.
+
+image::aap-advisor-remediation-success.png[Advisor remediation job completed successfully, link="_images/aap-advisor-remediation-success.png", window=blank]
+
+=== Verify the remediation
+
+Go back to **Operations** → **Advisor** → **Recommendations** in console.redhat.com and revisit the **Decreased security: OpenSSH LoginGraceTime settings** recommendation. You should see that `{rhel_node3}` is no longer listed as an affected system — the remediation worked. The other nodes that were not remediated will still show the issue.
+
+You can also verify using Claude Code by asking the Lightspeed MCP server directly:
+
+[source]
+----
+Check if the OpenSSH LoginGraceTime Advisor recommendation still
+affects my systems with the k5txp tag.
+----
+
+[quote]
+💡 **Advisor recommendations** are based on Red Hat's deep expertise supporting thousands of enterprise RHEL deployments. These are not theoretical — they flag real misconfigurations that Red Hat Support has seen cause outages in production.
+
+== Exercise 3: CVE Remediation (Agentic via MCP)
+
+This exercise demonstrates the **fully agentic approach**: you will use Claude Code to discover CVEs and download a remediation playbook entirely through the MCP interface, without ever opening the Lightspeed web UI manually.
+
+=== Step 1: Launch Claude Code
+
+1. Open a terminal in code-server. Navigate to **Terminal → New Terminal** from the top menu bar.
++
+image::codeserver-new-terminal.png[Open a new terminal in code-server, link="_images/codeserver-new-terminal.png", window=blank]
++
+2. Type `claude` to start Claude Code.
+3. When prompted with the workspace trust dialog, select **1. Yes, I trust this folder** and press Enter.
++
+image::claude-code-trust-folder.png[Claude Code trust folder prompt, link="_images/claude-code-trust-folder.png", window=blank]
++
+4. The Claude Code terminal interface will appear.
++
+image::claude-code-welcome.png[Claude Code welcome screen, link="_images/claude-code-welcome.png", window=blank]
+
+=== Step 2: Ask Claude Code about CVEs
+
+In the Claude Code chat, type a prompt like the one below. Replace `k5txp` with your unique tag from the registration step:
+
+[source]
+----
+What CVEs are affecting my RHEL systems? Show me the critical and important
+ones that have remediation available. Only show hosts with the k5txp tag.
+----
+
+Claude Code will use the **Red Hat Lightspeed MCP server** to:
+
+* Query your connected RHEL systems filtered by your unique tag
+* List CVEs with severity ratings
+* Identify which CVEs have remediation playbooks available
+
+Claude Code will prompt you for permission each time it wants to use an MCP tool. Select **1. Yes** or **2. Yes, and don't ask again** to allow it to proceed. You may be prompted multiple times depending on how Claude Code chooses to solve the request — it may use multiple different tools.
+
+image::claude-code-mcp-permission.png[Claude Code MCP tool permission prompt, link="_images/claude-code-mcp-permission.png", window=blank]
+
+At the end, you will get output similar to the following:
+
+image::claude-code-cve-results.png[Claude Code CVE query results, link="_images/claude-code-cve-results.png", window=blank]
+
+=== Step 3: Choose a CVE to remediate
+
+From the results, select a CVE to fix. We recommend **CVE-2025-31277** — _A flaw was found in WebKitGTK. Processing malicious web content can cause memory corruption due to improper memory handling._
+
+NOTE: You will reference this specific CVE in the following steps. If your environment shows a different critical CVE with an available advisory, you can choose that one instead — just adjust the prompts accordingly.
+
+=== Step 4: Download the remediation playbook
+
+Ask Claude Code to download the playbook for the specific CVE:
+
+[source]
+----
+Download the remediation playbook for CVE-2025-31277. Save it as
+cve-remediation.yml in the lightspeed_playbooks directory.
+----
+
+Claude Code will use the Lightspeed MCP server to fetch the remediation playbook and save it to the `lightspeed_playbooks` directory.
+
+=== Step 5: Review the playbook and fix the hostname
+
+The downloaded playbook will automatically be available in the code-server file explorer. Open it and review the YAML content to confirm it addresses CVE-2025-31277.
+
+Just like the Advisor exercise, the Lightspeed playbook will use the full DNS name in the `hosts:` field (e.g. `node2.lab.sandbox-xxxx-ocp4-cluster.svc.cluster.local`). Change it to just `node2` so it matches your AAP inventory and only runs on that one node.
+
+=== Step 6: Push to Git
+
+1. Ask Claude Code:
+
+[source]
+----
+push cve-remediation.yml to git
+----
+
+Claude will commit and push to your `lightspeed_playbooks` repo automatically.
+
+=== Step 7: Sync the AAP project and create a Job Template
+
+1. Ask Claude Code:
+
+[source]
+----
+Sync the AAP project, then create a Job Template called
+"CVE Remediation - CVE-2025-31277" that uses the cve-remediation.yml
+playbook from the Lightspeed-Playbooks project. It should target node2.
+----
+
+image::aap-cve-job-template.png[CVE Remediation Job Template in AAP, link="_images/aap-cve-job-template.png", window=blank]
+
+=== Step 8: Run the Job Template
+
+1. Ask Claude Code:
+
+[source]
+----
+Go ahead and launch it
+----
+
+Claude Code will launch the job and monitor it until completion.
+
+image::claude-code-cve-job-success.png[Claude Code CVE remediation job completed successfully, link="_images/claude-code-cve-job-success.png", window=blank]
+
+=== Verify the remediation
+
+Go back to **Security** → **Vulnerability** → **CVEs** in console.redhat.com and check the CVE you just remediated. You should see that `{rhel_node2}` is no longer listed as affected. The nodes that were not targeted will still show the vulnerability.
+
+image::console-cve-remediation-verified.png[CVE remediation verified in console, link="_images/console-cve-remediation-verified.png", window=blank]
+
+You can also ask Claude Code to verify without leaving the terminal:
+
+[source]
+----
+Check if CVE-2025-31277 still affects my node2
+----
+
+image::claude-code-cve-verified.png[Claude Code confirms CVE remediation, link="_images/claude-code-cve-verified.png", window=blank]
+
+[quote]
+💡 **This was entirely agentic.** You never opened a web browser, navigated dashboards, or clicked download buttons. Claude Code used MCP to query Lightspeed, found the CVE, fetched the playbook, pushed it to Git, created a Job Template, and ran it — all through a conversation in the terminal.
+
+== Exercise 4: HTTPD Configuration Fix (Automation code assistant)
+
+For this playbook, you will use **Automation code assistant** — Red Hat's AI-powered code generation tool integrated into your IDE — to generate a playbook that fixes the Apache configuration issue from Section 1.
+
+[quote]
+💡 **IDE-first workflow**: In Labs 1-3, playbooks were generated programmatically via API calls and pushed to Git without human review. Here, you are working in the IDE as a developer would — using AI assistance to write the playbook, reviewing the output, and making any adjustments before committing. This is the modern developer workflow for infrastructure as code.
+
+[NOTE]
+====
+**What is Automation code assistant?**
+
+Automation code assistant (previously called Ansible Lightspeed Code Assistant) is an AI-powered tool that generates Ansible Playbook content from natural language descriptions. In Labs 1-3 of this workshop, it was called via API to auto-generate playbooks. In this section, you use it directly in your IDE as a developer tool.
+
+**Flexible AI backends**: Automation code assistant is no longer tied to a single AI provider. Your lab environment is configured with **Google Gemini** as the backend, but it also supports **Red Hat AI** and **IBM watsonx**. This gives organizations the flexibility to choose the AI provider that best fits their requirements.
+====
+
+=== Step 1: Configure Automation code assistant with Google Gemini
+
+Before generating a playbook, you need to configure the Automation code assistant extension with the Google Gemini LLM provider.
+
+1. In code-server, click the **Ansible "A" icon** in the left sidebar to open the Ansible Development Tools panel.
+
+image::codeserver-ansible-plugin.png[Ansible Development Tools plugin, link="_images/codeserver-ansible-plugin.png", window=blank]
+
+[start=2]
+2. Under **GENERATIVE AI**, click **LLM Provider : Google Gemini**.
+3. Fill in the following values:
++
+[cols="2,3", options="header"]
+|===
+| Field | Value
+
+| API Endpoint
+| `http://localhost:4011`
+
+| API Key
+| `dummy`
+
+| Model Name
+| `gemini-2.5-pro`
+|===
+
+image::codeserver-gemini-configured.png[Google Gemini configured for Automation code assistant, link="_images/codeserver-gemini-configured.png", window=blank]
+
+[start=4]
+4. Click **Save**.
+
+=== Step 2: Generate the playbook with the wizard
+
+1. Click the **Ansible icon** in the left sidebar of code-server to open the Ansible Development Tools panel.
+
+image::codeserver-ansible-icon.png[Ansible plugin icon, link="_images/codeserver-ansible-icon.png", window=blank]
+
+[start=2]
+2. Under **GENERATIVE AI**, click **Generate Playbook**.
+
+3. In the prompt field, enter:
+
+[source]
+----
+Fix Apache httpd configuration by removing InvalidDirectiveHere and restarting the service, target node1, this needs to respond with one yaml file that we can run directly
+----
+
+[start=4]
+4. Click the blue **Analyze** button.
+5. Wait for Automation code assistant to process the request.
+6. Click the blue **Continue** button.
+
+The wizard will generate an Ansible Playbook:
+
+image::codeserver-generate-playbook-result.png[Generated playbook from Automation code assistant, link="_images/codeserver-generate-playbook-result.png", window=blank]
+
+[start=7]
+7. Click **Open editor** to load the playbook into the code-server editor.
+8. Click **File** → **Save** and save the playbook as `httpd-fix.yml` in the `lightspeed_playbooks` directory so it can be pushed to Git.
+
+=== Step 3: Push, create Job Template, and run
+
+1. Ask Claude Code to handle the full workflow:
+
+[source]
+----
+Push httpd-fix.yml to git, sync the AAP project, create a Job Template
+called "HTTPD Fix" using httpd-fix.yml from the Lightspeed-Playbooks
+project targeting node1, and then launch it.
+----
+
+Claude Code will push the playbook to Gitea, sync the AAP project, create the Job Template, and run it — all in one go.
+
+image::claude-code-httpd-fix-success.png[Claude Code HTTPD fix completed successfully, link="_images/claude-code-httpd-fix-success.png", window=blank]
+
+=== Step 4: (Optional) Verify in AAP
+
+1. Switch to the **AAP tab** in your lab interface.
+2. Navigate to **Jobs** and look for the most recent job run — you should see the **HTTPD Fix** job completed successfully.
+
+image::aap-httpd-fix-job-success.png[HTTPD Fix job success in AAP, link="_images/aap-httpd-fix-job-success.png", window=blank]
+
+=== Step 5: (Optional) Break and fix Apache again
+
+Want to try the full break-and-fix cycle yourself? You can intentionally break Apache on node1 and then use the playbook you just generated to fix it again — similar to the self-healing workflow in xref:module-01.adoc[Section 1].
+
+1. In the AAP Web UI, navigate to **Rulebook Activations**.
+2. Find the **Web App** rulebook activation and disable it (toggle it off so EDA does not auto-remediate).
+
+image::aap-rulebook-activation-running.png[Web App Rulebook Activation, link="_images/aap-rulebook-activation-running.png", window=blank]
+
+[start=3]
+3. Navigate to **Templates** and run the **Break Apache** Job Template.
+4. Once Apache is broken, run your **HTTPD Fix** Job Template to remediate it.
+
+[NOTE]
+====
+In a real-world scenario, you would most likely discover the error through **ticket enrichment** similar to Section 1 — where AI analyzes logs and tells you exactly what the issue is. Then you can use Automation code assistant to quickly create a playbook to fix it. This creates strong guardrails on generative AI: you know exactly what the issue is, and exactly how you are attempting to fix it.
+====
+
+== Exercise 5: RHEL System Roles (Pre-Built)
+
+=== What are RHEL System Roles?
+
+https://access.redhat.com/articles/3050101[RHEL System Roles^] are a collection of **officially supported Ansible roles and modules** shipped with Red Hat Enterprise Linux. They provide a stable, consistent, and version-independent interface for managing common RHEL subsystems.
+
+System Roles cover areas like:
+
+* **`rhel-system-roles.timesync`** — NTP/Chrony time synchronization configuration
+* **`rhel-system-roles.network`** — Network interface and connection management
+* **`rhel-system-roles.storage`** — Disk, partition, and filesystem management
+* **`rhel-system-roles.selinux`** — SELinux policy and mode configuration
+* **`rhel-system-roles.firewall`** — Firewall rules and zones
+* **`rhel-system-roles.crypto_policies`** — System-wide cryptographic policies
+* **`rhel-system-roles.logging`** — Rsyslog and journal configuration
+
+[quote]
+💡 **Why use System Roles?** System Roles abstract away the differences between RHEL major versions. A playbook using `rhel-system-roles.timesync` works the same on RHEL 8 and RHEL 9, even though the underlying NTP implementation may differ. This makes automation portable and future-proof.
+
+=== Example: Configuring NTP with System Roles
+
+For this exercise, a **pre-built playbook** using the `redhat.rhel_system_roles.timesync` role is already configured as a Job Template in Ansible Automation Platform called **RHEL System Roles - Timesync**. This playbook configures NTP time synchronization across your RHEL fleet.
+
+Here is the playbook content for reference:
+
+[source,yaml]
+----
+---
+- name: RHEL System Roles - Timesync
+  hosts: all
+  become: true
+  vars:
+    timesync_ntp_provider: "{{ ntp_provider | default('chrony') }}"
+    timesync_ntp_servers:
+      - hostname: "{{ ntp_server_1 | default('0.pool.ntp.org') }}"
+        pool: "{{ ntp_server_1_pool | default(true) }}"
+        iburst: "{{ ntp_server_1_iburst | default(true) }}"
+      - hostname: "{{ ntp_server_2 | default('1.pool.ntp.org') }}"
+        pool: "{{ ntp_server_2_pool | default(true) }}"
+        iburst: "{{ ntp_server_2_iburst | default(true) }}"
+  roles:
+    - redhat.rhel_system_roles.timesync
+----
+
+Source: https://github.com/ansible-tmm/aiops-summitlab/blob/feat/rhel-self-healing/playbooks/rhel_system_roles_timesync.yml[rhel_system_roles_timesync.yml on GitHub^]
+
+This playbook:
+
+* Uses the `redhat.rhel_system_roles.timesync` role — no raw module calls needed
+* Configures two NTP servers with sensible defaults and overridable survey variables
+* Works identically across RHEL 8 and RHEL 9 because System Roles abstract the underlying implementation
+
+=== Step 1: Explore the Job Template in AAP
+
+Before using the agentic workflow, take a moment to see what is already configured in AAP.
+
+1. Switch to the **AAP** tab in your lab interface.
+2. Navigate to **Automation Execution** → **Templates**.
+3. In the search/filter bar, type `time` to filter the list.
+4. Click on the **RHEL System Roles - Timesync** Job Template.
+5. Click the **Survey** tab.
+
+image::aap-timesync-survey-tab.png[Survey tab on the Timesync Job Template, link="_images/aap-timesync-survey-tab.png", window=blank]
+
+Notice that this Job Template is not just a playbook — it has a **survey** that prompts the operator for NTP provider, server hostnames, pool, and iburst settings. This is how AAP administrators create guardrails: the playbook logic is locked down, but specific parameters are exposed through a controlled form.
+
+[start=6]
+6. Click **Launch template**.
+7. When prompted for **Limit**, type `node1` and click **Next**.
+8. Review the survey form that appears:
+
+image::aap-timesync-survey-fields.png[Timesync survey fields with NTP configuration options, link="_images/aap-timesync-survey-fields.png", window=blank]
+
+You can see the default values — `0.pool.ntp.org` and `1.pool.ntp.org` — along with the NTP provider and iburst options. You are welcome to launch this manually if you'd like, but **cancel out for now** — in the next step, we will have Claude Code do this for us.
+
+[quote]
+💡 **Why does the survey matter?** Surveys are how AAP administrators define the boundaries of what an operator (or an AI agent) can change. The playbook itself is fixed and tested; only the survey variables are open for input. This means when an AI agent launches this template, it is constrained to the same guardrails as a human operator — it can only fill in the fields the administrator chose to expose.
+
+=== Step 2: Launch Claude Code
+
+1. Open a terminal in code-server. Navigate to **Terminal → New Terminal** from the top menu bar.
+2. Type `claude` to start Claude Code.
+
+=== Step 3: Configure NTP via the Agentic Workflow
+
+In the Claude Code chat, type the following prompt:
+
+[source]
+----
+configure time.google.com and time.cloudflare.com as the NTP servers for node1 using AAP
+----
+
+Claude Code will use the Ansible MCP server to find the **RHEL System Roles - Timesync** Job Template, read the survey spec to understand which parameters are required, fill in the survey variables with the requested NTP servers, and launch the job — all from a single natural language request.
+
+image::claude-code-timesync-success.png[Claude Code configures NTP via RHEL System Roles, link="_images/claude-code-timesync-success.png", window=blank]
+
+[quote]
+💡 **Notice what happened here.** You saw the survey form in AAP — the AI agent sees the exact same thing through MCP. Claude Code discovered the Job Template, read its survey definition, understood the parameters, and filled them in correctly. The administrator's guardrails are fully enforced: the AI can only supply values for the fields the survey exposes. It cannot modify the playbook, change the credentials, or bypass the inventory limit. This is how you keep AI on the rails that the administrator sets for that particular piece of automation.
+
+=== Step 4: (Optional) Explore Other Pre-Built Templates
+
+Your lab environment has several other Job Templates pre-configured in AAP. Take a few minutes to browse the **Templates** list and try launching one through Claude Code. For example, you might ask:
+
+[source]
+----
+What job templates are available in AAP?
+----
+
+Then pick one and ask Claude Code to run it. This is a great way to see how the agentic workflow handles different template types, surveys, and parameters.
+
+[NOTE]
+====
+**Stretch goal — AI-generated System Roles playbooks**: A known challenge in the Ansible community is getting AI code assistants to generate playbooks that use System Roles instead of raw module calls. This is an active area of work. In a future version of this lab, you may use a custom AI skill that instructs Automation code assistant to prefer System Roles when generating RHEL automation.
+====
+
+== Key Takeaways
+
+=== Where Do Good Playbooks Come From?
+
+This section demonstrated four distinct sources for production-quality Ansible Playbooks:
+
+[cols="1,3", options="header"]
+|===
+| Source | Description
+
+| **CVE Remediation (Lightspeed)**
+| Red Hat Lightspeed identifies vulnerabilities affecting your RHEL fleet and generates targeted playbooks to patch them. These are based on Red Hat's Security Data API and errata.
+
+| **Advisor Recommendations (Lightspeed)**
+| Lightspeed flags misconfigurations and best-practice violations (e.g., SELinux policy issues, configurations that won't survive a reboot) and generates playbooks to fix them proactively.
+
+| **RHEL System Roles**
+| Officially supported, pre-built Ansible roles shipped with RHEL that provide a stable, version-independent interface for common configuration tasks (NTP, networking, storage, SELinux, firewall, and more).
+
+| **AI-assisted authoring (Automation code assistant)**
+| Developers use Automation code assistant in the IDE to accelerate playbook creation. The AI generates a first draft, then a human reviews, refines, and validates before committing. This speeds up production of custom playbooks that go through a proper review process.
+|===
+
+Each source has its place. Lightspeed and System Roles give you ready-made, trusted content. Automation code assistant helps you create new playbooks faster — but the human review step is what makes them production-ready.
+
+=== Human-in-the-Loop and Gatekeeping with AAP
+
+The real power of this workflow is not just generating playbooks — it's the **gatekeeping**. Ansible Automation Platform provides the controls that ensure nothing reaches production without proper review:
+
+* **Git as source of truth** — every playbook is version-controlled, auditable, and reviewable before it enters AAP
+* **Project sync** — AAP only runs playbooks that have been committed and synced from a trusted Git repository
+* **Job Templates with guardrails** — credentials, inventory limits, and surveys ensure playbooks run against the right targets with the right parameters
+* **Approval gates** — workflows can include approval steps where a human signs off before execution proceeds
+* **Human-in-the-loop by design** — whether a playbook was generated by Lightspeed, written with AI assistance, or hand-crafted, the same review and approval process applies
+
+This is the difference between "AI wrote it" and "AI wrote it, a human reviewed it, and AAP enforces that it runs safely." The IDE is where the review happens; AAP is where the gatekeeping happens.
+
+=== The Agentic Architecture
+
+Throughout this lab, Claude Code connected to Ansible Automation Platform via the Ansible MCP server. Here is how the components fit together:
+
+[source]
+----
+code-server (VS Code in browser)
+    └── Claude Code (AI agent in terminal)
+            ↕ MCP Protocol
+        Ansible MCP Server          Red Hat Lightspeed MCP Server
+            ↕ REST API                      ↕ REST API
+    Ansible Automation Platform     Red Hat Lightspeed (console.redhat.com)
+    (Inventory, Job Templates,      (CVEs, Advisor, Remediation Playbooks)
+     Credentials, Jobs)
+----
+
+The **Ansible MCP server** exposes AAP capabilities (inventory, job templates, projects, jobs) as MCP tools. The **Lightspeed MCP server** exposes vulnerability and advisory data. Claude Code calls both behind the scenes when you ask questions in natural language — you don't need to know the API endpoints.
+
+=== How This Differs from Traditional Workflows
+
+[cols="2,2,2", options="header"]
+|===
+| Aspect | Traditional (Labs 1-3) | Agentic (This Lab)
+
+| **Trigger**
+| Event (Filebeat, Splunk, Winlogbeat)
+| Human prompt in Claude Code
+
+| **Decision Maker**
+| Pre-defined workflow logic
+| AI agent with human approval
+
+| **Flexibility**
+| Fixed workflow steps
+| Dynamic — Claude Code adapts to what it finds
+
+| **Approval**
+| Built into workflow (optional)
+| Always required — Claude Code asks before acting
+
+| **Best For**
+| Known, repeatable scenarios
+| Ad-hoc investigation and remediation
+|===
+
+[quote]
+💡 **Think of it this way**: Traditional automation is like a train on rails — fast and reliable, but it only goes where tracks exist. Agentic automation is like a GPS-guided driver — it can navigate new routes, but you're sitting in the passenger seat and can say "stop" at any time.
+
+== Complete
+
+You have completed Section 4 - Red Hat Lightspeed: CVE and Advisor Remediation. You used multiple approaches to generate, review, and deploy remediation playbooks — all through a human-in-the-loop workflow where AI proposes and you decide.
+
+In the next lab, you will see the **opposite approach**: a fully autonomous workflow where Splunk detects a RHEL misconfiguration and pre-approved automation fixes it without any human intervention.
+
+Click the link below to continue to *Section 5: Autonomous AIOps - Self-Healing RHEL with Splunk*.
