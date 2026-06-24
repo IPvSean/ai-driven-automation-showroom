@@ -173,7 +173,7 @@ image::currently_no_nodes_workflow.png[currently_no_nodes_workflow,400, link="_i
 [options="header"]
 |===
 | Parameter | Value
-| Node type | Job Template
+| Node type | Project Sync
 | Job Template | ⚙️ Apache Service Status Check
 | Convergence | Any
 | Node alias | (You can leave this blank)
