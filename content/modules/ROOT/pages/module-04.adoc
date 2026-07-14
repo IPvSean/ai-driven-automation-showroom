@@ -132,7 +132,7 @@ The rulebook activation history will show events as they are received from Splun
 
 == Complete
 
-You have verified the EDA controller configuration. In the next section, you'll see the complete AI-driven network automation workflow in action - from OSPF failure detection in Splunk, through Event-Driven Ansible triggering, to Lightspeed AI generating the remediation playbook automatically.
+You have verified the EDA controller configuration. In the next section, you'll see the complete AI-driven network automation workflow in action, from OSPF failure detection in Splunk, through Event-Driven Ansible triggering, to Automation coding assistant generating the remediation playbook automatically.
 
 ifeval::["{run_e2e_load_test}" == "true"]
 =====

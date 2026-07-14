@@ -5,7 +5,7 @@
 
 *Estimated time: 30-40 minutes*
 
-In earlier parts of this lab, you used AI to *generate* automation. Red Hat AI analyzed logs, Ansible Lightspeed wrote playbooks, and you reviewed the output before running it. The AI was powerful, but it operated in a fixed pipeline: detect, analyze, generate, execute.
+In earlier parts of this lab, you used AI to *generate* automation. Red Hat AI analyzed logs, Automation coding assistant wrote playbooks, and you reviewed the output before running it. The AI was powerful, but it operated in a fixed pipeline: detect, analyze, generate, execute.
 
 In this section, you will explore a fundamentally different approach. Instead of pre-built workflows and prompts, you will use AI agents that can directly interact with Ansible Automation Platform through the *Model Context Protocol (MCP)*, an open standard that lets AI models discover and use tools in real time. The AI no longer generates playbooks. It discovers *existing* automation and decides which playbooks to run, when, and in what order.
 
@@ -57,7 +57,7 @@ Any MCP-compatible AI client can discover these tools automatically and use them
 
 In this module, we use *Claude* (by Anthropic) as the AI model and *CrewAI* as the agent framework. These are choices, not requirements.
 
-*Models:* MCP is model-agnostic. Any large language model that supports tool use (Claude, GPT, Gemini, Llama, Granite, Mistral) can connect to the Ansible Automation Platform MCP server and interact with the same tools. In earlier parts of this lab, you used Ansible Lightspeed with IBM watsonx Code Assistant to generate playbooks (AI as a *code generator*). Here, you use Claude to interact with Ansible Automation Platform at runtime (AI as a *decision-maker*). Both patterns are valid, and your organization's AI strategy determines which models you use. The integration pattern remains the same.
+*Models:* MCP is model-agnostic. Any large language model that supports tool use (Claude, GPT, Gemini, Llama, Granite, Mistral) can connect to the Ansible Automation Platform MCP server and interact with the same tools. In earlier parts of this lab, you used Automation coding assistant to generate playbooks (AI as a *code generator*). Here, you use Claude to interact with Ansible Automation Platform at runtime (AI as a *decision-maker*). Both patterns are valid, and your organization's AI strategy determines which models you use. The integration pattern remains the same.
 
 == Learning objectives
 

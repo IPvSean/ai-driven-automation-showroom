@@ -12,7 +12,7 @@ Throughout this lab, you experienced the power of AI-driven automation across mu
 
 === Part 1: AIOps with Apache Remediation
 * Built an intelligent log enrichment workflow using Red Hat AI
-* Automatically generated remediation playbooks with Ansible Lightspeed
+* Automatically generated remediation playbooks with Automation coding assistant
 * Fixed a broken Apache service without writing any playbook code manually
 
 === Part 2: Network Automation
@@ -151,7 +151,7 @@ https://github.com/ansible-tmm/aiops-summitlab/blob/main/playbooks/mattermost_fi
 
 *Why this is important:*
 
-This allows Ansible Lightspeed to generate a remediation playbook without writing code manually. The job template created here will be used in the second workflow.
+This allows Automation coding assistant to generate a remediation playbook without writing code manually. The job template created here will be used in the second workflow.
 
 *Ansible Playbook:*
 https://github.com/ansible-tmm/aiops-summitlab/blob/main/playbooks/aap_create_job_template.yml[Github Link^]
@@ -167,7 +167,7 @@ Runs the job template created in the previous workflow `AI Insights and Lightspe
 
 *What it does:*
 
-- Uses Lightspeed to turn a prompt into a YAML playbook
+- Uses Automation coding assistant to turn a prompt into a YAML playbook
 - Stores the result locally as `lightspeed-response.yml`
 
 *Ansible Playbook:*
@@ -198,7 +198,7 @@ Syncs the git project from Gitea to Ansible Automation Platform
 === `⚙️ Build HTTPD Remediation Template`
 
 *Purpose:*
-Creates a new job template that uses the playbook pushed by Ansible Lightspeed to fix the Apache (httpd) service.
+Creates a new job template that uses the playbook pushed by Automation coding assistant to fix the Apache (httpd) service.
 
 *What it does:*
 
@@ -220,7 +220,7 @@ Fix httpd on the RHEL webserver
 - Restarts the httpd service
 
 *Ansible Playbook:*
-This Job Template is dynamically generated from Ansible Lightspeed and stored in your Gitea instance.  The Ansible Playbook should look similar to this:
+This Job Template is dynamically generated from Automation coding assistant and stored in your Gitea instance.  The Ansible Playbook should look similar to this:
 
 [source,yaml]
 ----
@@ -301,12 +301,12 @@ This workflow is triggered by the OSPF Neighbor rulebook activation when an OSPF
 === `Create Playbook AI`
 
 *Purpose:*
-Uses Ansible Lightspeed to generate a network remediation playbook based on the OSPF failure scenario.
+Uses Automation coding assistant to generate a network remediation playbook based on the OSPF failure scenario.
 
 *What it does:*
 
 - Receives the webhook payload containing OSPF event details
-- Constructs a detailed prompt for Ansible Lightspeed that includes:
+- Constructs a detailed prompt for Automation coding assistant that includes:
   * Scenario-specific troubleshooting logic (interface status, network type, hello timers)
   * Cisco IOS command requirements
   * Conditional checks for different failure modes
@@ -388,7 +388,7 @@ Applies the validated remediation to fix the OSPF neighbor adjacency issue.
 The network automation workflows demonstrate:
 
 - **Observability**: Splunk captures syslog messages from Cisco routers
-- **Inference**: Ansible Lightspeed generates scenario-specific remediation playbooks
+- **Inference**: Automation coding assistant generates scenario-specific remediation playbooks
 - **Automation**: Event-Driven Ansible triggers workflows that validate (check mode) and execute (run mode) fixes
 
 This creates a complete closed-loop automation system for network troubleshooting that codifies expert knowledge into reusable, AI-generated playbooks.

@@ -19,7 +19,7 @@ image::aiops-circle.png[aiops diagram,300, link="_images/aiops-circle.png", wind
 
 - *Observability* is the ability to understand the internal state of a system by collecting, analyzing, and visualizing data from logs, metrics, and traces.  This _can_ be another AI tool such as *IBM Instana Observability*.  For this lab we are simply relaying logs using https://www.elastic.co/beats/filebeat[Filebeat^], a Lightweight shipper for logs.  Ansible Automation Platform can integrate with observability tools using Event-Driven Ansible (EDA).
 
-- *Inference* - Inference in AI refers to the process of using a trained model to make predictions or decisions based on new, unseen data.  For this AIOps workflow we are using *Red Hat AI* for understanding service issues like an application outage, and *Ansible Lightspeed* to create an Ansible Playbook.
+- *Inference* - Inference in AI refers to the process of using a trained model to make predictions or decisions based on new, unseen data.  For this AIOps workflow we are using *Red Hat AI* for understanding service issues like an application outage, and *Automation coding assistant* to create an Ansible Playbook.
 
 - *Automation* is the ability to automatically detect, respond to, and resolve IT issues without human intervention.  We are using *Ansible Automation Platform* to tie observability and inference together directly to create workflows for self-healing infrastructure.
 
@@ -35,7 +35,7 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
 - Kafka acting as the event transport
 - Event-Driven Ansible is listening to Kafka and launching workflows based on defined rules
 - Red Hat AI to infer incident context from logs
-- Ansible Lightspeed to generate a remediation playbook
+- Automation coding assistant to generate a remediation playbook
 - Gitea for source control management of Ansible Playbooks
 - Ansible Automation Platform to run job templates and workflows
 - Mattermost for message notifications
@@ -43,7 +43,7 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
 - Winlogbeat on Windows forwarding events to Kafka
 - Red Hat Lightspeed (formerly Insights) for CVE and Advisor remediation playbook generation
 - code-server (VS Code in the browser) with Claude Code as the AI agent, connected to AAP via the Ansible MCP server
-- Automation code assistant (formerly Ansible Lightspeed Code Assistant) for AI-powered playbook generation in the IDE
+- Automation coding assistant (formerly Ansible Lightspeed) for AI-powered playbook generation in the IDE
 - Splunk Universal Forwarder on RHEL for system-level misconfiguration detection
 - CrewAI agent framework for autonomous AI-driven incident response
 
@@ -59,10 +59,10 @@ All lab content is preconfigured and ready to run.
 This lab environment includes a variety of tools working together to demonstrate AI-driven remediation. You'll interact with the following systems:
 
 * Ansible Automation Platform (AAP) - Executes workflows and job templates. Already opened in your lab interface.
-* Gitea - Git service used to host the Lightspeed-generated playbook.
+* Gitea - Git service used to host the AI-generated playbook.
 * Mattermost - Used for automated notifications during log enrichment.
 * RHEL node - The webserver (`httpd`) that will experience and recover from failure.
-* Red Hat AI & Lightspeed - AI services that analyze logs and generate remediation content.
+* Red Hat AI & Automation coding assistant - AI services that analyze logs and generate remediation content.
 
 === Access Table
 
@@ -134,7 +134,7 @@ This lab uses multiple Event-Driven Ansible (EDA) rulebook activations, and some
 
 |===
 
-Sections 1, 2, 3 can run concurrently since their activations do not conflict. Sections 5 and 6 require toggling activations as noted. Section 4 (Red Hat Lightspeed) does not use EDA at all.
+Sections 1, 2, 3 can run concurrently since their activations do not conflict. Sections 5 and 6 require toggling activations as noted. Section 4 (Red Hat Lightspeed and Agentic IDE Workflow) does not use EDA at all.
 ====
 
 '''
@@ -149,11 +149,11 @@ This workshop consists of six independent sections that can be completed in any 
 
 | xref:module-01.adoc[Section 1]
 | xref:module-01.adoc[AIOps with Apache Remediation]
-| A basic introduction to AIOps: build a self-healing workflow for Apache service failures using Red Hat AI and Ansible Lightspeed. (30-40 min)
+| A basic introduction to AIOps: build a self-healing workflow for Apache service failures using Red Hat AI and Automation coding assistant. (30-40 min)
 
 | xref:module-03.adoc[Section 2]
 | xref:module-03.adoc[AIOps with Network Automation]
-| Apply the same AIOps patterns to network infrastructure. Troubleshoot OSPF routing issues on Cisco routers using Splunk, Event-Driven Ansible, and Lightspeed-generated playbooks. (30-40 min)
+| Apply the same AIOps patterns to network infrastructure. Troubleshoot OSPF routing issues on Cisco routers using Splunk, Event-Driven Ansible, and AI-generated playbooks. (30-40 min)
 
 | xref:module-06.adoc[Section 3]
 | xref:module-06.adoc[AIOps with Windows Automation]
@@ -161,7 +161,7 @@ This workshop consists of six independent sections that can be completed in any 
 
 | xref:module-07.adoc[Section 4]
 | xref:module-07.adoc[Red Hat Lightspeed and Agentic IDE Workflow]
-| Use Red Hat Lightspeed to generate CVE and Advisor remediation playbooks, use Automation code assistant to generate an HTTPD fix in code-server, then use Claude Code to interactively discover and remediate issues via the Ansible MCP server. (50-70 min)
+| Use Red Hat Lightspeed to generate CVE and Advisor remediation playbooks, use Automation coding assistant to generate an HTTPD fix in code-server, then use Claude Code to interactively discover and remediate issues via the Ansible MCP server. (50-70 min)
 
 | xref:module-08.adoc[Section 5]
 | xref:module-08.adoc[Autonomous AIOps with Self-Healing RHEL]
@@ -192,7 +192,7 @@ For Sections 1-3, each section follows a consistent 4-part structure:
 
 2. *Log Enrichment and Prompt Generation Workflow* - Ansible Automation Platform (AAP) will retrieve systemd logs, coordinate with Red Hat AI to analyze the incident, notify Mattermost then automatically create a Job Template for us to use in the subsequent workflow.
 
-3. *Remediation Workflow* - This workflow will focus on automatically creating an Ansible Playbook to resolve the issue by using Ansible Lightspeed.  This workflow will take the prompt created by the previous workflow, request a playbook from Ansible Lightspeed, sync this playbook to Git and then automatically create a Job Template for us to remediate the issue.
+3. *Remediation Workflow* - This workflow will focus on automatically creating an Ansible Playbook to resolve the issue by using Automation coding assistant.  This workflow will take the prompt created by the previous workflow, request a playbook from Automation coding assistant, sync this playbook to Git and then automatically create a Job Template for us to remediate the issue.
 
 4. *Execute a remediation*
 * For Section 1: *Execute HTTPD Remediation* - This is the final Job Template that will actually fix the application outage on the RHEL webserver.

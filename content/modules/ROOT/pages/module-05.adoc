@@ -8,14 +8,14 @@ image::network-aiops-workflow.png[Network AI Workflow, link="_images/network-aio
 After completing this module, you will be able to:
 
 * Execute AI-driven network troubleshooting workflows for OSPF failures
-* Use Ansible Lightspeed to generate network remediation playbooks from natural language prompts
+* Use Automation coding assistant to generate network remediation playbooks from natural language prompts
 * Run AI-generated playbooks in check mode to validate changes before applying them
 * Troubleshoot three common OSPF failure scenarios (interface down, network type mismatch, hello timer mismatch)
 * Review and approve AI-generated network automation code through human-in-the-loop validation
 * Verify OSPF neighbor adjacency restoration using Splunk dashboards
 
 == Challenges
-The essence of the following scenarios is to empower a network expert to translate their manual OSPF troubleshooting rationale into intelligent, automated playbooks. Using a development pipeline, the expert creates and refines prompts for Ansible Lightspeed to generate the necessary automation code. To ensure safety and accuracy, a workflow allows the expert to first run each AI-generated playbook in check mode. This provides an opportunity to review and approve the proposed changes before they are applied to production. If a playbook doesn't work as intended, the expert can simply continue to refine their prompt in this iterative cycle until the desired outcome is achieved.
+The essence of the following scenarios is to empower a network expert to translate their manual OSPF troubleshooting rationale into intelligent, automated playbooks. Using a development pipeline, the expert creates and refines prompts for Automation coding assistant to generate the necessary automation code. To ensure safety and accuracy, a workflow allows the expert to first run each AI-generated playbook in check mode. This provides an opportunity to review and approve the proposed changes before they are applied to production. If a playbook doesn't work as intended, the expert can simply continue to refine their prompt in this iterative cycle until the desired outcome is achieved.
 
 * Challenge 1: OSPF neighbor down due to interface shut
 * Challenge 2: OSPF neighbor down due to incorrect OSPF network type
@@ -33,7 +33,7 @@ The playbook can be reviewed in its entirety here: https://github.com/ansible-tm
 💡 **Tip:** All playbooks and rulebooks used in this lab are available in the GitHub repository at https://github.com/ansible-tmm/aiops-summitlab[github.com/ansible-tmm/aiops-summitlab^]. You can review the complete source code there at any time.
 
 [quote]
-**Note:** The following snippets explain how this playbook uses the uri module and prompt variable to interact with Ansible Lightspeed AI to create an effective playbook for OSPF remediation. Not every task is explained in detail.
+**Note:** The following snippets explain how this playbook uses the uri module and prompt variable to interact with the Automation coding assistant API to create an effective playbook for OSPF remediation. Not every task is explained in detail.
 
 === AIOps.yml - Vars
 [source,yaml]
@@ -49,7 +49,7 @@ The playbook can be reviewed in its entirety here: https://github.com/ansible-tm
      create a task that shows the status of Tunnel0 and register the output 
      run a new task that administratively enables interface for parent interface tunnel0 when stdout contains 'administratively down' 
 ----
-In the above playbook snippet the network engineer is articulating the requirements for the playbook as a multi-line variable named `lightspeed_prompt`. This portion of the prompt is focused on scenario-1. Here we are asking for a playbook to identify when the OSPF interface is down and remediate with a `no shut`
+In the above playbook snippet the network engineer is articulating the requirements for the playbook as a multi-line prompt variable. This portion of the prompt is focused on scenario-1. Here we are asking for a playbook to identify when the OSPF interface is down and remediate with a `no shut`
 === AIOps.yml - Tasks
 
 [source,yaml]
@@ -66,10 +66,10 @@ In the above playbook snippet the network engineer is articulating the requireme
           text: "{{ lightspeed_prompt }}"
       register: response
 ----
-This above snippet is using the URI module to send the prompt to the lightspeed API
+This above snippet is using the URI module to send the prompt to the Automation coding assistant API
 [source, YAML]
 ----
-- name: Set fact for Ansible Lightspeed generated playbook
+- name: Set fact for Automation coding assistant generated playbook
       ansible.builtin.set_fact:
         lightspeed_playbook: "{{ response.json.playbook | from_yaml }}"
 
@@ -122,7 +122,7 @@ You can click on the icon and glean from the output the proposed playbook create
 
 image::workflow_job_3.png[Workflow 1, 150%, link="_images/workflow_job_3.png", window=blank]
 
-The tasks shown above were generated by Ansible Lightspeed in response to our prompt for remediating an OSPF down issue for scenario-1. The logic is straightforward: when a conditional task confirms the interface is administratively down, a subsequent task is run to re-enable it with the no shutdown command. The rest of the playbook has been truncated for brevity, as it pertains to later scenarios.
+The tasks shown above were generated by Automation coding assistant in response to our prompt for remediating an OSPF down issue for scenario-1. The logic is straightforward: when a conditional task confirms the interface is administratively down, a subsequent task is run to re-enable it with the no shutdown command. The rest of the playbook has been truncated for brevity, as it pertains to later scenarios.
 
 Step 5: Review the `lightspeed_response` playbook in the Gitea repository
 
@@ -147,7 +147,7 @@ You should see a recently updated file for `lightspeed-response.yml` in the `lig
 image::lightspeed_gitea.png[Lightspeed Gitea, 160%, link="_images/lightspeed_gitea.png", window=blank]
 
 [quote]
-💡 **Important**: The AI-generated playbook content may vary from run to run based on how Ansible Lightspeed interprets the prompt. If the playbook in your Gitea repository doesn't exactly match what you expected, this is normal behavior. The key is to verify that the logic and tasks align with the remediation goal (bringing up the Tunnel0 interface when it's administratively down). You can review the playbook content before proceeding with the workflow execution.
+💡 **Important**: The AI-generated playbook content may vary from run to run based on how Automation coding assistant interprets the prompt. If the playbook in your Gitea repository doesn't exactly match what you expected, this is normal behavior. The key is to verify that the logic and tasks align with the remediation goal (bringing up the Tunnel0 interface when it's administratively down). You can review the playbook content before proceeding with the workflow execution.
 
 Step 6: Review the `Playbook-Check-Mode` job-template in the workflow.
 
@@ -232,7 +232,7 @@ user=lab-user
 password="{ssh_password}"
 
 [quote]
-Note: The following snippets explain how this playbook uses the uri module and prompt variable to interact with the Ansible Lightspeed AI to create an effective playbook for OSPF remediation. Not every task is explained in detail.
+Note: The following snippets explain how this playbook uses the uri module and prompt variable to interact with the Automation coding assistant API to create an effective playbook for OSPF remediation. Not every task is explained in detail.
 
 
 === AIOps.yml
@@ -256,7 +256,7 @@ Note: The following snippets explain how this playbook uses the uri module and p
     run a new task with a list of two conditionals. The first condition is output contains 'line protocol is up' in stdout[0] and second condition is when new_output doesn't contain 'Network Type POINT_TO_POINT' This task would then configure interface tunnel0 with the command 'ip ospf network type point_to_point'
 ----
      
-In the above playbook snippet the network engineer has additional requirements to the multi-line variable named `lightspeed_prompt`. This portion of the prompt is focused on scenario-2. Here we are asking for a playbook to identify when the OSPF interface is up but missing the correct OSPF Network Type POINT_TO_POINT.
+In the above playbook snippet the network engineer has additional requirements added to the multi-line prompt variable. This portion of the prompt is focused on scenario-2. Here we are asking for a playbook to identify when the OSPF interface is up but missing the correct OSPF Network Type POINT_TO_POINT.
 
 [start=2]
 Step 2: Change the OSPF Network Type
@@ -316,7 +316,7 @@ image::display_2.png[Display, 160%, link="_images/display_2.png", window=blank]
 
 image::workflow_job_5.png[Workflow 4, 160%, link="_images/workflow_job_5.png", window=blank]
 
-For brevity, the previous `scenario(1-2)` tasks were truncated. The specific tasks shown above were generated by Ansible Lightspeed specifically for remediating an OSPF down issue for `scenario-3`. The logic is straightforward: when a conditional task confirms the interface is administratively up and the network type is correct, but the OSPF Hello timer (interval) is incorrect, a subsequent task is run to determine if the OSPF network type is correct. If Network type Point-to-Point is not configure it will correct the configuration.
+For brevity, the previous `scenario(1-2)` tasks were truncated. The specific tasks shown above were generated by Automation coding assistant specifically for remediating an OSPF down issue for `scenario-3`. The logic is straightforward: when a conditional task confirms the interface is administratively up and the network type is correct, but the OSPF Hello timer (interval) is incorrect, a subsequent task is run to determine if the OSPF network type is correct. If Network type Point-to-Point is not configure it will correct the configuration.
 
 Step 5: Review the `Playbook-Check-Mode` job-template in the workflow.
 
@@ -408,7 +408,7 @@ user=lab-user
 password="{ssh_password}"
 
 [quote]
-Note: The following snippets explain how this playbook uses the uri module and prompt variable to interact with the Ansible Lightspeed AI to create an effective playbook for OSPF remediation. Not every task is explained in detail.
+Note: The following snippets explain how this playbook uses the uri module and prompt variable to interact with the Automation coding assistant API to create an effective playbook for OSPF remediation. Not every task is explained in detail.
 
 === AIOps.yml
 [source,yaml]
@@ -432,7 +432,7 @@ Additions for Challenge 3--->
 run a new task with a list of three conditionals. The first condition is output contains 'line protocol is up' in stdout[0] and second condition is when new_output does contain 'Network Type POINT_TO_POINT' the third condition is when new_output doesn't contain 'Hello 10' This task would then ⚙️ configure interface tunnel0 with the command 'ip ospf hello-interval 10'"
 ----
      
-In the above playbook snippet the network engineer has additional requirements to the multi-line variable named `lightspeed_prompt`. This portion of the prompt is focused on scenario-3. Here we are asking for a playbook to identify when the OSPF interface is up, has the correct network type, but the Hello timer is misconfigured.
+In the above playbook snippet the network engineer has additional requirements added to the multi-line prompt variable. This portion of the prompt is focused on scenario-3. Here we are asking for a playbook to identify when the OSPF interface is up, has the correct network type, but the Hello timer is misconfigured.
 
 [start=2]
 Step 2: Change the OSPF Hello Timer
@@ -496,7 +496,7 @@ image::display_2.png[Display, 160%, link="_images/display_2.png", window=blank]
 
 image::workflow_job_5.png[Workflow 4, 160%, link="_images/workflow_job_5.png", window=blank]
 
-For brevity, the previous `scenario-1` tasks were truncated. The specific tasks shown above were generated by Ansible Lightspeed specifically for remediating an OSPF down issue for `scenario-2`. The logic is straightforward: when a conditional task confirms the interface is administratively up but the OSPF neighbor is down, a subsequent task is run to determine if the OSPF network type is correct. If Network type Point-to-Point is not configured, the task will correct the configuration.
+For brevity, the previous `scenario-1` tasks were truncated. The specific tasks shown above were generated by Automation coding assistant specifically for remediating an OSPF down issue for `scenario-2`. The logic is straightforward: when a conditional task confirms the interface is administratively up but the OSPF neighbor is down, a subsequent task is run to determine if the OSPF network type is correct. If Network type Point-to-Point is not configured, the task will correct the configuration.
 
 Step 5: Review the `Playbook-Check-Mode` job-template in the workflow.
 
@@ -565,7 +565,7 @@ Output:
 
 This Lab successfully implemented a closed-loop, AI-driven network automation workflow. We began by integrating Cisco OSPF monitoring with Splunk alerting. Subsequently, an Event-Driven Ansible (EDA) rulebook was configured to act on these alerts, establishing an operational feedback loop. This final module used that loop to trigger an AI workflow, which dynamically generates a remediation playbook. This new capability allowed us to successfully stage, test, and automate troubleshooting for three distinct OSPF failure scenarios. 
 
-By using Ansible Lightspeed, our network expert could focus on codifying their troubleshooting knowledge in plain language, rather than getting bogged down in low-level syntax like playbook conditionals, operators, or regular expressions. This same process could easily be used to iterate additional trouble shooting scenarios into the same playbook or refactored as roles.
+By using Automation coding assistant, our network expert could focus on codifying their troubleshooting knowledge in plain language, rather than getting bogged down in low-level syntax like playbook conditionals, operators, or regular expressions. This same process could easily be used to iterate additional trouble shooting scenarios into the same playbook or refactored as roles.
 
 == Congratulations! You've Completed Part 2!
 
