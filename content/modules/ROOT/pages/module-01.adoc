@@ -155,7 +155,10 @@ image::create_workflow.png[create_workflow,300, link="_images/create_workflow.pn
 | Parameter | Value
 | Name | AI Insights and Lightspeed prompt generation
 | Organization | Default
+| Extra Variables | Check **Prompt on Launch**
 |===
+
+NOTE: Enabling **Prompt on Launch** for Extra Variables is required so that Event-Driven Ansible can pass event data (`ansible_eda` variables) to the workflow when it triggers automatically.
 
 [start=5]
 5. Click Create workflow job template.
