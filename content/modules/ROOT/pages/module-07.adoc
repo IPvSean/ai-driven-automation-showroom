@@ -222,7 +222,9 @@ To verify registration and locate your nodes:
 
 1. Return to your https://console.redhat.com[console.redhat.com^] browser tab.
 2. Navigate to **Inventory** -> **Systems**.
-3. You should see your three RHEL nodes listed. Use **Filter by tags** with your lab's sandbox ID if needed to narrow the list.
+3. Click **Filter by tags**, select **Tags**, and search for `group={guid}`. This filters the system list to show only the three RHEL nodes belonging to your lab environment.
+
+Your sandbox ID is `{guid}`. You can find it in any of your lab URLs (e.g., `controller-{guid}.apps...`).
 
 image::console-inventory-tags-filter.png[Filter systems by tag in console.redhat.com, link="_images/console-inventory-tags-filter.png", window=blank]
 
@@ -332,7 +334,7 @@ The playbook you downloaded in the previous step is on your **local laptop/works
 
 === Step 4: Fix the hostname to match your AAP inventory
 
-1. Open `lightspeed_playbooks/remediation.yml` and find the `hosts:` field — Lightspeed generates the full DNS name (e.g. `node3.lab.sandbox-xxxx-ocp4-cluster.svc.cluster.local`).
+1. Open `lightspeed_playbooks/remediation.yml` and find the `hosts:` field — Lightspeed generates the full DNS name (e.g. `node3.sandbox-{guid}-ocp4-cluster.svc.cluster.local`).
 2. Change it to just `node3` to match the host name in your AAP inventory.
 
 === Step 5: Push the playbook to Gitea
@@ -386,7 +388,7 @@ You can also verify using Claude Code by asking the Lightspeed MCP server direct
 [source]
 ----
 Check if the OpenSSH LoginGraceTime Advisor recommendation still
-affects my systems with the k5txp tag.
+affects my systems with the {guid} tag.
 ----
 
 [quote]
@@ -413,12 +415,12 @@ image::claude-code-welcome.png[Claude Code welcome screen, link="_images/claude-
 
 === Step 2: Ask Claude Code about CVEs
 
-In the Claude Code chat, type a prompt like the one below. Replace `k5txp` with your unique tag from the registration step:
+In the Claude Code chat, type a prompt like the one below. Your sandbox ID `{guid}` is used as the tag to filter your systems:
 
-[source]
+[source,subs=attributes+]
 ----
 What CVEs are affecting my RHEL systems? Show me the critical and important
-ones that have remediation available. Only show hosts with the k5txp tag.
+ones that have remediation available. Only show hosts with the {guid} tag.
 ----
 
 Claude Code will use the **Red Hat Lightspeed MCP server** to:
@@ -457,7 +459,7 @@ Claude Code will use the Lightspeed MCP server to fetch the remediation playbook
 
 The downloaded playbook will automatically be available in the code-server file explorer. Open it and review the YAML content to confirm it addresses CVE-2025-31277.
 
-Just like the Advisor exercise, the Lightspeed playbook will use the full DNS name in the `hosts:` field (e.g. `node2.lab.sandbox-xxxx-ocp4-cluster.svc.cluster.local`). Change it to just `node2` so it matches your AAP inventory and only runs on that one node.
+Just like the Advisor exercise, the Lightspeed playbook will use the full DNS name in the `hosts:` field (e.g. `node2.sandbox-{guid}-ocp4-cluster.svc.cluster.local`). Change it to just `node2` so it matches your AAP inventory and only runs on that one node.
 
 === Step 6: Push to Git
 
