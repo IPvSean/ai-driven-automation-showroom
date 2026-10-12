@@ -30,22 +30,44 @@ It is important to note that AIOps can be adopted incrementally and it is not al
 
 link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank]
 
-- Three RHEL (Red Hat Enterprise Linux) nodes: one with Apache (`httpd`), and two additional nodes for CVE remediation and system role configuration
-- Filebeat monitoring Apache logs
-- Kafka acting as the event transport
-- Event-Driven Ansible is listening to Kafka and launching workflows based on defined rules
-- Red Hat AI to infer incident context from logs
-- Automation coding assistant to generate a remediation playbook
+=== Core Observability
+
+- **IBM Instana** - Enterprise observability platform monitoring applications and infrastructure
+  * Intelligent anomaly detection with Smart Alerts
+  * Distributed tracing and service dependencies
+  * Action Catalog integration with AAP for NLP-based remediation recommendations
+  * Webhook integration with Event-Driven Ansible for automated response
+- **Filebeat** - Lightweight log shipper monitoring Apache logs
+- **Kafka** - Distributed event streaming platform for real-time event transport
+- Splunk Universal Forwarder on RHEL for system-level misconfiguration detection (optional)
+
+=== Automation & Orchestration
+
+- **Ansible Automation Platform (AAP)** - Enterprise orchestration and automation
+  * Automation Controller for job template and workflow execution
+  * Event-Driven Ansible (EDA) for event-based automation triggers
+  * Integrated with Instana for bidirectional event flow
+- **Event-Driven Ansible (EDA)** - Listening to Kafka, webhooks, and Instana alerts to launch workflows
 - Gitea for source control management of Ansible Playbooks
-- Ansible Automation Platform to run job templates and workflows
-- Mattermost for message notifications
+- Mattermost for automated notifications during workflows
+
+=== AI & Inference
+
+- **Red Hat AI** - LLM inference service for incident analysis and context enrichment
+- **Automation coding assistant** (formerly Ansible Lightspeed) - AI-powered playbook generation
+- **Red Hat Lightspeed** (console.redhat.com) - CVE and Advisor remediation recommendations
+- code-server (VS Code in the browser) with Claude Code as the AI agent
+- **Claude Code Ansible MCP Server** - AI agent integration with AAP through Model Context Protocol
+- CrewAI agent framework for autonomous AI-driven incident response
+
+=== Monitored Systems
+
+- Three RHEL (Red Hat Enterprise Linux) nodes
+  * node1: Apache webserver (`httpd`) with Instana agent
+  * node2: Flask web application (`lab-webapp`) with Instana agent for APM
+  * node3: Additional node for system role configuration
 - A Windows Server with Active Directory for Windows event-driven automation
 - Winlogbeat on Windows forwarding events to Kafka
-- Red Hat Lightspeed (formerly Insights) for CVE and Advisor remediation playbook generation
-- code-server (VS Code in the browser) with Claude Code as the AI agent, connected to AAP via the Ansible MCP server
-- Automation coding assistant (formerly Ansible Lightspeed) for AI-powered playbook generation in the IDE
-- Splunk Universal Forwarder on RHEL for system-level misconfiguration detection
-- CrewAI agent framework for autonomous AI-driven incident response
 
 [quote]
 EDA (Event-Driven Ansible) is part of Ansible Automation Platform.  It is referred to separately sometimes depending on the workflow.  EDA uses rulebooks to monitor events, then executes specified job templates or workflows based on the event.  Think of it simply as inputs and outputs.  EDA is an automatic way for inputs into Ansible Automation Platform, where Automation controller / Automation execution is the output (running a job template or workflow).
@@ -87,10 +109,11 @@ Password: `{gitea_password}`
 | Username: `{mattermost_username}`
 Password: `{mattermost_password}`
 
-| Splunk
-| link:{splunk_url}[Splunk^]
-| Username: `{splunk_username}`
-Password: `{splunk_password}`
+| IBM Instana
+| https://unit0-techzone.163-66-82-253.nip.io/[Instana UI^]
+Used in xref:module-00-instana-part1.adoc[Section 1] for observability and alerting
+| Username: `admin@instana.local`
+Password: Provided by instructor
 
 | Red Hat Lightspeed (console.redhat.com)
 | link:https://console.redhat.com[console.redhat.com^]
@@ -112,13 +135,13 @@ This lab uses multiple Event-Driven Ansible (EDA) rulebook activations, and some
 |===
 | Section | EDA Activation | Notes
 
-| Section 1: Apache Remediation
+| Section 1: Instana Observability
+| **Instana AIOps** (enabled by default)
+| Listens on port 5000 for Instana Smart Alert webhooks
+
+| Section 2: Apache Remediation
 | **Web App** (enabled by default)
 | Listens on Kafka for httpd service events
-
-| Section 2: Network Automation
-| **OSPF Neighbor** (enabled by default)
-| Listens on port 5000 for Splunk webhooks
 
 | Section 3: Windows Automation
 | **Windows Events** (enabled by default)
@@ -126,7 +149,7 @@ This lab uses multiple Event-Driven Ansible (EDA) rulebook activations, and some
 
 | Section 5: Self-Healing RHEL
 | **RHEL Cron AIOps** (disabled by default)
-| Shares port 5000 with OSPF. *Disable OSPF Neighbor before enabling this one.*
+| Shares port 5000 with Instana. *Disable Instana AIOps before enabling this one.*
 
 | Section 6: AI-Driven Incident Response
 | **AI Agent** (disabled by default)
@@ -134,26 +157,26 @@ This lab uses multiple Event-Driven Ansible (EDA) rulebook activations, and some
 
 |===
 
-Sections 1, 2, 3 can run concurrently since their activations do not conflict. Sections 5 and 6 require toggling activations as noted. Section 4 (Red Hat Lightspeed and Agentic IDE Workflow) does not use EDA at all.
+Sections 1, 2, 3 can run concurrently since their activations do not conflict (Instana uses port 5000, Kafka is separate). Section 5 shares port 5000 with Instana, so toggles are required. Section 6 conflicts with Section 2 (Web App). Section 4 (Red Hat Lightspeed and Agentic IDE Workflow) does not use EDA at all.
 ====
 
 '''
 
 == Workshop Sections
 
-This workshop consists of six independent sections that can be completed in any order. Together they cover the full AIOps maturity spectrum, from event-driven remediation with human review to fully autonomous self-healing with AI agents.
+This workshop consists of six independent sections that can be completed in any order. Together they cover the full AIOps maturity spectrum, from intelligent observability with NLP to fully autonomous self-healing with AI agents.
 
 [cols="1,2,3", options="header"]
 |===
 | Section | Title | Description
 
-| xref:module-01.adoc[Section 1]
-| xref:module-01.adoc[AIOps with Apache Remediation]
-| A basic introduction to AIOps: build a self-healing workflow for Apache service failures using Red Hat AI and Automation coding assistant. (30-40 min)
+| xref:module-00-instana-part1.adoc[Section 1]
+| xref:module-00-instana-part1.adoc[IBM Instana Observability and Intelligent Remediation]
+| Learn how intelligent observability detects incidents and surfaces AI-recommended remediation. Understand Smart Alerts, distributed tracing, and the two paths to remediation: automated (EDA) and manual selection via NLP-ranked recommendations. (25-35 min)
 
-| xref:module-03.adoc[Section 2]
-| xref:module-03.adoc[AIOps with Network Automation]
-| Apply the same AIOps patterns to network infrastructure. Troubleshoot OSPF routing issues on Cisco routers using Splunk, Event-Driven Ansible, and AI-generated playbooks. (30-40 min)
+| xref:module-01.adoc[Section 2]
+| xref:module-01.adoc[AIOps with Apache Remediation]
+| Build a self-healing workflow for Apache service failures using Red Hat AI and Automation coding assistant. Combine log enrichment, AI-driven prompt generation, and automated remediation. (30-40 min)
 
 | xref:module-06.adoc[Section 3]
 | xref:module-06.adoc[AIOps with Windows Automation]
@@ -165,7 +188,7 @@ This workshop consists of six independent sections that can be completed in any 
 
 | xref:module-08.adoc[Section 5]
 | xref:module-08.adoc[Autonomous AIOps with Self-Healing RHEL]
-| Experience autonomous self-healing: Splunk detects a RHEL misconfiguration, EDA triggers an AI routing agent that selects and applies the correct fix automatically. (20-30 min)
+| Experience autonomous self-healing: System-level monitoring detects a RHEL misconfiguration, EDA triggers an AI routing agent that selects and applies the correct fix automatically. (20-30 min)
 
 | xref:module-09.adoc[Section 6]
 | xref:module-09.adoc[AI-Driven Incident Response with MCP]
@@ -220,9 +243,17 @@ Why Kafka? Apache Kafka is a distributed streaming platform used for building re
 
 == Ready to Begin?
 
-xref:module-01.adoc[**Start Section 1: AIOps with Apache Remediation ->**]
+xref:module-00-instana-part1.adoc[**Start Section 1: IBM Instana Observability and Intelligent Remediation ->**]
 
 [TIP]
 ====
-**All six sections are independent!** You can complete them in any order. New to AIOps? Start with Section 1. Already familiar with the basics? Jump directly to any section from the left navigation.
+**All six sections are independent!** You can complete them in any order. New to AIOps? We recommend starting with Section 1 to understand intelligent observability and the two paths to remediation. Already familiar with observability? Jump directly to any section from the left navigation.
+
+**Recommended order for first-time learners**:
+1. Section 1: Instana (understand observability and detection)
+2. Section 2: Apache (see full AIOps workflow with log enrichment + AI)
+3. Section 3: Windows (extend pattern to different systems)
+4. Section 4: Lightspeed & IDE (AI-assisted playbook creation)
+5. Section 5: Self-Healing (autonomous responses)
+6. Section 6: AI Agents (advanced orchestration with MCP)
 ====
