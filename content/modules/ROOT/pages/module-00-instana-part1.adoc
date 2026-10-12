@@ -1,4 +1,7 @@
-= Section 1 Part 1 - Instana Observability and Infrastructure Monitoring
+= Section 1.1 - Instana Observability and Infrastructure Monitoring
+:navtitle: Instana Observability and Infrastructure Monitoring
+
+*Estimated time: 25-35 minutes*
 
 == Objective
 
@@ -91,7 +94,7 @@ In this lab, Instana is monitoring a **Flask web application** (`lab-webapp`) ru
 | Provided by your instructor
 
 | Instana Agent Endpoint
-| `agent-acceptor.163-66-82-253.nip.io:443` (only for agent registration, not UI access)
+| `agent-acceptor.163-66-82-253.nip.io:443` (for agent registration only)
 |===
 
 [NOTE]
@@ -111,19 +114,20 @@ The Instana agent acceptor endpoint is different from the UI URL. Agents connect
 
 The Infrastructure Map shows all monitored systems organized by **zones**. In this lab, we use the zone name to separate each student's environment.
 
-**Your zone name is**: `{{ guid }}`
+**Your zone name is**: `{guid}`
 
 This unique identifier ensures your monitoring data is isolated from other students.
 
 ==== Exploring Your Infrastructure Zone
 
 1. In the Instana UI, click on **Infrastructure** in the left navigation menu
-2. Look for your zone in the map display (labeled with your `{{ guid }}`)
+2. Look for your zone in the map display (labeled with your `{guid}`)
 3. You should see a **tower icon** representing your zone with the Instana agent running on `node2`
 
 image::instana_infra_map_zone.png[Instana Infrastructure Map, link="_images/instana_infra_map_zone.png", window=blank]
 
 The infrastructure map shows:
+
 * **Green tower**: Healthy agent (monitoring actively)
 * **Number of nodes**: Count of monitored systems in the zone
 * **CPU/Memory metrics**: Real-time resource utilization
@@ -135,18 +139,19 @@ If you don't see your zone immediately, it may take 2-3 minutes after the lab st
 
 === 2. Services Tab
 
-The **Services** tab shows all monitored applications and their performance metrics. In this lab, we're monitoring a Flask web application called `lab-webapp-{{ guid }}`.
+The **Services** tab shows all monitored applications and their performance metrics. In this lab, we're monitoring a Flask web application called `lab-webapp-{guid}`.
 
 ==== Exploring Your Service
 
 1. Click on **Services** in the left navigation menu
-2. Search for or scroll to find `lab-webapp-{{ guid }}`
+2. Search for or scroll to find `lab-webapp-{guid}`
 3. Click on the service name to open its details
 
 image::instana_services_tab.png[Instana Services, link="_images/instana_services_tab.png", window=blank]
 
 The Services view displays:
-* **Service name**: `lab-webapp-{{ guid }}` (unique per student)
+
+* **Service name**: `lab-webapp-{guid}` (unique per student)
 * **Calls**: Number of HTTP requests (should be continuous if traffic generator is running)
 * **Latency**: Response time metrics (p50, p95, p99)
 * **Error rate**: Percentage of failed requests
@@ -178,10 +183,11 @@ In this lab, we're using a **Service-level Smart Alert** configured to monitor *
 * **Metric**: Number of calls (HTTP requests per minute)
 * **Trigger condition**: `< 1` (less than 1 call per minute = service is down)
 * **Evaluation granularity**: 1 minute (evaluates every minute)
-* **Scope**: Specific service (`lab-webapp-{{ guid }}`)
+* **Scope**: Specific service (`lab-webapp-{guid}`)
 * **Channel**: Generic webhook → EDA webhook URL
 
 When the alert fires:
+
 1. **State = OPEN**: Service is down (calls dropped below threshold)
 2. **State = CLOSED**: Service recovered (calls restored above threshold)
 
@@ -212,6 +218,7 @@ When a Smart Alert fires, Instana sends a webhook with this structure:
 ----
 
 This payload is parsed by the EDA rulebook to:
+
 1. Extract the service name (`entityLabel`)
 2. Determine the state (`OPEN` = alert, `CLOSED` = resolved)
 3. Trigger appropriate remediation actions
@@ -236,6 +243,7 @@ When the alert fires, immediately trigger a job template to restore the service:
 ----
 
 **Advantages**:
+
 * Fast response time
 * Predictable remediation action
 * Good for well-known failure modes
@@ -261,6 +269,7 @@ Analyze the alert with AI to select the best remediation from multiple options:
 ----
 
 **Advantages**:
+
 * Intelligent action selection
 * Learns from incident patterns
 * Can select different remediation based on context

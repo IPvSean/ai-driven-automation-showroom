@@ -1,160 +1,71 @@
-= Section 1 Part 2 - Smart Alerts and Dual-Path Remediation
+= Section 1.2 - Smart Alerts and Dual-Path Remediation
+:navtitle: Smart Alerts and Dual-Path Remediation
+
+*Estimated time: 25-35 minutes*
 
 == Objective
 
-In this section, we will configure **Smart Alerts** that integrate directly with **Ansible Automation Platform** through Instana's Action Catalog. You'll learn how Instana uses NLP (Natural Language Processing) to intelligently recommend AAP job templates based on the incident context. Then we'll trigger a service failure and execute remediation through two different paths: direct automated response (EDA) or manual selection from Instana's intelligent recommendations (Action Catalog UI).
+In this section, we will configure a **Smart Alert** in Instana that detects when the Flask application stops responding. We'll create a webhook channel pointing to your Event-Driven Ansible listener, then simulate a service failure to watch the complete automated remediation workflow execute.
 
-By the end of this module, you'll understand the complete architecture for **intelligent AIOps**: observability detects the problem, AI recommends solutions, and you choose between automated or human-guided remediation.
+By the end of this module, you'll have a fully operational closed-loop AIOps system: Instana detects the problem → EDA is notified → AAP executes remediation → Service is restored → Alert auto-closes.
 
 == Learning Objectives
 
 After completing this module, you will be able to:
 
-* Create Smart Alerts integrated with Ansible Automation Platform
-* Understand how Instana's NLP features surface intelligent job template recommendations
-* Use the Instana Action Catalog to manually select remediation actions
-* Execute remediation through the Instana UI (manual path)
-* Execute remediation through Event-Driven Ansible (automated path)
-* Understand the trade-offs between automated and intelligent remediation
-
-== Architecture: Two Paths to Remediation
-
-Instana provides two complementary paths for incident response:
-
-=== Path 1: Automated Direct Remediation (Immediate, Rule-Based)
-
-[source, text]
-----
-Instana Smart Alert (OPEN)
-           ↓
-Webhook POST to EDA
-           ↓
-EDA Rulebook (instana.yml)
-  condition: event.payload.issue.state == "OPEN"
-           ↓
-run_job_template: "LINUX | Web App | Restore"
-           ↓
-AAP executes immediately (no approval needed)
-           ↓
-✅ Service restored in seconds
-----
-
-**Advantages**:
-* Fastest response time
-* Zero human intervention
-* Predictable, deterministic
-* Good for known failure modes
-
-**When to use**: Service restart, connection reset, memory cache clear—simple, safe operations
-
-=== Path 2: Intelligent Manual Selection via Action Catalog NLP (Informed Decision)
-
-[source, text]
-----
-Instana Smart Alert (OPEN)
-           ↓
-Action Catalog syncs with AAP
-  (NLP scores job templates by relevance)
-           ↓
-Students see ranked recommendations in Instana UI:
-  1. "Restore Web App Service" (High confidence)
-  2. "Check Service Health" (Medium confidence)
-  3. "Collect Diagnostics" (Low confidence)
-           ↓
-Student clicks "Approve & Execute"
-           ↓
-Instana calls AAP API
-           ↓
-✅ Service restored (with auditing)
-----
-
-**Advantages**:
-* Informed decision-making
-* Visibility into multiple remediation options
-* AI-recommended actions ranked by relevance
-* Full audit trail
-
-**When to use**: Complex incidents, critical systems, learning/training, governance requirements
+* Create a generic webhook alert channel in Instana
+* Configure a Smart Alert for service-level monitoring
+* Simulate a service failure and observe the detection
+* Trigger automated remediation through Event-Driven Ansible
+* Review the complete incident-to-resolution workflow in multiple tools
+* Understand how observability platforms close the loop with automation
 
 == Prerequisites
 
-Ensure the following are already set up:
+Before starting this module, ensure:
 
-1. **Instana agent running** on `node2` with the Flask application
-2. **AAP job templates configured** in the `Instana AIOps` organization
-3. **EDA activation running** on port 5000 with the `instana.yml` rulebook
-4. **Continuous traffic generator** running (bastion curl loop)
+* You have access to the Instana UI (login credentials from Part 1)
+* Your EDA webhook listener is running on the bastion (port 5000)
+* The Flask web application (`lab-webapp-{guid}`) is running and receiving traffic
+* You have access to Ansible Automation Platform (controller)
 
-All of these are pre-configured during lab provisioning. You're adding the **Smart Alert** layer that connects them.
+== Step 1: Get Your EDA Webhook URL
 
-== Step 1: Verify AAP Templates Are Available for Instana Sync
+The EDA rulebook runs a webhook listener on port 5000 of your bastion VM. You need this URL to configure the alert channel in Instana.
 
-Before creating Smart Alerts, let's verify that your AAP job templates are visible to Instana for NLP matching.
+Your EDA webhook URL is:
 
-=== Check AAP Organization and Templates
-
-1. Log into Ansible Automation Platform
-2. Navigate to **Administration** → **Organizations**
-3. Verify the organization `Instana AIOps` exists
-4. Click on it and verify it contains these templates:
-
-   * `✅ LINUX | Web App | Restore` (primary remediation)
-   * `✅ LINUX | Web App | Break` (for testing)
-   * (Optional) `Check Service Health`, `Collect Diagnostics`, etc.
-
-image::aap_instana_org_templates.png[AAP Instana Organization Templates, link="_images/aap_instana_org_templates.png", window=blank]
+[source, text]
+----
+https://eda-webhook-{guid}.apps.{subdomain_base}
+----
 
 [NOTE]
 ====
-The Instana backend periodically polls your AAP instance to discover templates. This polling happens automatically and requires no manual triggering. The `instana-sensor` user with Execute role on the `Instana AIOps` organization is the identity used for this discovery.
+This URL is automatically created when the lab deploys. The `{guid}` and `{subdomain_base}` variables are substituted by the lab provisioning system.
 ====
 
-=== Verify Template Descriptions for NLP Matching
+Save this URL. You will need it for the Instana alert channel configuration.
 
-NLP (Natural Language Processing) works by comparing:
-* Alert text: "Number of calls is anomalously low"
-* Template names and descriptions
+== Step 2: Create a Generic Webhook Alert Channel in Instana
 
-1. Click on `LINUX | Web App | Restore` template
-2. Check the **Description** field contains keywords like:
-   * "restore" or "recovery"
-   * "service" or "web app"
-   * "calls" or "throughput"
-   * "down" or "outage"
-
-Example description:
-```
-Restore Web App Service - Fix anomalously low calls and service outage.
-Starts the lab-webapp service and verifies it is responding to health checks.
-Use this when Instana detects service latency spikes or call rate drops.
-```
-
-These keywords ensure NLP gives this template a **High confidence match** (typically 0.8+) when the "calls anomalously low" alert fires.
-
-image::aap_template_description.png[Template Description for NLP, link="_images/aap_template_description.png", window=blank]
-
-[NOTE]
-====
-If your templates don't have descriptions, add them now. Instana syncs description changes automatically (check back after ~5 minutes). Better descriptions = better NLP matches = smarter recommendations.
-====
-
-== Step 2: Create Generic Webhook Alert Channel
-
-An **alert channel** is where Instana sends notifications. We'll create one pointing to your EDA listener for the automated path.
+An **alert channel** is where Instana sends notifications when alerts fire. We'll create a generic webhook channel that points to your EDA listener.
 
 === In the Instana UI:
 
-1. Log in to Instana: https://unit0-techzone.163-66-82-253.nip.io/
-2. Click **Settings** (left navigation)
+1. Log in to Instana if you're not already logged in
+2. Click on **Settings** in the left navigation menu
 3. Navigate to **Alerting** → **Alert Channels**
 
-image::instana_settings_alerting.png[Instana Alerting, link="_images/instana_settings_alerting.png", window=blank]
+image::instana_settings_alerting.png[Instana Alerting Settings, link="_images/instana_settings_alerting.png", window=blank]
 
 [start=4]
-4. Click **+ Add Alert Channel**
+4. Click the blue **+ Add Alert Channel** button in the top right
+
+image::instana_add_alert_channel.png[Add Alert Channel, link="_images/instana_add_alert_channel.png", window=blank]
 
 [start=5]
-5. Fill in the following:
+5. Fill out the following fields:
 
 [options="header"]
 |===
@@ -165,40 +76,50 @@ image::instana_settings_alerting.png[Instana Alerting, link="_images/instana_set
 | Generic Webhook
 
 | Name
-| `EDA Automated Remediation - {{ guid }}`
+| `AIOps Automated Remediation - {guid}`
 
 | Webhook URL
-| `https://eda-webhook-{{ guid }}.apps.{{ DOMAIN}}`
+| `https://eda-webhook-{guid}.apps.{subdomain_base}`
 |===
 
-image::instana_add_webhook_channel.png[Add Webhook Channel, link="_images/instana_add_webhook_channel.png", window=blank]
+image::instana_webhook_channel_config.png[Webhook Channel Configuration, link="_images/instana_webhook_channel_config.png", window=blank]
 
 [start=6]
-6. Click **Create**
+6. Leave other fields at their defaults and click **Create**
+
+[start=7]
+7. You should see a success message: "Alert channel created successfully"
+
+image::instana_webhook_channel_created.png[Webhook Channel Created, link="_images/instana_webhook_channel_created.png", window=blank]
 
 [NOTE]
 ====
-This channel will be used if you want to trigger **Path 1 (automated)**. When an alert fires and this channel is selected, Instana POST's the full alert payload to your EDA listener, which processes it with the rulebook.
+The webhook channel is now ready. Instana will POST the full alert payload (including the issue state and metrics) to your EDA webhook listener whenever an alert fires on this channel.
 ====
 
-== Step 3: Create a Smart Alert for Service Monitoring
+== Step 3: Create a Smart Alert for Your Service
 
-A **Smart Alert** continuously monitors your service and fires when anomalies are detected. Unlike traditional threshold-based alerts, Smart Alerts use baseline learning.
+A **Smart Alert** monitors a specific metric on your service and fires when anomalies are detected. We'll monitor the **Calls** metric (throughput) and alert when it drops below 1 call per minute, indicating the service is down.
 
 === In the Instana UI:
 
-1. Navigate to **Services** (left navigation)
-2. Search for and click on your service: `lab-webapp-{{ guid }}`
+1. Click on **Services** in the left navigation menu
+2. Search for and click on your service: `lab-webapp-{guid}`
 
 image::instana_services_search.png[Services Search, link="_images/instana_services_search.png", window=blank]
 
 [start=3]
-3. In the service view, click the **Add Alert** button (top right)
+3. Once in your service details, click on the **Analytics** tab
 
-image::instana_add_alert_button.png[Add Smart Alert, link="_images/instana_add_alert_button.png", window=blank]
+image::instana_service_analytics_tab.png[Analytics Tab, link="_images/instana_service_analytics_tab.png", window=blank]
 
 [start=4]
-4. Configure the alert with these values:
+4. Click on the **+ Add Alert** button (usually in the top right of the Analytics view)
+
+image::instana_add_alert_button.png[Add Alert, link="_images/instana_add_alert_button.png", window=blank]
+
+[start=5]
+5. You'll see a Smart Alerts dialog. Fill out the following:
 
 [options="header"]
 |===
@@ -206,13 +127,13 @@ image::instana_add_alert_button.png[Add Smart Alert, link="_images/instana_add_a
 | Value
 
 | Alert Name
-| `{{ guid }} Web App - Calls Drop Detection`
+| `{guid} Service Down - Calls Drop`
 
 | Scope
-| Specific service: `lab-webapp-{{ guid }}`
+| Your service: `lab-webapp-{guid}`
 
 | Metric
-| Calls (throughput)
+| Calls
 
 | Condition
 | < 1 (less than 1 call per minute)
@@ -221,22 +142,21 @@ image::instana_add_alert_button.png[Add Smart Alert, link="_images/instana_add_a
 | 1 minute
 
 | Alert Channel
-| `EDA Automated Remediation - {{ guid }}`
+| Select: `AIOps Automated Remediation - {guid}`
 |===
 
 image::instana_smart_alert_config.png[Smart Alert Configuration, link="_images/instana_smart_alert_config.png", window=blank]
 
-[start=5]
-5. Click **Create Alert**
+[start=6]
+6. Review the configuration and click **Create Alert**
 
-The alert is now active and monitoring. When `lab-webapp-{{ guid }}` stops responding (calls drop below 1), Instana will:
-* Fire the alert (state = OPEN)
-* Send a webhook to your EDA listener (Path 1: automated)
-* Display recommendations in the Action Catalog (Path 2: manual)
+image::instana_alert_created.png[Alert Created, link="_images/instana_alert_created.png", window=blank]
+
+You've successfully created your Smart Alert! When the service stops responding (calls drop below 1 per minute), Instana will send a webhook POST to your EDA listener.
 
 [NOTE]
 ====
-Smart Alerts are **threshold-less** by default, using ML to learn normal behavior. We've explicitly set `< 1` for clarity in this lab. In production, you'd often leave the condition blank and let Instana's ML determine the threshold.
+Smart Alerts are threshold-less and use machine learning to understand normal baseline behavior. However, in this demo, we've explicitly set the condition to `< 1` for clarity. Instana will fire the alert when calls drop below this threshold for approximately 1 minute.
 ====
 
 == Exercise 1: NLP Matching - Observing Smart Recommendation
@@ -281,6 +201,7 @@ The Action Catalog displays **confidence scores** for how well each template mat
 |===
 
 The NLP works by analyzing:
+
 * Alert text: "Number of calls is anomalously low"
 * Template name: "Restore Web App Service"
 * Template description: (contains keywords about recovery, service, calls)
@@ -326,7 +247,7 @@ Switch to the Instana browser tab and watch your service metrics.
 
 === Calls Drop to Zero
 
-1. In Instana, navigate to **Services** → `lab-webapp-{{ guid }}`
+1. In Instana, navigate to **Services** → `lab-webapp-{guid}`
 2. Open the **Analytics** or **Timeline** view
 3. Watch the **Calls** metric line drop to zero
 
@@ -365,6 +286,7 @@ ssh bastion "sudo journalctl -u eda -n 20"
 ----
 
 You should see log entries showing:
+
 * Webhook received from Instana
 * Rule matched: `state == "OPEN"`
 * Job template triggered: `LINUX | Web App | Restore`
@@ -383,6 +305,7 @@ Exact log output depends on your EDA configuration. In the lab, check the system
 image::aap_restore_job_auto_triggered.png[Auto-Triggered Restore Job, link="_images/aap_restore_job_auto_triggered.png", window=blank]
 
 This job was automatically launched by EDA (not by you manually). It will:
+
 * Connect to `node2`
 * Start `lab-webapp.service`
 * Verify health checks pass
@@ -393,6 +316,7 @@ This job was automatically launched by EDA (not by you manually). It will:
 image::aap_restore_job_details.png[Restore Job Details, link="_images/aap_restore_job_details.png", window=blank]
 
 You've completed **Path 1 (automated remediation)**. The entire flow was:
+
 1. Service breaks
 2. Instana detects (1 min)
 3. Alert fires (immediate)
@@ -407,7 +331,7 @@ Once the restore job completes, the Flask app should be responding again.
 
 === Calls Resume in Instana
 
-1. Switch to Instana **Services** → `lab-webapp-{{ guid }}`
+1. Switch to Instana **Services** → `lab-webapp-{guid}`
 2. Watch the **Calls** metric climb back up to normal levels
 
 image::instana_calls_restored.png[Calls Restored, link="_images/instana_calls_restored.png", window=blank]
@@ -418,6 +342,7 @@ image::instana_calls_restored.png[Calls Restored, link="_images/instana_calls_re
 image::instana_alert_closed.png[Alert CLOSED, link="_images/instana_alert_closed.png", window=blank]
 
 The alert closes automatically because:
+
 * Calls are now > 1 per minute (condition no longer met)
 * Service is healthy again
 * Incident is resolved
@@ -477,12 +402,14 @@ This demonstrates **governance and auditability**. Unlike Path 1 (which is fully
 === When to Use Path 1 (Automated EDA)
 
 ✅ **Use Path 1 when**:
+
 * Failure mode is well-known and safe (service restart)
 * Need fastest possible response (milliseconds matter)
 * No compliance requirement for approval
 * Intent is full automation with zero human touch
 
 ❌ **Don't use Path 1 when**:
+
 * Remediation could have side effects
 * Regulatory/governance requires human review
 * Multiple remediation options exist (need selection)
@@ -491,6 +418,7 @@ This demonstrates **governance and auditability**. Unlike Path 1 (which is fully
 === When to Use Path 2 (Manual Selection)
 
 ✅ **Use Path 2 when**:
+
 * Multiple remediation options available
 * Need human decision-making
 * Compliance requires audit trail
@@ -498,13 +426,15 @@ This demonstrates **governance and auditability**. Unlike Path 1 (which is fully
 * Incident context is complex
 
 ❌ **Don't use Path 2 when**:
+
 * Need immediate response (seconds matter)
 * Failure mode is deterministic (only one right action)
 * Manual step would be bottleneck
 
 === The Instana + AAP Architecture
 
-```
+[source, text]
+----
 Instana detects incident
          ↓
     ┌────┴────┐
@@ -518,11 +448,12 @@ Instana detects incident
   AAP API  AAP API
     ↓         ↓
 Restore    Restore
-```
+----
 
 Both paths call the same AAP job templates. The difference is **trigger mechanism**: webhook (automated) vs. HTTP API call from Instana (manual).
 
 Instana provides **AAP integration credentials** (org + user) that allow it to discover and call job templates. This integration is bidirectional:
+
 * **Instana → AAP**: Discover templates (polling) & execute (API calls)
 * **AAP → Instana**: (Optional) Send events/status via webhook
 
@@ -540,6 +471,6 @@ This section demonstrates **observability is not just visibility—it's the trig
 
 [quote]
 🎯 **Next Steps**: In the following sections, you'll explore how to enhance this workflow with:
-- AI-driven route selection (which remediation to choose)
-- Approval gates (human approval before execution)
-- Closed-loop feedback (confirmation remediation worked)
+* AI-driven route selection (which remediation to choose)
+* Approval gates (human approval before execution)
+* Closed-loop feedback (confirmation remediation worked)
