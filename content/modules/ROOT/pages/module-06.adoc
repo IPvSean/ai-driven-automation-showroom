@@ -169,7 +169,7 @@ https://github.com/ansible-tmm/aiops-summitlab/blob/main/rulebooks/windows_event
 
 == Next steps
 
-You have completed Section 6. Continue to the next section to explore additional automation scenarios.
+You have completed Section 3. Continue to the next section to explore additional automation scenarios.
 
 xref:module-07.adoc[Next: Section 7 ->]
 

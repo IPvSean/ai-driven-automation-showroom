@@ -809,7 +809,7 @@ The **Ansible MCP server** exposes AAP capabilities (inventory, job templates, p
 | Aspect | Traditional (Labs 1-3) | Agentic (This Lab)
 
 | **Trigger**
-| Event (Filebeat, Splunk, Winlogbeat)
+| Event (Instana, Filebeat, Winlogbeat)
 | Human prompt in Claude Code
 
 | **Decision Maker**
@@ -836,6 +836,6 @@ The **Ansible MCP server** exposes AAP capabilities (inventory, job templates, p
 
 You have completed Section 4 - Red Hat Lightspeed: CVE and Advisor Remediation. You used multiple approaches to generate, review, and deploy remediation playbooks — all through a human-in-the-loop workflow where AI proposes and you decide.
 
-In the next lab, you will see the **opposite approach**: a fully autonomous workflow where Splunk detects a RHEL misconfiguration and pre-approved automation fixes it without any human intervention.
+In the next section, you will see the **opposite approach**: AI agents that discover your existing automation and orchestrate it autonomously, from an interactive assistant through to a fully event-driven agent.
 
-Click the link below to continue to *Section 5: Autonomous AIOps - Self-Healing RHEL with Splunk*.
+Continue to xref:module-09.adoc[Section 5: AI-Driven Incident Response with MCP].

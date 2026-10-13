@@ -436,30 +436,9 @@ You have successfully completed the **basic introduction** to AIOps! You've expe
 
 '''
 
-== ⭐ Ready for More? Part 2 Awaits!
-
-image::splunk-logo.png[splunk,150, link="_images/splunk-logo.png", window=blank]
-
-[IMPORTANT]
-====
-**Highly Recommended!** Part 2 takes the AIOps concepts you just learned and applies them to a **more complex, real-world networking scenario**. While Part 1 provided a basic introduction using Apache service remediation, Part 2 demonstrates the true power of AI-driven automation at scale with network infrastructure.
-====
-
-In the next modules, you'll apply everything you've learned to a **network automation scenario** involving:
-
-* 🔍 **Splunk** for network observability and alerting
-* 📡 **Event-Driven Ansible** responding to OSPF routing issues
-* 🧠 **Automation coding assistant** generating network remediation playbooks
-* 🌐 **Cisco routers** with OSPF configuration challenges
-
-[TIP]
-====
-**Both parts are independent.** If you've already completed Part 2 or want to skip ahead to the Summary and Call to Actions, you can navigate there directly from the menu. However, we strongly encourage completing Part 2 for a deeper understanding of AIOps capabilities.
-====
-
 == Complete
 
-Click the link below to continue to **Module 3: Splunk** and begin Part 2.
+You have finished Section 2. Continue to xref:module-06.adoc[Section 3: AIOps with Windows Automation] to apply the same event-driven pattern to Windows Server, or pick any other section from the left navigation.
 
 ifeval::["{run_e2e_load_test}" == "true"]
 =====

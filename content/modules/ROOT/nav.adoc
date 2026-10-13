@@ -8,8 +8,6 @@
 ** xref:module-06.adoc[3. Windows Events and AI-Driven Ticketing]
 * Section 4: Red Hat Lightspeed and Agentic IDE Workflow
 ** xref:module-07.adoc[4. Red Hat Lightspeed: CVE and Advisor Remediation]
-* Section 5: Autonomous AIOps with Self-Healing RHEL
-** xref:module-08.adoc[5. Autonomous AIOps: Self-Healing RHEL]
-* Section 6: AI-Driven Incident Response
-** xref:module-09.adoc[6. AI Agents and AAP via MCP]
+* Section 5: AI-Driven Incident Response
+** xref:module-09.adoc[5. AI Agents and AAP via MCP]
 * xref:module-10.adoc[Summary and Call to Actions]

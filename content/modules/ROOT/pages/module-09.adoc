@@ -1,4 +1,4 @@
-= Section 6 - AI-Driven Incident Response with MCP
+= Section 5 - AI-Driven Incident Response with MCP
 :navtitle: AI-Driven Incident Response with MCP
 
 == Objective

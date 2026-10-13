@@ -39,7 +39,6 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
   * Webhook integration with Event-Driven Ansible for automated response
 - **Filebeat** - Lightweight log shipper monitoring Apache logs
 - **Kafka** - Distributed event streaming platform for real-time event transport
-- Splunk Universal Forwarder on RHEL for system-level misconfiguration detection (optional)
 
 === Automation & Orchestration
 
@@ -63,8 +62,8 @@ link:_images/lab_topology.png[image:lab_topology.png[lab_topology], window=blank
 === Monitored Systems
 
 - Three RHEL (Red Hat Enterprise Linux) nodes
-  * node1: Apache webserver (`httpd`) with Instana agent
-  * node2: Flask web application (`lab-webapp`) with Instana agent for APM
+  * node1: Apache webserver (`httpd`)
+  * node2: Flask web application (`lab-webapp`) with the Instana agent for APM
   * node3: Additional node for system role configuration
 - A Windows Server with Active Directory for Windows event-driven automation
 - Winlogbeat on Windows forwarding events to Kafka
@@ -129,42 +128,49 @@ Password: `{insights_password}`
 ====
 **Read this before starting any section.**
 
-This lab uses multiple Event-Driven Ansible (EDA) rulebook activations, and some of them listen on the same ports or respond to overlapping events. Only the activations relevant to your current section should be enabled. Each section that requires an EDA change will include specific instructions, but here is the overall map for reference:
+This lab uses four Event-Driven Ansible (EDA) rulebook activations. Three are running when your lab starts, and one is intentionally left disabled because it would conflict with another. Here is the starting state:
 
-[cols="2,2,2", options="header"]
+[cols="2,2,1,2", options="header"]
 |===
-| Section | EDA Activation | Notes
+| Section | EDA Activation | At lab start | Event source
 
 | Section 1: Instana Observability
-| **Instana AIOps** (enabled by default)
-| Listens on port 5000 for Instana Smart Alert webhooks
+| **Instana AIOps**
+| Running
+| Webhook on port 5000, from Instana Smart Alerts
 
 | Section 2: Apache Remediation
-| **Web App** (enabled by default)
-| Listens on Kafka for httpd service events
+| **Web App**
+| Running
+| Kafka topic `httpd-error-logs`
 
 | Section 3: Windows Automation
-| **Windows Events** (enabled by default)
-| Listens on Kafka for Windows event logs
+| **Windows Events**
+| Running
+| Kafka, Windows event logs
 
-| Section 5: Self-Healing RHEL
-| **RHEL Cron AIOps** (disabled by default)
-| Shares port 5000 with Instana. *Disable Instana AIOps before enabling this one.*
-
-| Section 6: AI-Driven Incident Response
-| **AI Agent** (disabled by default)
-| *Disable Web App before enabling this one* to prevent duplicate responses.
+| Section 5: AI-Driven Incident Response
+| **AI Agent**
+| Disabled
+| Kafka topic `httpd-error-logs`
 
 |===
 
-Sections 1, 2, 3 can run concurrently since their activations do not conflict (Instana uses port 5000, Kafka is separate). Section 5 shares port 5000 with Instana, so toggles are required. Section 6 conflicts with Section 2 (Web App). Section 4 (Red Hat Lightspeed and Agentic IDE Workflow) does not use EDA at all.
+**There is only one conflict to manage.** **Web App** and **AI Agent** consume the same Kafka topic, so running both at once produces duplicate responses to a single Apache failure. **AI Agent** therefore starts disabled, and Section 5 walks you through swapping them over and swapping back afterwards.
+
+Everything else runs concurrently. Instana AIOps is the only activation using port 5000, and Windows Events has its own event source. Section 4 (Red Hat Lightspeed and Agentic IDE Workflow) does not use EDA at all.
+
+[NOTE]
+====
+Section 1 temporarily disables **Instana AIOps** for one exercise, to show what changes when automated remediation is not armed. That section tells you when to disable it and when to turn it back on. Leave it **Running** at all other times.
+====
 ====
 
 '''
 
 == Workshop Sections
 
-This workshop consists of six independent sections that can be completed in any order. Together they cover the full AIOps maturity spectrum, from intelligent observability with NLP to fully autonomous self-healing with AI agents.
+This workshop consists of five independent sections that can be completed in any order. Together they cover the full AIOps maturity spectrum, from intelligent observability through to autonomous incident response with AI agents.
 
 [cols="1,2,3", options="header"]
 |===
@@ -172,7 +178,7 @@ This workshop consists of six independent sections that can be completed in any 
 
 | xref:module-00-instana-part1.adoc[Section 1]
 | xref:module-00-instana-part1.adoc[IBM Instana Observability and Intelligent Remediation]
-| Learn how intelligent observability detects incidents and surfaces AI-recommended remediation. Understand Smart Alerts, distributed tracing, and the two paths to remediation: automated (EDA) and manual selection via NLP-ranked recommendations. (25-35 min)
+| Learn how intelligent observability detects incidents and surfaces recommended remediation. Explore distributed tracing, build an Application Perspective and Smart Alert, then run both paths to remediation: automated through EDA, and operator-driven from the NLP-ranked Instana Action Catalog. (45-60 min)
 
 | xref:module-01.adoc[Section 2]
 | xref:module-01.adoc[AIOps with Apache Remediation]
@@ -186,11 +192,7 @@ This workshop consists of six independent sections that can be completed in any 
 | xref:module-07.adoc[Red Hat Lightspeed and Agentic IDE Workflow]
 | Use Red Hat Lightspeed to generate CVE and Advisor remediation playbooks, use Automation coding assistant to generate an HTTPD fix in code-server, then use Claude Code to interactively discover and remediate issues via the Ansible MCP server. (50-70 min)
 
-| xref:module-08.adoc[Section 5]
-| xref:module-08.adoc[Autonomous AIOps with Self-Healing RHEL]
-| Experience autonomous self-healing: System-level monitoring detects a RHEL misconfiguration, EDA triggers an AI routing agent that selects and applies the correct fix automatically. (20-30 min)
-
-| xref:module-09.adoc[Section 6]
+| xref:module-09.adoc[Section 5]
 | xref:module-09.adoc[AI-Driven Incident Response with MCP]
 | Use AI agents that interact with Ansible Automation Platform through the Model Context Protocol (MCP). Progress from human-in-the-loop with Claude Code, to autonomous CrewAI agents, to fully operationalized AI-driven incident response with EDA. (30-40 min)
 
@@ -204,8 +206,7 @@ This workshop takes you through the full maturity spectrum:
 
 * **Sections 1-3**: Event-driven with AI content generation and human review checkpoints
 * **Section 4**: Human-in-the-loop with an AI agent that asks permission before every action
-* **Section 5**: Autonomous, pre-approved automation handles detection and remediation end-to-end
-* **Section 6**: AI agents that discover and orchestrate existing automation through MCP, from interactive to fully autonomous
+* **Section 5**: AI agents that discover and orchestrate existing automation through MCP, from interactive to fully autonomous
 
 === Workshop Agenda
 
@@ -247,13 +248,12 @@ xref:module-00-instana-part1.adoc[**Start Section 1: IBM Instana Observability a
 
 [TIP]
 ====
-**All six sections are independent!** You can complete them in any order. New to AIOps? We recommend starting with Section 1 to understand intelligent observability and the two paths to remediation. Already familiar with observability? Jump directly to any section from the left navigation.
+**All five sections are independent!** You can complete them in any order. New to AIOps? We recommend starting with Section 1 to understand intelligent observability and the two paths to remediation. Already familiar with observability? Jump directly to any section from the left navigation.
 
 **Recommended order for first-time learners**:
 1. Section 1: Instana (understand observability and detection)
 2. Section 2: Apache (see full AIOps workflow with log enrichment + AI)
 3. Section 3: Windows (extend pattern to different systems)
 4. Section 4: Lightspeed & IDE (AI-assisted playbook creation)
-5. Section 5: Self-Healing (autonomous responses)
-6. Section 6: AI Agents (advanced orchestration with MCP)
+5. Section 5: AI Agents (advanced orchestration with MCP)
 ====

@@ -1,91 +1,92 @@
 = Section 1.1 - Instana Observability and Infrastructure Monitoring
+
 :navtitle: Instana Observability and Infrastructure Monitoring
 
-*Estimated time: 25-35 minutes*
+*Estimated time: 15-20 minutes*
 
 == Objective
 
 In this section, we will explore **IBM Instana**, an enterprise-grade observability platform that provides real-time monitoring, intelligent alerting, and automated incident detection. This section demonstrates how observability platforms integrate with Ansible Automation Platform for intelligent remediation workflows.
 
-Instana continuously monitors your infrastructure and applications, detecting anomalies automatically. When issues occur, it generates intelligent alerts that trigger automated remediation through Event-Driven Ansible, creating a complete closed-loop AIOps workflow.
+Instana continuously monitors your infrastructure and applications, detecting anomalies automatically. When issues occur, it generates alerts that trigger automated remediation through Event-Driven Ansible, creating a complete closed-loop AIOps workflow.
 
 == Learning Objectives
 
 After completing this module, you will be able to:
 
 * Navigate the Instana observability platform and understand its core components
-* Explore the infrastructure map to visualize your monitored systems
-* Understand distributed tracing and service dependencies through the Services tab
-* Configure Smart Alerts for proactive incident detection
-* Create generic webhook alert channels for integration with Ansible Automation Platform
-* Understand how observability data flows into event-driven automation
+* Locate your own monitored host in the infrastructure map using your zone
+* Understand distributed tracing and service metrics through the Services tab
+* Read an Instana Smart Alert webhook payload and understand which fields drive automation
+* Describe the two remediation paths used in this lab and when each applies
 
 == What is Instana?
 
-Instana is an AI-powered observability and application performance monitoring (APM) platform that provides:
+Instana is an observability and application performance monitoring (APM) platform that provides:
 
 * **Full-stack observability**: Monitor infrastructure, containers, applications, and synthetic transactions
 * **Automated discovery**: Automatically detects and monitors services, dependencies, and infrastructure
-* **Intelligent alerting**: Uses machine learning to detect anomalies without manual threshold configuration
-* **Native integrations**: Built-in connectors for major platforms including Ansible Automation Platform
-* **Closed-loop remediation**: Trigger automated responses through webhooks and API integrations
+* **Smart Alerts**: Detects anomalies in service behavior and raises incidents
+* **Action Catalog**: Imports Ansible Automation Platform job templates and recommends them against live incidents
+* **Closed-loop remediation**: Triggers automated responses through webhooks and API calls
 
-In this lab, Instana is monitoring a **Flask web application** (`lab-webapp`) running on `node2`. The Instana agent collects metrics about service latency, error rates, throughput (calls), and infrastructure health. When the application stops responding (calls drop to 0), Instana detects this anomaly and sends a webhook alert to Event-Driven Ansible, which triggers an automated remediation workflow.
+In this lab, Instana monitors a **Flask web application** running on `{rhel_node2}`. The Instana agent collects metrics about service latency, error rates, throughput (calls), and infrastructure health. When the application stops responding and calls drop to zero, Instana detects the anomaly and sends a webhook to Event-Driven Ansible, which triggers remediation in Ansible Automation Platform.
 
 == Lab Architecture Overview
 
 [source, text]
 ----
 ┌─────────────────────────────────────────────────────────┐
-│ IBM Instana (On-Prem)                                  │
-│ unit0-techzone.163-66-82-253.nip.io                   │
-│                                                          │
-│  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │ Infra Map   │  │ Services Tab │  │ Smart Alerts │  │
-│  │ (Zones)     │  │ (Flask app)  │  │ (WebHooks)   │  │
-│  └─────────────┘  └──────────────┘  └──────────────┘  │
+│ IBM Instana (shared, on-premise)                        │
+│                                                         │
+│  ┌─────────────┐  ┌──────────────┐  ┌───────────────┐   │
+│  │ Infra Map   │  │ Services Tab │  │ Smart Alerts  │   │
+│  │ (zones)     │  │ (Flask app)  │  │ (webhook)     │   │
+│  └─────────────┘  └──────────────┘  └───────────────┘   │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │ Action Catalog (job templates imported from AAP)  │  │
+│  └───────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
-                            ↓
-                  Webhook (HTTP POST)
-                    issue.state=OPEN
-                            ↓
-┌─────────────────────────────────────────────────────────┐
-│ Event-Driven Ansible (EDA) - Bastion                   │
-│ Port 5000 (Webhook Listener)                           │
-│                                                          │
-│  Rulebook: instana.yml                                 │
-│  - Receives webhook payload                            │
-│  - Matches: state = "OPEN"                             │
-│  - Triggers: Workflow Template                         │
-└─────────────────────────────────────────────────────────┘
-                            ↓
-                   AAP Workflow Template
-              (AI-Driven Remediation or Direct)
-                            ↓
+            │                                  │
+   Path 1   │ webhook POST                     │ Path 2
+            │ issue.state=OPEN                 │ operator runs
+            v                                  │ action from UI
+┌─────────────────────────────────────────┐    │
+│ Event-Driven Ansible (on the controller)│    │
+│ Rulebook activation: Instana AIOps      │    │
+│ Webhook listener on port 5000           │    │
+│  - matches issue.state == "OPEN"        │    │
+│  - derives your {guid} from entityLabel │    │
+│  - launches the Restore job template    │    │
+└─────────────────────────────────────────┘    │
+            │                                  │
+            v                                  v
 ┌─────────────────────────────────────────────────────────┐
 │ Ansible Automation Platform                             │
-│ - Approve remediation action                           │
-│ - Execute: LINUX | Web App | Restore                 │
-│ - Restart lab-webapp service                           │
+│ Organization: Instana AIOps                             │
+│ Runs: INSTANA | {guid} | Restore Web App Service        │
 └─────────────────────────────────────────────────────────┘
-                            ↓
+                            │
+                            v
 ┌─────────────────────────────────────────────────────────┐
-│ RHEL Node 2 (lab-webapp)                               │
-│ - Service restored                                     │
-│ - Calls resume                                         │
-│ - Alert auto-closes in Instana                         │
+│ RHEL node {rhel_node2}                                  │
+│ - lab-webapp service started                            │
+│ - calls resume                                          │
+│ - Instana closes the alert automatically                │
 └─────────────────────────────────────────────────────────┘
 ----
 
+Both paths end in the same place: a job template in Ansible Automation Platform. Only the trigger differs.
+
 == Accessing Instana
 
-[cols="2,2", options="header"]
+[cols="2,3", options="header"]
 |===
 | Component
 | Value
 
 | Instana URL
-| https://unit0-techzone.163-66-82-253.nip.io/
+| https://unit0-techzone.163-66-82-253.nip.io/[Instana UI^]
 
 | Username
 | `admin@instana.local`
@@ -93,200 +94,229 @@ In this lab, Instana is monitoring a **Flask web application** (`lab-webapp`) ru
 | Password
 | Provided by your instructor
 
-| Instana Agent Endpoint
-| `agent-acceptor.163-66-82-253.nip.io:443` (for agent registration only)
+| Your zone
+| `{guid}`
+
+| Your service name
+| `lab-webapp-{guid}`
 |===
 
-[NOTE]
+[IMPORTANT]
 ====
-The Instana agent acceptor endpoint is different from the UI URL. Agents connect to `agent-acceptor.163-66-82-253.nip.io:443`, while users access the UI at `unit0-techzone.163-66-82-253.nip.io`. This separation allows the Instana backend to scale agent ingestion independently from the UI.
+This Instana instance is **shared across all students in this workshop**. Every participant logs in with the same account and sees the same infrastructure map, service list, and Action Catalog.
+
+Everything you create must be named with your own `{guid}` so you can find it again, and so you do not disturb anyone else. Do not delete or modify alerts, channels, or actions that belong to another `{guid}`.
 ====
 
 === Step 1: Log Into Instana
 
-1. Open your browser and navigate to the Instana URL above
-2. Log in with the provided credentials
-3. You should see the Instana dashboard with the **Infrastructure** map as the default view
+. Open the Instana URL above in a new browser tab
+. Log in with the credentials provided by your instructor
+. The **Infrastructure** map opens as the default view
 
 == Understanding Instana Components
 
-=== 1. Infrastructure Map (Zones)
+=== 1. Infrastructure Map (zones)
 
-The Infrastructure Map shows all monitored systems organized by **zones**. In this lab, we use the zone name to separate each student's environment.
+The infrastructure map shows all monitored hosts, grouped into **zones**. Each student environment reports into its own zone, named after the `{guid}`.
 
 **Your zone name is**: `{guid}`
 
-This unique identifier ensures your monitoring data is isolated from other students.
+==== Exploring your zone
 
-==== Exploring Your Infrastructure Zone
-
-1. In the Instana UI, click on **Infrastructure** in the left navigation menu
-2. Look for your zone in the map display (labeled with your `{guid}`)
-3. You should see a **tower icon** representing your zone with the Instana agent running on `node2`
+. In the Instana UI, click **Infrastructure** in the left navigation menu
+. Locate the tower labelled `{guid}` in the map
+. The tower represents the RHEL host `{rhel_node2}`, where the Instana agent and the Flask application are running
 
 image::instana_infra_map_zone.png[Instana Infrastructure Map, link="_images/instana_infra_map_zone.png", window=blank]
 
-The infrastructure map shows:
-
-* **Green tower**: Healthy agent (monitoring actively)
-* **Number of nodes**: Count of monitored systems in the zone
-* **CPU/Memory metrics**: Real-time resource utilization
+Hovering or clicking the tower shows CPU, memory, and the processes discovered on the host.
 
 [NOTE]
 ====
-If you don't see your zone immediately, it may take 2-3 minutes after the lab starts for the agent to register and appear in the map. Check back after completing other sections.
+Searching the infrastructure map with a query such as `entity.zone:{guid}` does **not** filter reliably for host agents in this environment. Find your zone visually in the map instead, or skip straight to the Services tab, where your service name already contains your `{guid}`.
+
+If your zone is not visible yet, allow 2-3 minutes after lab start for the agent to register.
 ====
 
-=== 2. Services Tab
+=== 2. Services tab
 
-The **Services** tab shows all monitored applications and their performance metrics. In this lab, we're monitoring a Flask web application called `lab-webapp-{guid}`.
+The **Services** tab lists monitored applications and their performance metrics. Your Flask application is registered as `lab-webapp-{guid}`.
 
-==== Exploring Your Service
+==== Exploring your service
 
-1. Click on **Services** in the left navigation menu
-2. Search for or scroll to find `lab-webapp-{guid}`
-3. Click on the service name to open its details
+. Click **Services** in the left navigation menu
+. Search for `{guid}` to filter the list down to your own service
+. Click `lab-webapp-{guid}` to open its details
 
 image::instana_services_tab.png[Instana Services, link="_images/instana_services_tab.png", window=blank]
 
 The Services view displays:
 
-* **Service name**: `lab-webapp-{guid}` (unique per student)
-* **Calls**: Number of HTTP requests (should be continuous if traffic generator is running)
-* **Latency**: Response time metrics (p50, p95, p99)
-* **Error rate**: Percentage of failed requests
-* **Dependencies**: Upstream/downstream services and databases
-* **Trace sampling**: Individual request traces showing detailed execution flow
+* **Calls**: HTTP request throughput, which should be continuous while the lab is healthy
+* **Latency**: response time metrics
+* **Error rate**: percentage of failed requests
+* **Traces**: individual request traces showing the execution flow
 
 [NOTE]
 ====
-A continuous traffic generator runs on the bastion VM to simulate realistic load on the Flask app. This ensures Instana can detect when calls drop to zero (service down). Without traffic, Instana cannot trigger anomaly detection alerts.
+A traffic generator runs continuously on the bastion and calls the Flask application's `/health` endpoint every few seconds. This matters: the alert used in this lab fires when the call rate drops to zero. Without a steady baseline of traffic there is nothing to drop, and no alert would ever fire.
 ====
 
-==== Distributed Tracing Example
+==== Distributed tracing
 
-1. While viewing your service, click on the **Traces** section
-2. You should see individual HTTP GET requests to `/health` (health checks) and `/api/data` (application endpoints)
-3. Click on one trace to see the full execution flow
-4. The trace shows response time, payload size, and any errors
+. While viewing your service, open the **Traces** view
+. You will see individual HTTP GET requests to `/health` from the traffic generator
+. Click a trace to see the full execution flow, response time, and any errors
 
-This distributed tracing capability is crucial for understanding service behavior during incident investigation.
+The Python Instana SDK is loaded by the Flask application, so these traces are produced by real instrumentation rather than synthetic checks.
 
 === 3. Smart Alerts
 
-Smart Alerts are intelligent, threshold-less alerting that detects when your service behaves abnormally. Unlike traditional alerting (which requires you to manually set thresholds), Instana's Smart Alerts use machine learning to understand normal baseline behavior and alert only when something is actually wrong.
+Smart Alerts monitor a service and raise an incident when its behaviour changes. In this lab we use a Smart Alert on the **Throughput** (calls) metric:
 
-==== Types of Smart Alerts
+* **Metric**: calls (throughput)
+* **Condition**: `< 1` call per minute, which means the service has stopped serving traffic
+* **Evaluation granularity**: 1 minute, the minimum available
+* **Scope**: an Application Perspective containing only your service, `lab-webapp-{guid}`
+* **Channel**: a generic webhook pointing at your Event-Driven Ansible listener
 
-In this lab, we're using a **Service-level Smart Alert** configured to monitor **Calls (Throughput)** metric:
+[NOTE]
+====
+Smart Alerts cannot be attached straight to a service. They are always created in the context of an **Application Perspective**, a scoped view of one or more services. In the next module you will therefore build the alert in two stages: first an Application Perspective wrapping your service, then the Smart Alert inside it.
+====
 
-* **Metric**: Number of calls (HTTP requests per minute)
-* **Trigger condition**: `< 1` (less than 1 call per minute = service is down)
-* **Evaluation granularity**: 1 minute (evaluates every minute)
-* **Scope**: Specific service (`lab-webapp-{guid}`)
-* **Channel**: Generic webhook → EDA webhook URL
+The alert has two states that matter to automation:
 
-When the alert fires:
+* **OPEN**: the service is down and remediation should run
+* **CLOSED**: the service has recovered and the incident is resolved
 
-1. **State = OPEN**: Service is down (calls dropped below threshold)
-2. **State = CLOSED**: Service recovered (calls restored above threshold)
+[NOTE]
+====
+Instana Smart Alerts can use machine learning baselines, but in this lab we set an explicit `< 1` threshold. It is deterministic, which makes the exercise reproducible inside a short workshop slot.
+====
 
-The webhook payload contains detailed incident information that the EDA rulebook uses to decide on remediation actions.
+== The Instana Webhook Payload
 
-== Instana Webhook Payload Structure
+When the Smart Alert fires, Instana sends an HTTP POST to the configured channel. The following payload was captured from a real alert in this lab environment:
 
-When a Smart Alert fires, Instana sends a webhook with this structure:
-
-[source, json]
+[source, yaml]
 ----
-{
-  "issue": {
-    "state": "OPEN",                           // "OPEN" = alert triggered, "CLOSED" = resolved
-    "severity": 10,                            // Alert severity level
-    "type": "incident",                        // Type of issue
-    "metricName": "calls",                     // What metric triggered the alert
-    "metric": "0.0",                           // Current value (0 calls = service down)
-    "thresholdValue": "1.0",                   // Alert threshold
-    "entityLabel": "lab-webapp-ds2nq",        // Service name (matches your INSTANA_SERVICE_NAME)
-    "text": "Number of calls is anomalously low",  // Human-readable alert message
-    "link": "https://unit0-techzone.../events;eventId=...",  // Link to incident in Instana UI
-    "start": 1791404942004,                    // Timestamp when issue started
-    "entity": "Service",                       // What type of entity (Service, Application, etc)
-    "zone": "not available"                    // Zone info (for service alerts, may be N/A)
-  }
-}
+issue:
+  state: OPEN                                 # OPEN when raised, CLOSED when resolved
+  type: incident
+  severity: 10
+  entity: Service
+  entityLabel: lab-webapp-ds2nq               # service name, ends with the student guid
+  metricName: calls
+  metric: "0.000"                             # current value: no calls at all
+  thresholdValue: "1.0"
+  calls: "0.000 < 1.000"
+  text: Number of calls is anomalously low    # human readable alert text
+  link: https://unit0-techzone.../events;eventId=...
+  start: 1791404942004
+  zone: not available                         # service-scoped alerts carry no zone
 ----
 
-This payload is parsed by the EDA rulebook to:
+Three fields drive the automation:
 
-1. Extract the service name (`entityLabel`)
-2. Determine the state (`OPEN` = alert, `CLOSED` = resolved)
-3. Trigger appropriate remediation actions
-4. Pass context to the AAP workflow
+[cols="1,3", options="header"]
+|===
+| Field
+| Why it matters
+
+| `issue.state`
+| The rulebook only acts on `OPEN`. `CLOSED` is logged so you can see recovery.
+
+| `issue.entityLabel`
+| Carries your `{guid}` as a suffix. The rulebook strips `lab-webapp-` from it to work out which student's job template to launch.
+
+| `issue.text`
+| "Number of calls is anomalously low". This text is what the Action Catalog matches job templates against in Path 2.
+|===
+
+[IMPORTANT]
+====
+The payload sent by the **Send Test Alert** button in the Instana channel configuration is a `change` event and contains **no** `state` field. The rulebook condition is `event.payload.issue.state == "OPEN"`, so a test alert will reach Event-Driven Ansible but will not launch a job. Only a real firing alert triggers remediation.
+====
 
 == Two Paths to Remediation
 
-Based on the Instana alert, AAP can take two complementary paths:
+This lab deliberately wires up two different ways to get from an Instana incident to an Ansible job. Both run the same job template in the end.
 
-=== Path 1: Direct Remediation (Immediate)
+=== Path 1: Automated remediation through Event-Driven Ansible
 
-When the alert fires, immediately trigger a job template to restore the service:
+Instana posts the alert to a webhook. The **Instana AIOps** rulebook activation running in Ansible Automation Platform matches the event and launches the restore job with no human involved:
 
 [source, yaml]
 ----
-- name: "Trigger direct remediation on Instana OPEN alert"
+- name: "Trigger AI remediation on Instana OPEN alert"
   condition: event.payload.issue.state == "OPEN"
   actions:
     - run_job_template:
-        name: "LINUX | Web App | Restore"
-        organization: "Default"
+        name: "INSTANA | {{ event.payload.issue.entityLabel | replace('lab-webapp-', '') }} | Restore Web App Service - Fix anomalously low calls"
+        organization: "Instana AIOps"
+        job_args:
+          limit: "node2"
+          extra_vars:
+            instana_entity_label: "{{ event.payload.issue.entityLabel }}"
+            instana_alert_text: "{{ event.payload.issue.text }}"
+            instana_metric: "{{ event.payload.issue.metric }}"
+            instana_alert_state: "{{ event.payload.issue.state }}"
 ----
 
-**Advantages**:
+Note how the template name is built at runtime from `entityLabel`. That is what keeps one shared rulebook working for every student at once: your alert can only ever launch your own job template.
 
-* Fast response time
-* Predictable remediation action
-* Good for well-known failure modes
+**Strengths**: fastest possible response, no human in the loop, predictable for well-understood failures.
 
-**Use case**: Service restart, connection reset, application hang
+=== Path 2: Operator-driven remediation through the Action Catalog
 
-=== Path 2: AI-Driven Remediation (Intelligent)
+Instana polls Ansible Automation Platform and imports the job templates it is allowed to see into its **Action Catalog**. When an incident is open, Instana matches the incident text against the names and descriptions of those actions and surfaces the most relevant ones as recommendations. An operator picks one and runs it from the Instana UI.
 
-Analyze the alert with AI to select the best remediation from multiple options:
+**Strengths**: a human chooses between several candidate remediations, every run is attributable, and the decision is recorded.
 
-[source, yaml]
-----
-- name: "Trigger AI-driven remediation on Instana OPEN alert"
-  condition: event.payload.issue.state == "OPEN"
-  actions:
-    - run_workflow_template:
-        name: "AI-Driven Instana Remediation"
-        organization: "Default"
-        extra_vars:
-          instana_event: "{{ event.payload.issue }}"
-          metric_name: "{{ event.payload.issue.metricName }}"
-          service_name: "{{ event.payload.issue.entityLabel }}"
-----
+[NOTE]
+====
+In this workshop you will see the recommendations Instana produces, but you will not be able to execute an action from the Instana UI. The shared lab instance does not permit it. Section 1.2 explains the constraint and has you run the same job template from Ansible Automation Platform instead.
+====
 
-**Advantages**:
+=== Comparing the paths
 
-* Intelligent action selection
-* Learns from incident patterns
-* Can select different remediation based on context
-* Opportunity for human approval before execution
+[cols="1,2,2", options="header"]
+|===
+| Aspect
+| Path 1 (Event-Driven Ansible)
+| Path 2 (Action Catalog)
 
-**Use case**: Multiple remediation options, complex incidents, critical services requiring approval
+| Trigger
+| Webhook from the Smart Alert
+| Operator clicks in the Instana UI
+
+| Human involvement
+| None
+| Required
+
+| Response time
+| Seconds after the alert fires
+| As fast as someone responds
+
+| Best for
+| Known, safe, repeatable fixes
+| Ambiguous incidents, changes needing approval
+|===
+
+[NOTE]
+====
+These are complementary, not competing. A mature AIOps practice automates the failure modes it trusts and routes the rest to an operator with good recommendations attached.
+====
 
 == Summary
 
 You now understand:
 
-* How Instana monitors services and infrastructure through agents and distributed tracing
-* How Smart Alerts detect anomalies without manual threshold configuration
-* How webhooks send alert data to external systems for automated response
-* The two complementary paths for remediation: direct and AI-driven
+* How Instana monitors hosts and services through its agent and the Python tracing SDK
+* How to find your own zone and service in a shared Instana instance using your `{guid}`
+* What a Smart Alert webhook payload contains and which fields drive automation
+* The two remediation paths this lab implements, and the trade-off between them
 
-In the next module, we will set up your Smart Alert channel and trigger the automated remediation workflow.
-
-[quote]
-⚠️ **You will create the Smart Alert in the next module.** Make sure the EDA webhook listener is running first, as we need that URL for the alert channel configuration.
+In the next module you will create the alert channel and Smart Alert, break the service, and watch both paths run.
