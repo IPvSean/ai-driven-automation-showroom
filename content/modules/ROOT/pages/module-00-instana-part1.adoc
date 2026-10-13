@@ -56,7 +56,7 @@ In this lab, Instana monitors a **Flask web application** running on `{rhel_node
 │ Rulebook activation: Instana AIOps      │    │
 │ Webhook listener on port 5000           │    │
 │  - matches issue.state == "OPEN"        │    │
-│  - derives your {guid} from entityLabel │    │
+│  - derives your guid from entityLabel   │    │
 │  - launches the Restore job template    │    │
 └─────────────────────────────────────────┘    │
             │                                  │
@@ -64,12 +64,12 @@ In this lab, Instana monitors a **Flask web application** running on `{rhel_node
 ┌─────────────────────────────────────────────────────────┐
 │ Ansible Automation Platform                             │
 │ Organization: Instana AIOps                             │
-│ Runs: INSTANA | {guid} | Restore Web App Service        │
+│ Runs: INSTANA | <guid> | Restore Web App Service        │
 └─────────────────────────────────────────────────────────┘
                             │
                             v
 ┌─────────────────────────────────────────────────────────┐
-│ RHEL node {rhel_node2}                                  │
+│ RHEL node 2 (your application host)                     │
 │ - lab-webapp service started                            │
 │ - calls resume                                          │
 │ - Instana closes the alert automatically                │

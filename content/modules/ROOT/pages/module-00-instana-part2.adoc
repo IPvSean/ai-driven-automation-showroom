@@ -88,7 +88,7 @@ This activation runs the `instana.yml` rulebook, which listens for webhooks on p
 
 Your webhook URL is:
 
-[source, text]
+[source, text, subs="attributes+"]
 ----
 {eda_webhook_url}
 ----
@@ -155,7 +155,7 @@ An Application Perspective is a scoped view of one or more services. Yours will 
 . Click **Add Application Perspective**
 . Name it:
 +
-[source, text]
+[source, text, subs="attributes+"]
 ----
 {guid} Web App
 ----
@@ -255,7 +255,7 @@ Break the service and let Event-Driven Ansible repair it without you.
 . Click **Launch**
 . The template prompts for a **Limit**. Enter:
 +
-[source, text]
+[source, text, subs="attributes+"]
 ----
 {rhel_node2}
 ----
