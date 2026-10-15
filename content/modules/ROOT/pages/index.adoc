@@ -159,11 +159,11 @@ This lab uses four Event-Driven Ansible (EDA) rulebook activations. Three are ru
 **There is only one conflict to manage.** **Web App** and **AI Agent** consume the same Kafka topic, so running both at once produces duplicate responses to a single Apache failure. **AI Agent** therefore starts disabled, and Section 5 walks you through swapping them over and swapping back afterwards.
 
 Everything else runs concurrently. Instana AIOps is the only activation using port 5000, and Windows Events has its own event source. Section 4 (Red Hat Lightspeed and Agentic IDE Workflow) does not use EDA at all.
+====
 
 [NOTE]
 ====
 Section 1 temporarily disables **Instana AIOps** for one exercise, to show what changes when automated remediation is not armed. That section tells you when to disable it and when to turn it back on. Leave it **Running** at all other times.
-====
 ====
 
 '''
@@ -204,13 +204,14 @@ This workshop consists of five independent sections that can be completed in any
 
 This workshop takes you through the full maturity spectrum:
 
-* **Sections 1-3**: Event-driven with AI content generation and human review checkpoints
+* **Section 1**: Instana detects an outage; EDA runs a predefined restore job, or an operator reviews Action Catalog recommendations
+* **Sections 2-3**: Event-driven workflows with AI content generation and human review checkpoints
 * **Section 4**: Human-in-the-loop with an AI agent that asks permission before every action
 * **Section 5**: AI agents that discover and orchestrate existing automation through MCP, from interactive to fully autonomous
 
 === Workshop Agenda
 
-For Sections 1-3, each section follows a consistent 4-part structure:
+Section 1 covers Instana observability and the two remediation paths. Section 3 covers Windows events and AI-driven ticketing. Section 2 follows this four-part Apache workflow:
 
 1. *Event-Driven Ansible (EDA) Response* - Event Driven Ansible will respond to a systemd application outage
 
@@ -219,8 +220,8 @@ For Sections 1-3, each section follows a consistent 4-part structure:
 3. *Remediation Workflow* - This workflow will focus on automatically creating an Ansible Playbook to resolve the issue by using Automation coding assistant.  This workflow will take the prompt created by the previous workflow, request a playbook from Automation coding assistant, sync this playbook to Git and then automatically create a Job Template for us to remediate the issue.
 
 4. *Execute a remediation*
-* For Section 1: *Execute HTTPD Remediation* - This is the final Job Template that will actually fix the application outage on the RHEL webserver.
-* For Section 2: *AI Driven Ansible for Network Automation* - This section synthesizes the AI skills from the preceding sections of the {lab_name} into a practical network automation scenario.
++
+Launch *Execute HTTPD Remediation* to fix the Apache outage on the RHEL webserver after reviewing the generated playbook.
 
 [quote]
 Could this all be one workflow? Yes.  This is purposely broken up at natural breakpoints where a human user can review what the AIOps workflow is doing and course correct if required.  This also allows organizations to incrementally adopt AIOps workflows.  Organizations can benefit greatly from any of these individual sections!

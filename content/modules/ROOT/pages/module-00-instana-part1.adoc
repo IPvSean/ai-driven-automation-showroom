@@ -1,5 +1,4 @@
 = Section 1.1 - Instana Observability and Infrastructure Monitoring
-
 :navtitle: Instana Observability and Infrastructure Monitoring
 
 *Estimated time: 15-20 minutes*
@@ -30,7 +29,7 @@ Instana is an observability and application performance monitoring (APM) platfor
 * **Action Catalog**: Imports Ansible Automation Platform job templates and recommends them against live incidents
 * **Closed-loop remediation**: Triggers automated responses through webhooks and API calls
 
-In this lab, Instana monitors a **Flask web application** running on `{rhel_node2}`. The Instana agent collects metrics about service latency, error rates, throughput (calls), and infrastructure health. When the application stops responding and calls drop to zero, Instana detects the anomaly and sends a webhook to Event-Driven Ansible, which triggers remediation in Ansible Automation Platform.
+In this lab, Instana monitors a **Flask web application** running on `node2`. The Instana agent collects metrics about service latency, error rates, throughput (calls), and infrastructure health. When the application stops responding and calls drop to zero, Instana detects the anomaly and sends a webhook to Event-Driven Ansible, which triggers remediation in Ansible Automation Platform.
 
 == Lab Architecture Overview
 
@@ -118,25 +117,24 @@ Everything you create must be named with your own `{guid}` so you can find it ag
 
 === 1. Infrastructure Map (zones)
 
-The infrastructure map shows all monitored hosts, grouped into **zones**. Each student environment reports into its own zone, named after the `{guid}`.
+The infrastructure map shows all monitored hosts, grouped into **zones**. In this workshop, zones are the **student separation layer**: every student environment reports into its own zone, named after that student's `{guid}`. Your lab's RHEL node2 — the host running the Flask web application — shows up in the map attached to your `{guid}` as its zone, together with the Instana agent and every process it discovers on that host.
 
 **Your zone name is**: `{guid}`
 
 ==== Exploring your zone
 
 . In the Instana UI, click **Infrastructure** in the left navigation menu
-. Locate the tower labelled `{guid}` in the map
-. The tower represents the RHEL host `{rhel_node2}`, where the Instana agent and the Flask application are running
+. Locate the tower labelled `{guid}` in the map — this is your host, and everything inside it belongs to your lab environment
+. The tower represents the RHEL host `node2`, where the Instana agent and the Flask application (`lab-webapp`) are running
+. Confirm the agent shows as **online**; if your zone is not visible yet, allow 2-3 minutes after lab start for the agent to register and refresh the map
 
 image::instana_infra_map_zone.png[Instana Infrastructure Map, link="_images/instana_infra_map_zone.png", window=blank]
 
-Hovering or clicking the tower shows CPU, memory, and the processes discovered on the host.
+Hovering over the tower shows a summary of CPU, memory, and the agents and processes reporting from the host. Clicking it opens the host details, where you can see the individual processes discovered on `node2` — including the Python process behind `lab-webapp`.
 
 [NOTE]
 ====
 Searching the infrastructure map with a query such as `entity.zone:{guid}` does **not** filter reliably for host agents in this environment. Find your zone visually in the map instead, or skip straight to the Services tab, where your service name already contains your `{guid}`.
-
-If your zone is not visible yet, allow 2-3 minutes after lab start for the agent to register.
 ====
 
 === 2. Services tab
@@ -176,8 +174,9 @@ The Python Instana SDK is loaded by the Flask application, so these traces are p
 Smart Alerts monitor a service and raise an incident when its behaviour changes. In this lab we use a Smart Alert on the **Throughput** (calls) metric:
 
 * **Metric**: calls (throughput)
-* **Condition**: `< 1` call per minute, which means the service has stopped serving traffic
-* **Evaluation granularity**: 1 minute, the minimum available
+* **Condition**: operator `<` with the **Critical** threshold set to `< 1` call per minute, which means the service has stopped serving traffic
+* **Time threshold**: evaluation windows of 1 minute each
+* **Grace period**: 1 minute, so the incident closes shortly after traffic resumes
 * **Scope**: an Application Perspective containing only your service, `lab-webapp-{guid}`
 * **Channel**: a generic webhook pointing at your Event-Driven Ansible listener
 
@@ -235,9 +234,11 @@ Three fields drive the automation:
 | "Number of calls is anomalously low". This text is what the Action Catalog matches job templates against in Path 2.
 |===
 
+One more field worth knowing: `issue.severity` is `10` for Critical alerts like the one you will create, and `5` for Warning. The rulebook in this lab does not use it, but it is useful for filtering events in the activation history.
+
 [IMPORTANT]
 ====
-The payload sent by the **Send Test Alert** button in the Instana channel configuration is a `change` event and contains **no** `state` field. The rulebook condition is `event.payload.issue.state == "OPEN"`, so a test alert will reach Event-Driven Ansible but will not launch a job. Only a real firing alert triggers remediation.
+The payload sent by the **Test channel** button in the Instana channel configuration is a `change` event and contains **no** `state` field. The rulebook condition is `event.payload.issue.state == "OPEN"`, so a test alert will reach Event-Driven Ansible but will not launch a job. Only a real firing alert triggers remediation.
 ====
 
 == Two Paths to Remediation

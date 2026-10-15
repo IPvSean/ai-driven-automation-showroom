@@ -1,5 +1,4 @@
 = Section 1.2 - Smart Alerts and Dual-Path Remediation
-
 :navtitle: Smart Alerts and Dual-Path Remediation
 
 *Estimated time: 30-40 minutes*
@@ -14,7 +13,7 @@ By the end of this module you will have a working closed loop: Instana detects t
 
 After completing this module, you will be able to:
 
-* Identify the Ansible job templates provisioned for your environment and explain how they are isolated per student
+* Identify the Ansible job templates provisioned for your environment and verify their target host
 * Create a generic webhook alert channel that targets your Event-Driven Ansible listener
 * Create an Application Perspective and a service-level Smart Alert scoped to it
 * Trigger and observe fully automated remediation through Event-Driven Ansible
@@ -62,7 +61,7 @@ You will see six templates, all in the **Instana AIOps** organization:
 | Gathers host facts for triage.
 
 | `INSTANA \| {guid} \| AI Route Web App Incident - Analyze anomalously low calls`
-| Entry point for AI-driven routing.
+| Reserved for AI-driven routing. The current provisioning points this template at a cron-specific playbook; do not launch it for this Instana exercise.
 
 | `INSTANA \| {guid} \| Notify Mattermost - Web App Low Calls Alert`
 | Sends a notification to Mattermost.
@@ -70,7 +69,7 @@ You will see six templates, all in the **Instana AIOps** organization:
 
 [NOTE]
 ====
-Every template name begins with `INSTANA | {guid} |`. That prefix is what keeps a shared Instana instance safe: your alert can only ever launch templates carrying your own `{guid}`, and you can find your own work in a catalog containing every student's templates.
+Every template name begins with `INSTANA | {guid} |`. Use that prefix to find your templates in the shared catalog. The prefix is a naming convention, not an access-control boundary. Permissions depend on the AAP account used by the integration, and host targeting depends on the inventory and launch limit. Before launching a job, verify both the full template name and the limit.
 
 Notice also that the descriptions repeat phrases such as "anomalously low calls", "service is down", and "unreachable". That wording is deliberate, and Exercise 2 explains why.
 ====
@@ -135,7 +134,7 @@ image::instana_webhook_channel_config.png[Webhook Channel Configuration, link="_
 
 [TIP]
 ====
-If the channel configuration offers a **Send Test Alert** button, use it to prove connectivity. The activation **History** in Ansible Automation Platform will show the event arriving.
+Click **Test channel** to prove connectivity. The activation **History** in Ansible Automation Platform will show the event arriving.
 
 No job will launch, and that is expected. The test payload is a `change` event with no `state` field, so it cannot satisfy the rulebook condition `issue.state == "OPEN"`. Only a genuine firing alert launches remediation.
 ====
@@ -149,36 +148,51 @@ Instana does not let you attach a Smart Alert directly to a service. Smart Alert
 
 === Stage 1: Create your Application Perspective
 
-An Application Perspective is a scoped view of one or more services. Yours will contain a single service, `lab-webapp-{guid}`.
+An Application Perspective is a scoped view of one or more services. Yours will contain a single service, `lab-webapp-{guid}`. You will build it in this order: pick the call type, filter down to your service with a filter you type by hand, and name it last.
 
 . In the Instana UI, click **Applications** in the left navigation menu
-. Click **Add Application Perspective**
-. Name it:
+. Click the large blue **+** button (Add) and choose **Add Application Perspective**
+. For the call type, select **Calls for this application** — the inbound calls arriving at your services — then click **Next**
+. Add a service filter: click **Add filter**, select **service.name**, and type `lab-webapp-{guid}`
+
+[IMPORTANT]
+====
+Type the full service name into the filter field — do not pick from the dropdown. The dropdown does not list every service in this shared instance, and `lab-webapp-{guid}` may not appear in it. Typing the complete name is what makes your service show up in the filter results.
+====
+
+. Confirm the preview shows your service: `lab-webapp-{guid}`
+. Name the Application Perspective:
 +
 [source, text, subs="attributes+"]
 ----
-{guid} Web App
+lab-webapp-{guid}
 ----
 +
-. For the scope, select your service: `lab-webapp-{guid}`
-. Save the Application Perspective
+. Click **Create** to save the Application Perspective
 
 image::instana_application_perspective.png[Application Perspective, link="_images/instana_application_perspective.png", window=blank]
 
 [IMPORTANT]
 ====
-Select only `lab-webapp-{guid}`. Every student's Flask service is visible in this shared instance, and an Application Perspective scoped too broadly will alert on other students' services as well as your own.
+Your filter must match only `lab-webapp-{guid}`. Every student's Flask service is visible in this shared instance, and an Application Perspective scoped too broadly will alert on other students' services as well as your own.
+====
+
+[IMPORTANT]
+====
+Name the Application Perspective exactly `lab-webapp-{guid}` — the same name as the service. Event-Driven Ansible identifies your environment by the `entityLabel` field of the alert payload, which is the Application Perspective name. The rulebook strips the `lab-webapp-` prefix from it to build the job template name, so any other name (for example `{guid} Web App`) produces a template name that does not exist and the automated restore will not launch.
 ====
 
 Allow a short time for the Application Perspective to populate with data before continuing.
 
 === Stage 2: Create the Smart Alert
 
-. Open your `{guid} Web App` Application Perspective
+. Open your `lab-webapp-{guid}` Application Perspective
 . Go to its **Smart Alerts** tab
-. Click to create a new Smart Alert
-. Switch the alert to **Advanced mode**
+. Click **Create Smart Alert**
+. Switch the alert to **Advanced mode** — the default Simple mode hides the threshold and time settings you need
 . Select **Throughput** as the alert type, then choose the **Calls** metric
+. In the time threshold settings, change the evaluation times to **1 minute** each, so the metric is evaluated in one minute windows
+. Set the **Grace period** to **1 minute**
 . Configure the condition:
 
 [cols="2,3", options="header"]
@@ -198,19 +212,27 @@ Allow a short time for the Application Perspective to populate with data before 
 | Metric
 | Calls
 
-| Condition
-| `< 1`, severity Critical
+| Threshold times
+| 1 minute each
 
-| Evaluation granularity
+| Grace period
 | 1 minute
+
+| Condition operator
+| `<`
+
+| Critical threshold
+| `< 1`
 
 | Alert Channel
 | `AIOps Automated Remediation - {guid}`
 |===
 
+The critical threshold of `< 1` is what arms the automation: as soon as calls fall below one per minute, the alert fires and the webhook goes out.
+
 image::instana_smart_alert_config.png[Smart Alert Configuration, link="_images/instana_smart_alert_config.png", window=blank]
 
-[start=7]
+[start=9]
 . Attach the alert channel `AIOps Automated Remediation - {guid}` that you created in Step 3
 . Review the configuration and save the alert
 
@@ -248,6 +270,12 @@ The import is scoped by the credentials Instana uses, which only have access to 
 
 Break the service and let Event-Driven Ansible repair it without you.
 
+=== Note your healthy baseline
+
+. In Instana, open **Services** -> `lab-webapp-{guid}`
+. Note the current **Calls** rate — a steady stream of requests from the traffic generator
+. This is what healthy looks like. You will compare against it after the outage and again after recovery
+
 === Break the service
 
 . In Ansible Automation Platform, navigate to **Automation Execution** -> **Templates**
@@ -255,9 +283,9 @@ Break the service and let Event-Driven Ansible repair it without you.
 . Click **Launch**
 . The template prompts for a **Limit**. Enter:
 +
-[source, text, subs="attributes+"]
+[source, text]
 ----
-{rhel_node2}
+node2
 ----
 +
 . Click **Launch** to confirm
@@ -269,26 +297,39 @@ image::aap_break_template.png[Break Template, link="_images/aap_break_template.p
 The limit is required. These templates run against the shared lab inventory, and the limit is what confines the play to your own application host. Launching without it targets more hosts than intended.
 ====
 
-The job stops `lab-webapp.service` on `{rhel_node2}`. The Flask application stops answering, and the traffic generator on the bastion starts failing its health checks.
+The job stops `lab-webapp.service` on `node2`. The Flask application stops answering, and the traffic generator on the bastion starts failing its health checks.
 
 === Watch the calls drop
 
 . Switch to Instana, open **Services** -> `lab-webapp-{guid}`
+. Compare the graph against the healthy baseline you noted at the start of this exercise
 . Watch the **Calls** metric fall to zero within a few seconds
 
 image::instana_calls_drop_graph.png[Calls Drop to Zero, link="_images/instana_calls_drop_graph.png", window=blank]
 
 === Wait for the Smart Alert to open
 
-Allow roughly one to two minutes. The Smart Alert uses a one minute evaluation granularity, so it waits for a full minute below threshold before firing. This is what prevents a brief hiccup from triggering automation.
+Allow roughly one to two minutes. The Smart Alert uses one minute evaluation windows, so it waits for a full minute below threshold before firing. This is what prevents a brief hiccup from triggering automation.
 
 When it fires, the incident appears in Instana with state **OPEN** and the text "Number of calls is anomalously low".
 
 image::instana_alert_open.png[Alert OPEN, link="_images/instana_alert_open.png", window=blank]
 
+[TIP]
+====
+**If the alert has not fired after four or five minutes**, do not keep waiting — this sometimes happens on the first attempt after a Smart Alert is created. Reset the cycle instead:
+
+. Launch `INSTANA | {guid} | Restore Web App Service - Fix anomalously low calls` from Ansible Automation Platform (with the limit `node2`) and let calls return
+. Wait one to two minutes for the **Calls** metric to register steady traffic again
+. Break the service a second time
+
+The alert reliably fires on this second attempt once the metric has a fresh baseline to drop from. Then continue with the steps below as normal.
+====
+
 === Confirm Event-Driven Ansible received the webhook
 
 . In Ansible Automation Platform, navigate to **Automation Decisions** -> **Rulebook Activations**
+. Find **Instana AIOps** in the list and check its **fire count** — it has incremented by 1 for the event that just matched
 . Open **Instana AIOps**
 . Open the **History** tab to see the received event and the rule that matched
 
@@ -304,13 +345,13 @@ image::aap_restore_job_auto_triggered.png[Auto-Triggered Restore Job, link="_ima
 [start=3]
 . Open the job and wait for it to finish
 
-The job starts `lab-webapp.service` on `{rhel_node2}` and verifies the health endpoint responds.
+The job starts `lab-webapp.service` on `node2` and verifies the health endpoint responds.
 
 === Confirm recovery in Instana
 
 . Return to Instana, **Services** -> `lab-webapp-{guid}`
 . The **Calls** metric climbs back to its normal level as the traffic generator succeeds again
-. After a minute or two above threshold, the incident closes automatically and the state becomes **CLOSED**
+. After a few minutes above threshold — the 1 minute grace period plus evaluation time — the incident closes automatically and the state becomes **CLOSED**
 
 image::instana_calls_restored.png[Calls Restored, link="_images/instana_calls_restored.png", window=blank]
 
@@ -346,7 +387,7 @@ Re-enable the **Instana AIOps** activation when you finish this exercise. Later 
 
 === Break the service again
 
-Repeat the break step from Exercise 1: launch `INSTANA | {guid} | Break Web App Service - Simulate low calls outage` with the limit `{rhel_node2}`.
+Repeat the break step from Exercise 1: launch `INSTANA | {guid} | Break Web App Service - Simulate low calls outage` with the limit `node2`.
 
 Wait for the Smart Alert to open in Instana as before. This time nothing repairs it, because the webhook has nowhere to go.
 
@@ -388,7 +429,7 @@ Since you cannot run the action from Instana here, restore the service from Ansi
 
 . In Ansible Automation Platform, navigate to **Automation Execution** -> **Templates**
 . Open `INSTANA | {guid} | Restore Web App Service - Fix anomalously low calls`
-. Click **Launch**, enter the limit `{rhel_node2}`, and confirm
+. Click **Launch**, enter the limit `node2`, and confirm
 . Wait for the job to complete, then return to Instana and confirm calls resume and the incident closes
 
 === Re-enable Path 1
@@ -444,7 +485,7 @@ Most organisations run both. The value of the Action Catalog is that the operato
 
 You have:
 
-* Reviewed the per-student job templates and seen how the `{guid}` prefix isolates each environment
+* Reviewed the job templates named for your `{guid}` and checked the launch limit for your application host
 * Created a generic webhook alert channel pointing at your rulebook activation
 * Created an Application Perspective and a Smart Alert scoped to your own service
 * Watched Event-Driven Ansible detect and repair an outage with no human involvement
