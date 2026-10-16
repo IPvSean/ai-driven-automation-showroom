@@ -416,16 +416,27 @@ image::instana_action_restore_details.png[Action Details, link="_images/instana_
 
 This is the same job template that Event-Driven Ansible launched for you in Exercise 1. Instana is not holding a copy of the automation. It holds a reference to your job template and calls the Ansible Automation Platform API to run it.
 
+=== Run the action from Instana
+
+You can execute the action directly from Instana — this is what a production operator would do at incident time, with the run attributed to them. Since every student environment publishes its actions to the same shared catalog, take care before you run anything.
+
+. Select `INSTANA | {guid} | Restore Web App Service - Fix anomalously low calls` and click **Run**
+. In the run prompt, type `node2` into the host limit field and **press Enter** so it becomes its own entry
+. Run the action and confirm the job starts in Ansible Automation Platform
+
 [IMPORTANT]
 ====
-**You cannot execute the action from Instana in this workshop.** The shared Instana instance used here is configured in a way that does not permit running actions from the UI. This is a limitation of the lab environment, not of the integration.
+**Only run actions that carry your own guid.** The shared Action Catalog contains the actions of every student environment — an `INSTANA | <other guid> | ...` action launches a job template in another student's environment. Check the name before you click **Run**.
+====
 
-In a production Instana deployment, this is exactly where the operator clicks **Run** and the remediation executes, with the run attributed to them. Everything up to that click is identical to what you are looking at now.
+[IMPORTANT]
+====
+**Press Enter after typing the host limit.** The limit only takes effect once it is committed as its own entry in the field. If you type `node2` and move on without pressing Enter, the limit is silently ignored and the job template runs on **all hosts** in the inventory — including other students' nodes.
 ====
 
 === Restore the service
 
-Since you cannot run the action from Instana here, restore the service from Ansible Automation Platform instead. This runs the same job template that the Instana action points at.
+If you would rather restore from Ansible Automation Platform, this runs the same job template that the Instana action points at.
 
 . In Ansible Automation Platform, navigate to **Automation Execution** -> **Templates**
 . Open `INSTANA | {guid} | Restore Web App Service - Fix anomalously low calls`
@@ -474,12 +485,28 @@ You saw the same remediation reached two different ways: once triggered by a rul
 
 | In this workshop
 | Fully functional
-| Recommendations are visible; execution is disabled on the shared instance
+| Fully functional — run it from Instana (watch the host limit) or from AAP
 |===
 
 Use Path 1 where the failure mode is understood and the fix is safe to apply unattended. Use Path 2 where the correct response depends on context a rule cannot capture, or where your change process requires a person to decide.
 
 Most organisations run both. The value of the Action Catalog is that the operator making the judgement call is handed a short, ranked list of validated automation instead of a blank terminal.
+
+== Taking It Further: AI-Driven Remediation
+
+In Path 1, Event-Driven Ansible remediated the incident directly: the rulebook matched the alert and launched one job template, pre-selected by you when you wrote the rule. The decision was made in advance.
+
+The next step is to let the automation itself choose the remediation. Your job templates are already in Ansible Automation Platform and your actions are already in the Instana catalog — so you can bake AI into the playbooks and build an **AI router and dispatch pattern**:
+
+- an **AI router** job receives the incident text and asks a large language model to pick the most likely remediation from your **complete automation catalog**, not from one hardcoded mapping
+- an **approval gate** pauses the workflow so a human reviews the AI's choice before anything executes
+- a **dispatcher** launches the approved job template against the affected host
+
+This lab already builds that pattern end to end for the cron failure mode in the **Autonomous AIOps: Self-Healing RHEL with Splunk** section: the `Cron-AIOps-Workflow` chains `ai_router` -> `approval_gate` -> `dispatch_fix`, and two different cron failures get two different fixes, automatically, with you approving the AI's choice in between.
+
+The same shape applies to the Instana incident from this section. The Smart Alert payload already carries what a router needs — the incident text, the affected entity in `entityLabel`, and even Instana's own remediation hint in `issue.suggestion`. Instead of the rulebook launching `Restore Web App Service` directly, an AI router could read that payload, rank your catalog (the six `INSTANA |` actions plus everything else you own), and propose a fix — with the approval gate making sure a human signs off before the automation runs.
+
+The dividing line to keep in mind: **rules for known failure modes, AI for everything else**. Path 1 is faster and fully predictable, but only covers what you wrote a rule for. The AI-routed pattern trades a little latency for coverage of incidents nobody anticipated — and the approval gate is what keeps it governed: every AI decision is reviewed, attributable, and auditable before it touches a host.
 
 == Summary
 
@@ -494,4 +521,4 @@ You have:
 
 The wider point: observability is not only about seeing problems. Once an observability platform can both describe an incident and reach your automation, detection and repair become one loop rather than two disconnected activities.
 
-In the sections that follow you will extend this pattern with AI-driven route selection, approval gates, and closed-loop verification.
+The AI router and dispatch pattern described in the previous section is not a slide — you build it hands-on in the **Autonomous AIOps: Self-Healing RHEL with Splunk** section, where the AI routes real cron failures to different fixes and you approve each decision before it runs.
