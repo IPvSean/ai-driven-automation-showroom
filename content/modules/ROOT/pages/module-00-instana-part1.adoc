@@ -278,7 +278,7 @@ Instana polls Ansible Automation Platform and imports the job templates it is al
 
 [NOTE]
 ====
-In this workshop you will see the recommendations Instana produces, but you will not be able to execute an action from the Instana UI. The shared lab instance does not permit it. Section 1.2 explains the constraint and has you run the same job template from Ansible Automation Platform instead.
+In this workshop you will run the action from the Instana UI yourself — Section 1.2 walks you through it, including two cautions that matter in a shared instance: run only actions carrying your own `{guid}`, and commit the host limit properly before running. If you would rather not run anything, Section 1.2 also shows how to restore from Ansible Automation Platform instead.
 ====
 
 === Comparing the paths
