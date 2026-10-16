@@ -143,7 +143,7 @@ The **Services** tab lists monitored applications and their performance metrics.
 
 ==== Exploring your service
 
-. Click **Services** in the left navigation menu
+. Click **Applications** in the left navigation menu, then click **Services**
 . Search for `{guid}` to filter the list down to your own service
 . Click `lab-webapp-{guid}` to open its details
 
