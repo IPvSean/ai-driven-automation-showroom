@@ -424,6 +424,8 @@ You can execute the action directly from Instana — this is what a production o
 . In the run prompt, type `node2` into the host limit field and **press Enter** so it becomes its own entry
 . Run the action and confirm the job starts in Ansible Automation Platform
 
+image::instana_action_run.png[Run action prompt with committed host limit, link="_images/instana_action_run.png", window=blank]
+
 [IMPORTANT]
 ====
 **Only run actions that carry your own guid.** The shared Action Catalog contains the actions of every student environment — an `INSTANA | <other guid> | ...` action launches a job template in another student's environment. Check the name before you click **Run**.
