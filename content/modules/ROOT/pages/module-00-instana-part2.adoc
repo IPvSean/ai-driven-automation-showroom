@@ -498,13 +498,9 @@ In Path 1, Event-Driven Ansible remediated the incident directly: the rulebook m
 
 The next step is to let the automation itself choose the remediation. Your job templates are already in Ansible Automation Platform and your actions are already in the Instana catalog — so you can bake AI into the playbooks and build an **AI router and dispatch pattern**:
 
-- an **AI router** job receives the incident text and asks a large language model to pick the most likely remediation from your **complete automation catalog**, not from one hardcoded mapping
+- an **AI router** job receives the Smart Alert payload and asks a large language model to pick the most likely remediation from your **complete automation catalog**, not from one hardcoded mapping — the payload already carries the incident text, the affected entity in `entityLabel`, and Instana's own remediation hint in `issue.suggestion`
 - an **approval gate** pauses the workflow so a human reviews the AI's choice before anything executes
 - a **dispatcher** launches the approved job template against the affected host
-
-This lab already builds that pattern end to end for the cron failure mode in the **Autonomous AIOps: Self-Healing RHEL with Splunk** section: the `Cron-AIOps-Workflow` chains `ai_router` -> `approval_gate` -> `dispatch_fix`, and two different cron failures get two different fixes, automatically, with you approving the AI's choice in between.
-
-The same shape applies to the Instana incident from this section. The Smart Alert payload already carries what a router needs — the incident text, the affected entity in `entityLabel`, and even Instana's own remediation hint in `issue.suggestion`. Instead of the rulebook launching `Restore Web App Service` directly, an AI router could read that payload, rank your catalog (the six `INSTANA |` actions plus everything else you own), and propose a fix — with the approval gate making sure a human signs off before the automation runs.
 
 The dividing line to keep in mind: **rules for known failure modes, AI for everything else**. Path 1 is faster and fully predictable, but only covers what you wrote a rule for. The AI-routed pattern trades a little latency for coverage of incidents nobody anticipated — and the approval gate is what keeps it governed: every AI decision is reviewed, attributable, and auditable before it touches a host.
 
@@ -521,4 +517,4 @@ You have:
 
 The wider point: observability is not only about seeing problems. Once an observability platform can both describe an incident and reach your automation, detection and repair become one loop rather than two disconnected activities.
 
-The AI router and dispatch pattern described in the previous section is not a slide — you build it hands-on in the **Autonomous AIOps: Self-Healing RHEL with Splunk** section, where the AI routes real cron failures to different fixes and you approve each decision before it runs.
+The AI router and dispatch pattern is the natural next step on that path: detection and repair become one loop, with AI choosing the fix and a human approving it before it runs.
