@@ -230,6 +230,17 @@ image::console-inventory-tags-filter.png[Filter systems by tag in console.redhat
 
 You can also verify registration from the AAP Jobs history. Look for the **Register with Red Hat Lightspeed** job that ran during provisioning.
 
+[IMPORTANT]
+====
+**Not seeing all three nodes?** Occasionally one node fails the Insights upload step even though `rhc connect` succeeded (a transient registration race). If you see fewer than three systems tagged with `group={guid}`:
+
+1. In AAP, go to **Templates** and open **Register with Red Hat Lightspeed**.
+2. Click **Launch**, targeting all three RHEL nodes (`node1`, `node2`, `node3`).
+3. Wait for the job to finish, then refresh the Inventory filter in console.redhat.com.
+
+The playbook is idempotent — re-run it as many times as needed. It re-connects via `rhc`, re-registers with Insights (with retries), and leaves Satellite package repos usable.
+====
+
 == Generating Remediation Playbooks
 
 You will work through **five exercises** in this section. The first generates a vulnerability report, and the remaining four each produce a remediation playbook:
